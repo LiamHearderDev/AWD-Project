@@ -1,9 +1,9 @@
+from app import application
 
-def init_intro_routes(app):
-    @app.route('/')
-    @app.route('/index')
-    def index():
-        return "Intro Page"
+@application.route('/')
+@application.route('/index')
+def index():
+    return "Intro Page"
 
 
 
