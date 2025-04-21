@@ -13,8 +13,13 @@ Notes:
     6. Commom mistakes,
     7. Ranking (leaderboard between friends + daily leaderboard),
        
-Basic roles
-- Ziying: Database stuff
-- Quan: Layout and UI/UX
-- Ryan: Core JavaScript functionality
-- Liam: Server stuff (and probably JS cause there'll be a lot)
+Working roles (HTML)
+- Ziying: Introduction
+- Quan: 
+- Ryan: Game
+- Liam: Authorisation/Login
+
+
+
+Sending stats
+- A "retrieve data" page, where the link has a userID as a parameter, which retrives the target's user's friends and checks if the current user is on that list. If so, send the data.
