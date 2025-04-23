@@ -6,6 +6,7 @@
         <title>SpeedLogger</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        {% block head %}{% endblock %}
     </head>
     <body>
         <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #d6d6d6;">

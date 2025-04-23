@@ -1,0 +1,13 @@
+
+.game-text {
+    font-size: 1.5em;
+    color: #333;
+    padding: 20px; 
+    margin: 20px; 
+    background-color: #f8f8f8;
+}
+.game-text:focus {
+    color: #007BFF;
+    cursor: pointer;
+}
+
