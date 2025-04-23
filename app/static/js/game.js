@@ -33,6 +33,8 @@ function setupGame(elementId, resultId, text = test) {
         }
     }
 
+    $screen.focus();
+
     startGame(elementId, resultId);
 }
 
@@ -72,7 +74,7 @@ function startGame(elementId, resultId) {
                 if ($word.length === 0) { // end of game if no more words
                     $('#' + elementId)
                         .off('keydown')
-                    stats.push(new statistic('seconds to complete', Math.floor((Date.now() - startTime) / 1000)));
+                    stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000)));
                     stats.push(new statistic('total mistakes', mistakes));
                     readResults(resultId, stats);
                     return;
@@ -107,6 +109,11 @@ function readResults(resultId, stats) {
             .text(stat.toString())
             .appendTo($list);
     }
+    $list.scrollIntoView({ 
+        behavior: 'smooth',  
+        block: 'center'       
+      });
+    $list.focus();
 }
 
     // Initialize the game when the DOM is fully loaded, change the text as needed
