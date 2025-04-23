@@ -7,6 +7,14 @@ const test3 = "Sunlight filtered through the high canopy of oak and maple, scatt
 const gameId = 'gameElement';
 const resultId = 'resultElement';
 
+function statistic(description, value) {
+    this.description = description;
+    this.value = value;
+    this.toString = function() {
+        return this.description + ': ' + this.value;
+    };
+}
+
 function setupGame(elementId, resultId, text = test) {
     // reset screen
     const $screen = $('#' + elementId).empty();
@@ -37,6 +45,8 @@ function startGame(elementId, resultId) {
     let start = true;
     let startTime = 0;
 
+    stats = []
+
     $('#' + elementId).on('keydown', function (e) {
         const key = e.key;
         if ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,'".includes(key)) {
@@ -62,10 +72,9 @@ function startGame(elementId, resultId) {
                 if ($word.length === 0) { // end of game if no more words
                     $('#' + elementId)
                         .off('keydown')
-                    $('#' + resultId)
-                        .css('display', 'block')
-                        .text('You finished in ' + ((Date.now() - startTime) / 1000).toFixed(2) 
-                                + ' seconds with ' + mistakes + ' recorded mistakes.');
+                    stats.push(new statistic('seconds to complete', Math.floor((Date.now() - startTime) / 1000)));
+                    stats.push(new statistic('total mistakes', mistakes));
+                    readResults(resultId, stats);
                     return;
                 }
                 $letter = $word.children().eq(0);
@@ -88,8 +97,20 @@ function startGame(elementId, resultId) {
     });
   }
 
+function readResults(resultId, stats) {
+    const $result = $('#' + resultId).empty();
+    $result.css('display', 'block');
+    const $list = $('<ul></ul>').appendTo($result);
+    for (let i = 0; i < stats.length; i++) {
+        const stat = stats[i];
+        $('<li></li>')
+            .text(stat.toString())
+            .appendTo($list);
+    }
+}
+
     // Initialize the game when the DOM is fully loaded, change the text as needed
   document.addEventListener('DOMContentLoaded', function() {
-    setupGame(gameId, resultId, test2);
+    setupGame(gameId, resultId, test);
   });
  
