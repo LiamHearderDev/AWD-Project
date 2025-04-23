@@ -5,8 +5,9 @@ const test2 = "Golden autumn leaves drift across the silent pond's surface, each
 const test3 = "Sunlight filtered through the high canopy of oak and maple, scattering golden patterns across the forest floor. A gentle breeze carried the scent of damp earth and wildflowers, while distant birdsong wove a delicate soundtrack through the trees. Beneath a fallen log, a family of salamanders stirred among the moss and decaying leaves, their slick bodies glinting in the dappled light. Nearby, a solitary mushroom unfurled its cap, releasing spores into the air like tiny drifting lanterns. Somewhere overhead, a squirrel chattered as it leapt from branch to branch in search of acorns. In this quiet woodland glade, time seemed to slow, inviting any wanderer to pause, breathe deeply, and marvel at nature’s subtle choreography.";
 
 const gameId = 'gameElement';
+const resultId = 'resultElement';
 
-function setupGame(elementId, text = test) {
+function setupGame(elementId, resultId, text = test) {
     // reset screen
     const $screen = $('#' + elementId).empty();
     $screen.off('keydown');
@@ -24,10 +25,10 @@ function setupGame(elementId, text = test) {
         }
     }
 
-    startGame(elementId);
+    startGame(elementId, resultId);
 }
 
-function startGame(elementId) {
+function startGame(elementId, resultId) {
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
     let index = 0;
@@ -44,9 +45,15 @@ function startGame(elementId) {
                 start = false;
             }
             if (key === $letter.text()) { // colour inputs accordingly
-                $letter.css('color', 'green');
+                if ($letter.hasClass('wrong-char')) {
+                    $letter.removeClass('wrong-char');
+                }
+                $letter.addClass('right-char');
             } else {
-                $letter.css('color', 'red');
+                if ($letter.hasClass('right-char')) {
+                    $letter.removeClass('right-char');
+                }
+                $letter.addClass('wrong-char');
                 mistakes += 1;
             }
             $letter = $letter.next();
@@ -55,7 +62,8 @@ function startGame(elementId) {
                 if ($word.length === 0) { // end of game if no more words
                     $('#' + elementId)
                         .off('keydown')
-                        .empty()
+                    $('#' + resultId)
+                        .css('display', 'block')
                         .text('You finished in ' + ((Date.now() - startTime) / 1000).toFixed(2) 
                                 + ' seconds with ' + mistakes + ' mistakes.');
                     return;
@@ -69,13 +77,18 @@ function startGame(elementId) {
                 $word = $word.prev();
                 $letter = $word.children().last();
             }
-            $letter.css('color', 'black');
+            if ($letter.hasClass('right-char')) {
+                $letter.removeClass('right-char');
+            }
+            if ($letter.hasClass('wrong-char')) {
+                $letter.removeClass('wrong-char');
+            }
             index -= 1;
         }
     });
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    setupGame(gameId, test2);
+    setupGame(gameId, resultId, test);
   });
  

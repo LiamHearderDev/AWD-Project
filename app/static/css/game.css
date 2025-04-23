@@ -7,6 +7,16 @@
     background-color: #f8f8f8;
 }
 .game-text:focus {
-    color: #007BFF;
+    color: black;
+}
+
+.right-char {
+    background-color: lightgreen;
+    font-weight: bold;
+}
+
+.wrong-char {
+    background-color: salmon;
+    font-weight: bold;
 }
 
