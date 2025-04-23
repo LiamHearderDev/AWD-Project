@@ -1,5 +1,11 @@
 const test = "beans on toast";
 
+const test2 = "Golden autumn leaves drift across the silent pond's surface, each ripple catching amber light as a lone heron glides overhead.";
+
+const test3 = "Sunlight filtered through the high canopy of oak and maple, scattering golden patterns across the forest floor. A gentle breeze carried the scent of damp earth and wildflowers, while distant birdsong wove a delicate soundtrack through the trees. Beneath a fallen log, a family of salamanders stirred among the moss and decaying leaves, their slick bodies glinting in the dappled light. Nearby, a solitary mushroom unfurled its cap, releasing spores into the air like tiny drifting lanterns. Somewhere overhead, a squirrel chattered as it leapt from branch to branch in search of acorns. In this quiet woodland glade, time seemed to slow, inviting any wanderer to pause, breathe deeply, and marvel at nature’s subtle choreography.";
+
+const gameId = 'gameElement';
+
 function setupGame(elementId, text = test) {
     // reset screen
     const $screen = $('#' + elementId).empty();
@@ -10,7 +16,7 @@ function setupGame(elementId, text = test) {
     for (let i = 0; i < text.length; i++) {
         const ch = text[i];
         $('<span></span>') // add character to word
-        .text(ch === ' ' ? '\u00A0' : ch)
+        .text(ch)
         .appendTo($current_word);
 
         if (ch === ' ') { // make new word
@@ -32,7 +38,7 @@ function startGame(elementId) {
 
     $('#' + elementId).on('keydown', function (e) {
         const key = e.key;
-        if ("abcdefghijklmnopqrstuvwxyz ".includes(key)) {
+        if ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,'".includes(key)) {
             if (start) { // start timer on first valid input
                 startTime = Date.now();
                 start = false;
@@ -69,4 +75,7 @@ function startGame(elementId) {
     });
   }
 
+  document.addEventListener('DOMContentLoaded', function() {
+    setupGame(gameId, test2);
+  });
  

@@ -2,12 +2,13 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 
 {% endblock %}
 
 {% block content %}
-    <p class="game-text">
+    <p class="game-text" id="gameElement" tabindex="0">
         This is the Game page.
     </p>
 {% endblock %}
