@@ -44,7 +44,7 @@ function startGame(elementId, resultId) {
                 startTime = Date.now();
                 start = false;
             }
-            if (key === $letter.text()) { // colour inputs accordingly
+            if (key === $letter.text()) { // style inputs accordingly with classes
                 if ($letter.hasClass('wrong-char')) {
                     $letter.removeClass('wrong-char');
                 }
@@ -65,7 +65,7 @@ function startGame(elementId, resultId) {
                     $('#' + resultId)
                         .css('display', 'block')
                         .text('You finished in ' + ((Date.now() - startTime) / 1000).toFixed(2) 
-                                + ' seconds with ' + mistakes + ' mistakes.');
+                                + ' seconds with ' + mistakes + ' recorded mistakes.');
                     return;
                 }
                 $letter = $word.children().eq(0);
@@ -88,7 +88,8 @@ function startGame(elementId, resultId) {
     });
   }
 
+    // Initialize the game when the DOM is fully loaded, change the text as needed
   document.addEventListener('DOMContentLoaded', function() {
-    setupGame(gameId, resultId, test);
+    setupGame(gameId, resultId, test2);
   });
  
