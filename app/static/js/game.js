@@ -32,6 +32,8 @@ function callGame() {
 }
 
 function setupGame(elementId, resultId, timerId, text) {
+    // adds words to game element
+
     const $screen = $('#' + elementId).empty();
     $screen.off('keydown');
 
@@ -54,6 +56,8 @@ function setupGame(elementId, resultId, timerId, text) {
 }
 
 function startGame(elementId, resultId, timerId) {
+    // starts game logic
+
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
     let index = 0;
