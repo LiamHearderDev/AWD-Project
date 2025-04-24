@@ -14,10 +14,10 @@ Notes:
     7. Ranking (leaderboard between friends + daily leaderboard),
        
 Working roles (HTML)
-- Ziying: Introduction
-- Quan: 
-- Ryan: Game
-- Liam: Authorisation/Login
+- Ziying: Intro / About
+- Quan: Stats/Shared Stats
+- Ryan: Game / Result
+- Liam: Authorisation / Login
 
 
 

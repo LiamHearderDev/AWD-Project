@@ -1,7 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p>
-        This is the Login page.
-    </p>
+    <!-- This adds the script used for logging in -->
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+    <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
+        <form id="login_form" class="container-xxl">
+            <div id="login-title">
+                <h1> Sign in </h1>
+            </div> <br>
+            <div id="form_username" class="login_field">
+                <label for="login_input_username">
+                    Username
+                </label> <br>
+                <div>
+                    <input type="text" name="username" id="login_input_username" required placeholder="your-username">
+                </div>
+            </div>
+            <br>
+            <div id="form_password" class="login_field">
+                <label for="login_input_password">
+                    Password
+                </label> <br>
+                <div>
+                    <input type="password" name="password" id="login_input_password" required placeholder="******">
+                </div>
+            </div> <br>
+            <div class="login_field_submit">
+                <input type="submit" id="login_input_submit" value="Sign in" method="POST"> <!-- CHANGE THIS TO POST BEFORE PRODUCTION -->
+            </div>
+        </form>
+    </section>
 {% endblock %}
+
+
+<!--             
+            div
+                label
+                input-wrapper
+                Invalid-text
+ -->
