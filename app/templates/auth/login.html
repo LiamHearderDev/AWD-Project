@@ -1,25 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin: 100px;">
+    <!-- This adds the script used for logging in -->
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 
-        <div id="login-title">
-            <h1> Sign in </h1>
-        </div> <br>
-        
-        <form style="margin: 0;">
-            <div style="border: 1px solid black; padding: 10px;">
-                <label for="user-name" style="position: absolute; margin: 0;">
+    <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
+        <form id="login_form" class="container-xxl">
+            <div id="login-title">
+                <h1> Sign in </h1>
+            </div> <br>
+            <div id="form_username" class="login_field">
+                <label for="login_input_username">
                     Username
-                </label>
+                </label> <br>
                 <div>
-                    <input type="text" id="user-name" style="border-width: 0; min-height: 50px; min-width: 300px;">
+                    <input type="text" name="username" id="login_input_username" required placeholder="your-username">
                 </div>
-                <div aria-hidden="true" hidden="true">
-                    <p>
-                        WRONG! YOU GOT IT WRONG!
-                    </p>
+            </div>
+            <br>
+            <div id="form_password" class="login_field">
+                <label for="login_input_password">
+                    Password
+                </label> <br>
+                <div>
+                    <input type="password" name="password" id="login_input_password" required placeholder="******">
                 </div>
+            </div> <br>
+            <div class="login_field_submit">
+                <input type="submit" id="login_input_submit" value="Sign in" method="POST"> <!-- CHANGE THIS TO POST BEFORE PRODUCTION -->
             </div>
         </form>
     </section>
