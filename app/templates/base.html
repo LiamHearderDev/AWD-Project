@@ -13,16 +13,23 @@
                 <border style="margin: 0; border-radius: 50%; border: 2px solid black; background-color: black; height: 75px; width: 75px; margin-right: 15px;"></border>
                 <h1 style="margin: 0; font-size: xx-large;">SpeedLogger</h1>
             </div>
-            <nav style="position: absolute; right: 0%;">
+            <nav style="position: absolute; left: 2%;">
                 <a style="padding: 10px;" href="{{ url_for('intro') }}">Home</a>
                 <a style="padding: 10px;" href="{{ url_for('game') }}">Game</a>
                 <a style="padding: 10px;" href="{{ url_for('stats') }}">Stats</a>
                 <a style="padding: 10px;" href="{{ url_for('leaderboard') }}">Leaderboard</a>
+            </nav>
+            <nav style="position: absolute; right: 2%;">
                 <a style="padding: 10px;" href="{{ url_for('login') }}">Login</a>
+                <!-- need to add Sign Up -->
             </nav>
         </border>
-        <main>
-            {% block content %}{% endblock %}
-        </main>
+        <main class="container" style="padding-top: 4%;">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                {% block content %}{% endblock %}
+              </div>
+            </div>
+          </main>
     </body>
 </html>
