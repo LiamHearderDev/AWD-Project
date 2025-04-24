@@ -37,3 +37,18 @@ form label {
     margin: 0; 
     color: var(--base-colour-3)
 }
+
+/* makes it so that footer always appears at bottom using flex */
+html, body {
+    height: 100%;               
+}
+body {
+    display: flex;              
+    flex-direction: column;     
+}
+main {
+    flex: 1 0 auto;             
+}
+footer {
+flex-shrink: 0;             
+}
