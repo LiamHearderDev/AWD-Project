@@ -10,6 +10,47 @@
     color: black;
 }
 
+.game-timer {
+    display: block;           
+    width: fit-content;       
+    margin: 0 auto;           
+    
+    padding: 0.25em 0.5em;
+    font-size: 2em;
+    text-align: center;
+    background-color: #f8f8f8;
+    border-radius: 12px;
+    border: 2px solid #ccc;
+}
+
+.start-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.start {
+    display: flex;
+    justify-content: center;         
+    align-items: center;             
+    width: 6em;
+    height: 6em;
+    border: none;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background-color 0.2s;
+}
+.game-start:hover {
+    background-color: #45a049;
+}
+.game-start:active {
+    background-color: #3e8e41;
+}
+
 .right-char {
     background-color: lightgreen;
 }

@@ -8,10 +8,16 @@
 {% endblock %}
 
 {% block content %}
-    <p class="game-text" id="gameElement" tabindex="0">
-        <!-- Script replaces text in here with text to be typed for game. -->
-        This is the Game page.
-    </p>
+    <div class="start-wrapper">
+        <button class="start" id="startButton" onclick="callGame()">Start Game</button>
+    </div>
+    <div id="gameContainer" style="display: none;">
+        <p class="game-timer" id="timerElement"> 0.00 s</p>
+        <p class="game-text" id="gameElement" tabindex="0">
+            <!-- Script replaces text in here with text to be typed for game. -->
+            This is the Game page.
+        </p>
+    </div>
     <p class="game-text" id="resultElement" style="display: none;">
         <!-- This is where the game result will be displayed. -->
     </p>

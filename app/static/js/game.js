@@ -6,6 +6,9 @@ const test3 = "Sunlight filtered through the high canopy of oak and maple, scatt
 
 const gameId = 'gameElement';
 const resultId = 'resultElement';
+const timerId = 'timerElement';
+const buttonId = 'startButton';
+const gameContainerId = 'gameContainer';
 
 function statistic(description, value) {
     this.description = description;
@@ -15,8 +18,20 @@ function statistic(description, value) {
     };
 }
 
-function setupGame(elementId, resultId, text = test) {
-    // reset screen
+function updateTimerDisplay(timerId, startTime) {
+    const elapsed = (Date.now() - startTime) / 1000;
+    $('#'+timerId).text(elapsed.toFixed(2) + ' s');
+}
+
+function callGame() {
+    const $button = $('#' + buttonId);
+    const $game = $('#' + gameContainerId);
+    $button.css('display', 'none');
+    $game.css('display', 'block');
+    setupGame(gameId, resultId, timerId, test);
+}
+
+function setupGame(elementId, resultId, timerId, text) {
     const $screen = $('#' + elementId).empty();
     $screen.off('keydown');
 
@@ -35,13 +50,14 @@ function setupGame(elementId, resultId, text = test) {
 
     $screen.focus();
 
-    startGame(elementId, resultId);
+    startGame(elementId, resultId, timerId);
 }
 
-function startGame(elementId, resultId) {
+function startGame(elementId, resultId, timerId) {
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
     let index = 0;
+    let totalMistakes = 0;
     let mistakes = 0;
 
     let start = true;
@@ -55,6 +71,7 @@ function startGame(elementId, resultId) {
             if (start) { // start timer on first valid input
                 startTime = Date.now();
                 start = false;
+                interval = setInterval(() => updateTimerDisplay(timerId, startTime), 10);
             }
             if (key === $letter.text()) { // style inputs accordingly with classes
                 if ($letter.hasClass('wrong-char')) {
@@ -66,16 +83,19 @@ function startGame(elementId, resultId) {
                     $letter.removeClass('right-char');
                 }
                 $letter.addClass('wrong-char');
+                totalMistakes += 1;
                 mistakes += 1;
             }
             $letter = $letter.next();
             if ($letter.length === 0) { // move to next word
                 $word = $word.next();
                 if ($word.length === 0) { // end of game if no more words
+                    clearInterval(interval);
                     $('#' + elementId)
                         .off('keydown')
                     stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000)));
-                    stats.push(new statistic('total mistakes', mistakes));
+                    stats.push(new statistic('finished mistakes', mistakes));
+                    stats.push(new statistic('total mistakes', totalMistakes));
                     readResults(resultId, stats);
                     return;
                 }
@@ -93,6 +113,7 @@ function startGame(elementId, resultId) {
             }
             if ($letter.hasClass('wrong-char')) {
                 $letter.removeClass('wrong-char');
+                mistakes -= 1;
             }
             index -= 1;
         }
@@ -116,8 +137,4 @@ function readResults(resultId, stats) {
     $list.focus();
 }
 
-    // Initialize the game when the DOM is fully loaded, change the text as needed
-  document.addEventListener('DOMContentLoaded', function() {
-    setupGame(gameId, resultId, test);
-  });
  
