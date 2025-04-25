@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+
+{% endblock %}
+
 {% block content %}
-    <p>
-        This is the Game page.
+    <div class="start-wrapper">
+        <button class="start" id="startButton" onclick="callGame()">Start Game</button>
+    </div>
+    <div id="gameContainer" style="display: none;">
+        <p class="game-timer" id="timerElement"> 0.00 s</p>
+        <p class="game-text" id="gameElement" tabindex="0">
+            <!-- Script replaces text in here with text to be typed for game. -->
+            This is the Game page.
+        </p>
+    </div>
+    <p class="game-text" id="resultElement" style="display: none;">
+        <!-- This is where the game result will be displayed. -->
     </p>
 {% endblock %}
