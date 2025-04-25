@@ -52,3 +52,8 @@ main {
 footer {
     flex-shrink: 0;             
 }
+
+#header {
+    flex-shrink: 0;
+  }
+  
