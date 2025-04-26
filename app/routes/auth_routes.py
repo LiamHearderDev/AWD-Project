@@ -9,5 +9,5 @@ def login():
 @application.route('/register', methods=['GET', 'POST'])
 def register():
     # Handle registration logic here
-    return "Register Page"
+    return render_template('auth/register.html')
 

@@ -1,7 +1,47 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- This adds the script used for logging in -->
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
-    <p>
-        This is the Register page.
-    </p>
+    <section id="register_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
+        <form id="register_form" class="container-lg">
+            <div id="register-title">
+                <h1>Create Account</h1>
+            </div> <br>
+            <div id="form_username" name="input_field" class="login_field">
+                <label for="register_input_username">
+                    Username
+                </label> <br>
+                <div>
+                    <input type="text" name="username" id="register_input_username" required placeholder="Enter your username">
+                </div>
+            </div> <br>
+            <div id="form_password" name="input_field" class="login_field">
+                <label for="register_input_password">
+                    Password
+                </label> <br>
+                <div>
+                    <input type="password" name="password" id="register_input_password" required placeholder="******">
+                </div>
+            </div> <br>
+            <div id="form_password_resubmit" name="input_field" class="login_field">
+                <label for="register_input_password_resubmit">
+                    Re-submit Password
+                </label> <br>
+                <div>
+                    <input type="password" name="password_resubmit" id="register_input_password_resubmit" required placeholder="******">
+                </div>
+            </div> <br>
+            <div class="login_field_submit" name="input_field">
+                <input type="submit" id="register_input_submit" class="login_input_submit" value="Create Account" style="display: block;" method="POST">
+            </div>
+            <div class="login_field_submit" id="register_success" style="display: none;">
+                <button id="register_success_button" style="margin: 0; text-align: center; color: black; padding: 15px; border: 0; width: 100%; background-color: var(--base-colour-0);">Success! Click here to Login!</button>
+            </div>
+        </form> <br>
+    </section>
 {% endblock %}
