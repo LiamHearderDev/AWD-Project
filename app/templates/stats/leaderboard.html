@@ -1,7 +1,94 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p>
-        This is the Leaderboard page.
-    </p>
+<style>
+    th, td {
+        color: var(--base-colour-1);
+        text-align: center;
+        padding: 25px 28px; 
+        font-size: 18px; 
+    }
+
+    .leaderboard-title {
+        text-align: center; 
+        font-size: 40px; 
+        font-weight: bold;
+        color: var(--base-colour-1);
+        margin-bottom: 40px;
+
+    }
+
+    .leaderboard-table {
+        width: 80%; 
+        margin: 0 auto;
+        border-collapse: collapse;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .leaderboard-container {
+        padding-top: 30px;
+        padding-bottom: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+    thead th {
+        background-color: var(--base-colour-2);
+    }
+    tbody tr:nth-child(even) {
+        background-color: #f7f7f7;
+    }
+    
+</style>
+
+
+<section class="leaderboard-container">
+    <h2 class="leaderboard-title">Leaderboard</h2>
+    <!-- can add a selector here -->
+    <table class="leaderboard-table">
+        <thead>
+            <tr style="background-color: var(--base-colour-2);">
+                <th style="padding: 18px">Rank</th>
+                <th style="padding: 18px">Username</th>
+                <th style="padding: 18px">Score(WPM)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color: #DCDCDC;">
+                <td>1</td><td>Apple</td><td>95</td>
+            </tr>
+            <tr>
+                <td>2</td><td>HuluDuck</td><td>93</td>
+            </tr>
+            <tr style="background-color: #DCDCDC;">
+                <td>3</td><td>Cat</td><td>92</td>
+            </tr>
+            <tr>
+                <td>4</td><td>Doggy</td><td>91</td>
+            </tr>
+            <tr style="background-color: #DCDCDC;">
+                <td>5</td><td>Elephant</td><td>90</td>
+            </tr>
+            <tr>
+                <td>6</td><td>Coconut</td><td>88</td>
+            </tr>
+            <tr style="background-color: #DCDCDC;">
+                <td>7</td><td>Jummping_monkey</td><td>86</td>
+            </tr>
+            <tr>
+                <td>8</td><td>BlackCat</td><td>84</td>
+            </tr>
+            <tr style="background-color: #DCDCDC;">
+                <td>9</td><td>Gold_star</td><td>83</td>
+            </tr>
+            <tr>
+                <td>10</td><td>D</td><td>80</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
 {% endblock %}
