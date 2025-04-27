@@ -3,32 +3,15 @@ const shouldPost = false; // This is a placeholder for when we have a backend to
 
 /* This handles the submit button's OnClick event.
 This should check if the information being used to login to the website is valid and it should then direct the user to the home page using Flask. */
-function handleSubmit(event){
+function handleLoginSubmit(event){
     event.preventDefault();
     const username = document.getElementById("login_input_username").value;
     const password = document.getElementById("login_input_password").value;
 
     const status = validateLoginInfo(username, password);
+    
     if (status < 0) {
-        switch (status) {
-            case -1:
-                alert("Username and Password must be strings.");
-                break;
-            case -2:
-                alert("Username and Password must not be empty.");
-                break;
-            case -3:
-                alert("Username must be at least 5 characters long.");
-                break;
-            case -4:
-                alert("Password must be at least 8 characters long.");
-                break;
-            case -5:
-                alert("Password must include a special character.");
-                break;
-            default:
-                alert("Unknown error occurred. Please reload the page and try again.");
-        }
+        displayLoginErrors(status)
     }
     else {
         // If the login info is valid, submit the form
@@ -47,7 +30,8 @@ function handleSubmit(event){
             .then((response) => {
                 if (response.ok) {
                     // If the response is ok, redirect to the game
-                    window.location.href = "/game";
+                    document.cookie = "username=" + username + ";" + "path=/";
+                    window.location.href = "/intro";                        // TO-DO: Make sure the user is logged in first. Should use cookies to do that.
                 } else {
                     // If the response is not ok, show an error message
                     alert("Login failed. Please check your username and password.");
@@ -55,12 +39,74 @@ function handleSubmit(event){
             })
         }
         else {
-            window.location.href = "/game";
+            document.cookie = "username=" + username + ";" + "path=/";
+            window.location.href = "/intro";
         }
     }
 }
 
+// This handles submission of account registry.
+function handleRegistrySubmit(event) {
+    event.preventDefault();
+    const username = document.getElementById("register_input_username").value;
+    const password = document.getElementById("register_input_password").value;
+    const passwordResubmit = document.getElementById("register_input_password_resubmit").value;
 
+    // Check if the two passwords match
+    if (password !== passwordResubmit) { 
+        alert("Passwords do not match.");
+        return;
+    }
+
+    // Check if the provided username and password are valid
+    const status = validateLoginInfo(username, password);
+
+    // Displays errors if there are any
+    if (status < 0) {
+        displayLoginErrors(status)
+    }
+    else {
+        // If the registration info is valid, submit the form
+        if (shouldPost == true){ // This will be false until we have a backend to send the data to.
+            fetch("/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+
+            .then((response) => {
+                if (response.ok) {
+                    // If the response is ok, inform the user they can now login
+                    const $loginSubmit = document.getElementById("register_input_submit");
+                    if ($loginSubmit != null) { $loginSubmit.style.display = "none"; }
+                    const $registrySuccess = document.getElementById("register_success");
+                    if ($registrySuccess != null) { $registrySuccess.style.display = "block"; }
+
+                } else {
+                    // If the response is not ok, show an error message
+                    alert("Registration failed. Please try again later.");
+                }
+            })
+        }
+        else {
+
+            const $inputFields = document.getElementsByName("input_field");
+            for (let i = 0; i < $inputFields.length; i++){
+                if ($inputFields[i] != null) { $inputFields[i].style.display = "none"; }
+            }
+
+            const $registrySuccess = document.getElementById("register_success");
+            if ($registrySuccess != null) { $registrySuccess.style.display = "block"; }
+
+            // window.location.href = "/login";
+        }
+    }
+}
 
 
 /* It checks if a string includes any of the provided substrings.
@@ -104,8 +150,54 @@ function validateLoginInfo(username, password){
 }
 
 
+// Used to display any issues with provided login info. 
+function displayLoginErrors(loginStatus) {
+    if (loginStatus < 0) {
+        switch (loginStatus) {
+            case -1:
+                alert("Username and Password must be strings.");
+                break;
+            case -2:
+                alert("Username and Password must not be empty.");
+                break;
+            case -3:
+                alert("Username must be at least 5 characters long.");
+                break;
+            case -4:
+                alert("Password must be at least 8 characters long.");
+                break;
+            case -5:
+                alert("Password must include a special character.");
+                break;
+            default:
+                alert("Unknown error occurred. Please reload the page and try again.");
+        }
+        return 1;
+    }
+    return 0;
+}
+
+
 // Once the page has loaded, this executes
 window.onload = () => {
-    document.getElementById("login_form").addEventListener("submit", handleSubmit);
-    console.log("yep, its working");
+
+    // This code should only execute on the login and registry pages.
+
+    // If there is a form called "login_form" then this is the login page.
+    const $loginForm = document.getElementById("login_form");
+    if ($loginForm != null) { 
+        $loginForm.addEventListener("submit", handleLoginSubmit);
+    }
+
+    const $registryForm = document.getElementById("register_form");
+    if ($registryForm != null) {
+        $registryForm.addEventListener("submit", handleRegistrySubmit);
+    }
+
+    const $registrySuccessButton = document.getElementById("register_success_button");
+    if ($registrySuccessButton != null) {
+        $registrySuccessButton.onclick = () => {
+            window.location.href = "/login";
+        }
+    }
 }

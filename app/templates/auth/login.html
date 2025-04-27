@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block head %}
     <!-- This adds the script used for logging in -->
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
 
+{% block content %}
     <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
-        <form id="login_form" class="container-xxl">
+        <form id="login_form" class="container-lg">
             <div id="login-title">
                 <h1> Sign in </h1>
             </div> <br>
@@ -16,8 +19,7 @@
                 <div>
                     <input type="text" name="username" id="login_input_username" required placeholder="your-username">
                 </div>
-            </div>
-            <br>
+            </div> <br>
             <div id="form_password" class="login_field">
                 <label for="login_input_password">
                     Password
@@ -27,9 +29,13 @@
                 </div>
             </div> <br>
             <div class="login_field_submit">
-                <input type="submit" id="login_input_submit" value="Sign in" method="POST"> <!-- CHANGE THIS TO POST BEFORE PRODUCTION -->
+                <input type="submit" id="login_input_submit" class="login_input_submit" value="Sign in" method="POST">
             </div>
-        </form>
+        </form> <br>
+    </section>
+    <section id="register_section" style="display: grid; align-items: center; justify-content: center;">
+        <p> Don't have an account? </p>
+        <a href="{{ url_for('register') }}">Register here!</a>
     </section>
 {% endblock %}
 
