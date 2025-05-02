@@ -13,6 +13,14 @@ const gameContainerId = 'gameContainer';
 function statistic(description, value) {
     this.description = description;
     this.value = value;
+
+    this.toJSON = function() {
+        return {
+            description: this.description,
+            value: this.value
+        };
+    };
+
     this.toString = function() {
         if (this.value && typeof this.value === 'object' && !Array.isArray(this.value)) {
             const formatted = Object.entries(this.value)
@@ -23,6 +31,7 @@ function statistic(description, value) {
         return `${this.description}: ${this.value}`;
     };
 }
+
 
 function updateTimerDisplay(timerId, startTime) {
     const elapsed = (Date.now() - startTime) / 1000;
@@ -127,6 +136,7 @@ function startGame(elementId, resultId, timerId, text) {
                     stats.push(new statistic('wrong characters', wrong_char_dict));
                     stats.push(new statistic('wrong words', wrong_word_dict));
                     readResults(resultId, stats);
+                    //sendData(stats);
                     return;
                 }
                 else if ($word.next().length != 0) { // not end of game, move to next word
@@ -206,5 +216,20 @@ function incrementDict(dict, key) {
     } else {
         dict[key] = 1;
     }
+}
+
+function sendData(statistics) {
+    $.ajax({
+        type: 'POST',
+        url: '/save_statistics',
+        data: JSON.stringify(statistics),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log('Data sent successfully:', response);
+        },
+        error: function(error) {
+            console.error('Error sending data:', error);
+        }
+    });
 }
  
