@@ -5,8 +5,6 @@ from app.config import Config
 from flask_login import LoginManager
 
 
-
-
 application = Flask(__name__)
 application.config.from_object(Config)
 application.config['SECRET_KEY'] = 'you-will-never-guess'

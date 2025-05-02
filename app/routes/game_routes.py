@@ -2,7 +2,7 @@ from flask import request, jsonify, render_template
 from app import db, application
 from app.models import TypingResult, Paragraph
 from flask_login import current_user, login_required
-from datetime import datetime, timezone
+from datetime import datetime
 import json
 from sqlalchemy.sql.expression import func # SQLite function that returns a random row
 
@@ -14,8 +14,7 @@ def game():
 
 @application.route('/random-paragraph', methods=['GET'])
 def random_paragraph():
-    # pick one row at random
-    p = Paragraph.query.order_by(func.random()).first()
+    p = Paragraph.query.order_by(func.random()).first() # pick a row at random
     if p is None:
         return jsonify({'error': 'no paragraphs available'}), 404
 
@@ -23,7 +22,7 @@ def random_paragraph():
         'paragraph_id': p.paragraph_id,
         'body':         p.body,
         'type':         p.type
-    })
+    }) # return the paragraph as JSON
 
 
 @application.route('/submit-instance-statistics', methods=['POST'])
@@ -44,10 +43,10 @@ def submit_results():
         correct_words       = json.dumps(data.get('correct words', {})),
         total_mistakes      = data.get('total mistakes', 0),
         mistake_characters  = json.dumps(data.get('wrong characters', {})),
-        timestamp           = datetime.now(timezone.utc)
+        timestamp           = datetime.now()
     )
 
-    db.session.add(result)
+    db.session.add(result) # add to database
     db.session.commit()
 
     return jsonify({'status': 'saved', 'result_id': result.result_id})
