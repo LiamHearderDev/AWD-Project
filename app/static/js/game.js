@@ -35,7 +35,7 @@ function updateTimerDisplay(timerId, startTime) {
 }
 
 function callGame() {
-    $.getJSON('/random‑paragraph')
+    $.getJSON('/random-paragraph')
       .done(para => {
         $('#' + buttonId).hide();
         $('#' + gameContainerId).show();
@@ -142,7 +142,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     stats.push(new statistic('paragraph id', paragraphId));
                     readResults(resultId, stats);
                     if (paragraphId !== -1) {
-                        //sendData(stats);
+                        sendData(stats);
                     }
                     return;
                 }
