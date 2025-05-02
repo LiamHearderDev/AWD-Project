@@ -1,7 +1,14 @@
+# Database imports
 from app import db
 from sqlalchemy.types import JSON
 
+# Login imports
+from app import login
+from werkzeug.security import generate_password_hash, check_password_hash
+
 class User(db.Model):
+
+    # The fields of the user table in the database
     __tablename__ = 'user'
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
@@ -10,8 +17,18 @@ class User(db.Model):
     registration_time = db.Column(db.DateTime, nullable=False)
     highest_wpm = db.Column(db.Integer, default=0)
 
+    # Defines how this class is printed
     def __repr__(self):
         return '<User {}>'.format(self.username)
+    
+    # Encrypts an un-hashed password and sets it as the hashed password
+    def set_password(self, password_plain_text):
+        self.password = generate_password_hash(password_plain_text)
+    
+    def check_password(self, password_plain_text):
+        return check_password_hash(self.password, password_plain_text)
+
+
 
 class TypingResult(db.Model):
     __tablename__ = 'result'
@@ -50,3 +67,8 @@ class Friendship(db.Model):
 
     def __repr__(self):
         return f"<Friendship: {self.user_id}> and {self.friend_id}, requested={self.is_requested}"
+    
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
