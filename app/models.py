@@ -31,6 +31,9 @@ class User(UserMixin, db.Model):
     # Checks if the plain text, when hashed, is the same as the stored password.
     def check_password(self, password_plain_text):
         return check_password_hash(self.password, password_plain_text)
+    
+    def get_id(self):
+        return str(self.user_id)
 
 
 # This is a class defining the result of an individual game.
@@ -82,4 +85,4 @@ class Friendship(db.Model):
 
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return db.session.get(User, int(id))

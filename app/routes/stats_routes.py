@@ -1,5 +1,6 @@
 from app import application
 from flask import render_template
+from flask_login import login_required
 
 @application.route('/stats', methods=['GET'])
 @login_required

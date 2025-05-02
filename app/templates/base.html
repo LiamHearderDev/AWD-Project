@@ -34,11 +34,11 @@
                 <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats') }}">Stats</a>
                 <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('leaderboard') }}">Leaderboard</a>
             </nav>
-            <nav style="position: absolute; right: 2%;">
+            <nav style="position: absolute; right: 2%; display: flex;">
               {% if current_user.is_anonymous %}
               <a class="header-link text-white font-weight-bold" href="{{ url_for('login') }}">Login</a>
               {% else %}
-              <p class="header-link text-white font-weight-bold"> {{ current_user.username }}</p>
+              <a class="header-link text-white font-weight-bold" href="{{ url_for('profile') }}"> {{ current_user.username }}</a>
               <a class="header-link text-white font-weight-bold" href="{{ url_for('logout') }}">Logout</a>
               {% endif %}
             </nav>

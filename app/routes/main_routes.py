@@ -1,5 +1,6 @@
 from app import application
 from flask import render_template
+from flask_login import login_required
 
 @application.route('/dashboard', methods=['GET'])
 def dashboard():
@@ -7,6 +8,7 @@ def dashboard():
     return render_template('main/dashboard.html')
 
 @application.route('/profile', methods=['GET'])
+@login_required
 def profile():
     return render_template('main/profile.html')
 
