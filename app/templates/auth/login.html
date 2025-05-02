@@ -8,7 +8,7 @@
 
 {% block content %}
     <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
-        <form id="login_form" class="container-lg">
+        <form id="login_form" class="container-lg" method="post" action="" novalidate>
             <div id="login-title">
                 <h1> Sign in </h1>
             </div> <br>
@@ -17,7 +17,8 @@
                     Username
                 </label> <br>
                 <div>
-                    <input type="text" name="username" id="login_input_username" required placeholder="your-username">
+                    {{ form.username(size=32, id="login_input_username", placeholder="your-username") }}
+                    <!-- <input type="text" name="username" id="login_input_username" required placeholder="your-username"> -->
                 </div>
             </div> <br>
             <div id="form_password" class="login_field">
@@ -25,11 +26,17 @@
                     Password
                 </label> <br>
                 <div>
-                    <input type="password" name="password" id="login_input_password" required placeholder="******">
+                    {{ form.password(size=32, id="login_input_password", placeholder="********") }}
+                    <!-- <input type="password" name="password" id="login_input_password" required placeholder="******"> -->
                 </div>
             </div> <br>
+            <div id="form_remember_me" class="login_field" style="display: flex; justify-content: space-between; align-items: center;">
+                <div > {{ form.remember_me.label(style="position: relative;") }} </div>
+                <div style="height: 25px;"> {{ form.remember_me(style="min-height: 25px; min-width: 25px; margin: 0;") }} </div>
+            </div> <br>
             <div class="login_field_submit">
-                <input type="submit" id="login_input_submit" class="login_input_submit" value="Sign in" method="POST">
+                {{ form.submit(class="login_input_submit", id="login_input_submit") }}
+                <!-- <input type="submit" id="login_input_submit" class="login_input_submit" value="Sign in" method="POST"> -->
             </div>
         </form> <br>
     </section>
