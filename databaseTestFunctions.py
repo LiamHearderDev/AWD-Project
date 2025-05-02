@@ -46,3 +46,4 @@ if __name__ == "__main__":
         # add_paragraph("This is a test paragraph.", "normal")
         # purge_result_table()
         # display_results_for_user(1)
+        pass

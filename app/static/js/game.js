@@ -213,10 +213,11 @@ function getCorrectDicts(element_list, element_check) {
     let element_dict = {};
     for (let i = 0; i < element_list.length; i++) {
         if (element_check[i]) {
-            if (element_list[i] in element_dict) {
-                element_dict[element_list[i]] += 1;
+            let key = element_list[i].toLowerCase().replace(/[.,!?;:'"()]/g, '').trim(); // remove punctuation and trim whitespace
+            if (key in element_dict) {
+                element_dict[key] += 1;
             } else {
-                element_dict[element_list[i]] = 1;
+                element_dict[key] = 1;
             }
         }
     }
@@ -224,6 +225,7 @@ function getCorrectDicts(element_list, element_check) {
 }
 
 function incrementDict(dict, key) { // helper function to increment dictionary values
+    key = key.toLowerCase().replace(/[.,!?;:'"()]/g, '').trim(); // remove punctuation and trim whitespace
     if (key in dict) {
         dict[key] += 1;
     } else {
