@@ -5,8 +5,11 @@ from sqlalchemy.types import JSON
 # Login imports
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
-class User(db.Model):
+
+# This is a class defining each user account that has been registered.
+class User(UserMixin, db.Model):
 
     # The fields of the user table in the database
     __tablename__ = 'user'
@@ -15,7 +18,7 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
     registration_time = db.Column(db.DateTime, nullable=False)
-    highest_wpm = db.Column(db.Integer, default=0)
+    highest_wpm = db.Column(db.Integer, default=0) # TODO: This is only used for the leaderboards. May not need this as we can extract from TypingResult table... 
 
     # Defines how this class is printed
     def __repr__(self):
@@ -25,11 +28,13 @@ class User(db.Model):
     def set_password(self, password_plain_text):
         self.password = generate_password_hash(password_plain_text)
     
+    # Checks if the plain text, when hashed, is the same as the stored password.
     def check_password(self, password_plain_text):
         return check_password_hash(self.password, password_plain_text)
 
 
-
+# This is a class defining the result of an individual game.
+# Each one of these will be assigned to a user, which we can then extract and analyze to get a user's statistics.
 class TypingResult(db.Model):
     __tablename__ = 'result'
     result_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -48,6 +53,8 @@ class TypingResult(db.Model):
     def __repr__(self):
         return '<TypingResult(WPM) {}>'.format(self.wpm)
 
+
+# This is a class defining the text displayed in a game. We will store many of these.
 class Paragraph(db.Model):
     __tablename__ = 'paragraph'
     paragraph_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -57,6 +64,10 @@ class Paragraph(db.Model):
     def __repr__(self):
         return '<Paragraph {}>'.format(self.body)
 
+
+# This is a class defining the friendship between users.
+# The PK is a composite key of user_id and friend_id. There will only be one friendship between two users, so these must be unique.
+# This is a strange table and it may be subsequent to change. BE WARNED.
 class Friendship(db.Model):
     __tablename__ = 'friendship'
     # user_id and friend_id is composite primary key
