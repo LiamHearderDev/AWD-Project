@@ -6,19 +6,19 @@ const timerId = 'timerElement';
 const buttonId = 'startButton';
 const gameContainerId = 'gameContainer';
 
-function statistic(description, value) {
+function statistic(description, value) { // constructor for statistics
     this.description = description;
     this.value = value;
 
-    this.toJSON = function() {
+    this.toJSON = function() { // turn to JSON for sending data to server
         return {
             description: this.description,
             value: this.value
         };
     };
 
-    this.toString = function() {
-        if (this.value && typeof this.value === 'object' && !Array.isArray(this.value)) {
+    this.toString = function() { // turn to string for displaying data
+        if (this.value && typeof this.value === 'object' && !Array.isArray(this.value)) { // for dictionary like objects
             const formatted = Object.entries(this.value)
                 .map(([k, v]) => `${k}: ${v}`)
                 .join(', ');
@@ -29,24 +29,24 @@ function statistic(description, value) {
 }
 
 
-function updateTimerDisplay(timerId, startTime) {
+function updateTimerDisplay(timerId, startTime) { // function to update timer display, is used in setInterval
     const elapsed = (Date.now() - startTime) / 1000;
     $('#'+timerId).text(elapsed.toFixed(2) + ' s');
 }
 
 function callGame() {
-    $.getJSON('/random-paragraph')
+    $.getJSON('/random-paragraph') // get random paragraph from server
       .done(para => {
         $('#' + buttonId).hide();
         $('#' + gameContainerId).show();
-        setupGame(gameId, resultId, timerId, para.body, para.paragraph_id);
+        setupGame(gameId, resultId, timerId, para.body, para.paragraph_id); // setup game
       })
       .fail((status, error) => {
         console.error('Could not load paragraph:', status, error);
         //alert('Sorry, could not load a paragraph.');
         $('#' + buttonId).hide();
         $('#' + gameContainerId).show();
-        setupGame(gameId, resultId, timerId, placeholder, -1);
+        setupGame(gameId, resultId, timerId, placeholder, -1); // pass placeholder if deosn't work
       });
   }
 
@@ -71,7 +71,7 @@ function setupGame(elementId, resultId, timerId, text, paragraphId) {
 
     $screen.focus();
 
-    startGame(elementId, resultId, timerId, text, paragraphId);
+    startGame(elementId, resultId, timerId, text, paragraphId); // starts game logic
 }
 
 function startGame(elementId, resultId, timerId, text, paragraphId) {
@@ -87,7 +87,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
     let start = true;
     let startTime = 0;
 
-    let stats = []
+    let stats = [] // stores statistic objects
     let interval;
 
     // used for collecting words and characters user never makes mistake on
@@ -96,6 +96,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
     let word_check = new Array(word_list.length).fill(true);
     let char_check = new Array(char_list.length).fill(true);
 
+    // used for collecting words and characters user makes mistake on
     let wrong_char_dict = {};
     let wrong_word_dict = {};
 
@@ -105,7 +106,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
             if (start) { // start timer on first valid input
                 startTime = Date.now();
                 start = false;
-                interval = setInterval(() => updateTimerDisplay(timerId, startTime), 10);
+                interval = setInterval(() => updateTimerDisplay(timerId, startTime), 10); // update timer every 10ms
             }
             if (key === $letter.text()) { // style inputs accordingly with classes
                 if ($letter.hasClass('wrong-char')) {
@@ -117,17 +118,18 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     $letter.removeClass('right-char');
                 }
                 $letter.addClass('wrong-char');
+                // update info on mistake
                 mistakes += 1;
                 char_check[index] = false;
                 word_check[wordIndex] = false;
                 incrementDict(wrong_char_dict, key);
                 incrementDict(wrong_word_dict, $word.text());
             }
-            if ($letter.next().length === 0) { // signal to move on to next word
-                if ($word.next().length === 0 && mistakes === 0) { // end of game if no more words
+            if ($letter.next().length === 0) { // signal to move on to next word (no more letters in word)
+                if ($word.next().length === 0 && mistakes === 0) { // end of game if no more words and all correct
                     clearInterval(interval);
-                    $('#' + elementId)
-                        .off('keydown')
+                    $('#' + elementId).off('keydown') // turn off keydown event
+                    // add statistics
                     stats.push(new statistic('total characters', text.length));
                     stats.push(new statistic('total words', text.split(' ').length));
                     stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000)));
@@ -141,7 +143,9 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     stats.push(new statistic('wrong words', wrong_word_dict));
                     stats.push(new statistic('paragraph id', paragraphId));
                     readResults(resultId, stats);
-                    if (paragraphId !== -1) {
+                    if (paragraphId !== -1) { 
+                        // send data if valid paragraph
+                        // don't worry about being logged in or not, if not logged in server doesn't save data automatically
                         sendData(stats);
                     }
                     return;
@@ -152,18 +156,17 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     $letter = $word.children().eq(0);
                     wordIndex += 1;
                 }
-                else if ($word.next().length === 0 && mistakes > 0) { // no more words but not end of game
+                else if ($word.next().length === 0 && mistakes > 0) { // no more words but not end of game (need to go back and correct words to finish)
                     console.log("no more words but not end of game");
                     index -= 1;
                 }
             }
             else {
-                $letter = $letter.next();
+                $letter = $letter.next(); // move to next letter
             }
             index += 1;
         } else if (key === 'Backspace' && index > 0) { // handle backspace
             if (!($word.next().length === 0 && mistakes > 0 && ($letter.hasClass('right-char') || $letter.hasClass('wrong-char')))) { // not at end of text
-                console.log("backspace not at end");
                 $letter = $letter.prev();
                 if ($letter.length === 0) {
                     $word = $word.prev();
@@ -172,30 +175,28 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 }
                 index -= 1;
             }
-            else {
-                console.log("backspace at end");
-            }
-            if ($letter.hasClass('right-char')) {
+            if ($letter.hasClass('right-char')) { // remove styling for character
                 $letter.removeClass('right-char');
             }
             if ($letter.hasClass('wrong-char')) {
                 $letter.removeClass('wrong-char');
-                mistakes -= 1;
+                mistakes -= 1; // update mistakes
             }
         }
     });
   }
 
-function readResults(resultId, stats) {
-    const $result = $('#' + resultId).empty();
-    $result.css('display', 'block');
-    const $list = $('<ul></ul>').appendTo($result);
-    for (let i = 0; i < stats.length; i++) {
+function readResults(resultId, stats) { // function to display results, dynamically creating HTML list with data in statistics
+    const $result = $('#' + resultId).empty(); // reset results
+    $result.show();
+    const $list = $('<ul></ul>').appendTo($result); // create list
+    for (let i = 0; i < stats.length; i++) { // add point for each statistic
         const stat = stats[i];
         $('<li></li>')
             .text(stat.toString())
             .appendTo($list);
     }
+    // focus onto result list
     $list[0].scrollIntoView({ 
         behavior: 'smooth',  
         block: 'center'       
@@ -203,7 +204,12 @@ function readResults(resultId, stats) {
     $list[0].focus();
 }
 
-function getCorrectDicts(element_list, element_check) {
+function getCorrectDicts(element_list, element_check) { 
+    // helper function to get dictionary of correct elements
+    // element_list is a list of elements (words or characters)
+    // element_check is a list of booleans indicating if the element was correct
+    // returns a dictionary of elements and their correct counts
+    // getting an element correct means the user never made a mistake on it
     let element_dict = {};
     for (let i = 0; i < element_list.length; i++) {
         if (element_check[i]) {
@@ -217,7 +223,7 @@ function getCorrectDicts(element_list, element_check) {
     return element_dict;
 }
 
-function incrementDict(dict, key) {
+function incrementDict(dict, key) { // helper function to increment dictionary values
     if (key in dict) {
         dict[key] += 1;
     } else {
@@ -225,7 +231,7 @@ function incrementDict(dict, key) {
     }
 }
 
-function sendData(statistics) {
+function sendData(statistics) { // send data to server
     $.ajax({
         type: 'POST',
         url: '/submit-instance-statistics',

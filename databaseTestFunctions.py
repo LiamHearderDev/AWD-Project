@@ -11,7 +11,7 @@ def add_paragraph(body, type=None): # add a new paragraph to the database
     db.session.commit()
     return new_paragraph
 
-def display_results_for_user(user_id):
+def display_results_for_user(user_id): # display all results for a specific user
     results = TypingResult.query.filter_by(user_id=user_id).all()
 
     if not results:
@@ -31,7 +31,7 @@ def display_results_for_user(user_id):
         print(f"Timestamp: {r.timestamp}")
         print("-" * 40)
 
-def display_results_context(user_id):
+def display_results_context(user_id): # need to do it in context of app
     if __name__ == "__main__":
         with application.app_context():
             display_results_for_user(1)

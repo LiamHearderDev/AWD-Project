@@ -28,7 +28,7 @@ def random_paragraph():
 @application.route('/submit-instance-statistics', methods=['POST'])
 @login_required
 def submit_results():
-    payload = request.get_json()            
+    payload = request.get_json() # get the JSON data from the request           
 
     data = { stat['description']: stat['value'] for stat in payload }
 
@@ -49,7 +49,7 @@ def submit_results():
     db.session.add(result) # add to database
     db.session.commit()
 
-    return jsonify({'status': 'saved', 'result_id': result.result_id})
+    return jsonify({'status': 'saved', 'result_id': result.result_id}) # return the result ID, client prints it in console
 
 # test link
 @application.route('/results', methods=['GET'])
