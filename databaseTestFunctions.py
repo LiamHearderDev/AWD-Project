@@ -42,7 +42,8 @@ def purge_result_table():
 
 if __name__ == "__main__":
     with application.app_context():
-        # functions go here
+        # functions to run in console go here
+
         # add_paragraph("This is a test paragraph.", "normal")
         # purge_result_table()
         # display_results_for_user(1)
