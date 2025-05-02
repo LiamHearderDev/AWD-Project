@@ -1,19 +1,21 @@
 from flask import Flask
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from app.config import Config
+from flask_login import LoginManager
+
+
 
 
 application = Flask(__name__)
-
 application.config.from_object(Config)
-
+application.config['SECRET_KEY'] = 'you-will-never-guess'
 db = SQLAlchemy(application)
 migrate = Migrate(application, db)
-
+login = LoginManager(application)
+login.login_view = 'login'
 
 from app import models
-
 import app.routes.auth_routes
 import app.routes.game_routes
 import app.routes.intro_routes
@@ -22,24 +24,3 @@ import app.routes.stats_routes
 
 if __name__ == '__main__':
     application.run(debug=True)
-
-
-
-
-# def create_app():
-
-#     # import and register each module’s routes
-#     from app.routes.auth_routes  import init_auth_routes
-#     from app.routes.intro_routes  import init_intro_routes
-#     from app.routes.main_routes  import init_main_routes
-#     from app.routes.game_routes  import init_game_routes
-#     from app.routes.stats_routes import init_stats_routes
-
-#     # Deprecated functions. 
-#     init_auth_routes(app)
-#     init_main_routes(app)
-#     init_game_routes(app)
-#     init_intro_routes(app)
-#     init_stats_routes(app)
-
-#     return app

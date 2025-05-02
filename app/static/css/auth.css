@@ -30,3 +30,8 @@ form label {
     margin: 0; 
     color: var(--base-colour-3)
 }
+
+.error_message {
+    color: red;
+    max-width: 300px;
+}
