@@ -61,7 +61,7 @@ function startGame(elementId, resultId, timerId) {
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
     let index = 0;
-    let totalMistakes = 0;
+    let mistakes = 0;
 
     let start = true;
     let startTime = 0;
@@ -86,7 +86,7 @@ function startGame(elementId, resultId, timerId) {
                     $letter.removeClass('right-char');
                 }
                 $letter.addClass('wrong-char');
-                totalMistakes += 1;
+                mistakes += 1;
             }
             $letter = $letter.next();
             if ($letter.length === 0) { // move to next word
@@ -96,7 +96,9 @@ function startGame(elementId, resultId, timerId) {
                     $('#' + elementId)
                         .off('keydown')
                     stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000)));
-                    stats.push(new statistic('total mistakes', totalMistakes));
+                    stats.push(new statistic('total characters', text.length));
+                    stats.push(new statistic('total words', text.split(' ').length));
+                    stats.push(new statistic('total mistakes', mistakes));
                     readResults(resultId, stats);
                     return;
                 }
