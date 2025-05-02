@@ -2,6 +2,7 @@ from app import application
 from flask import render_template
 
 @application.route('/stats', methods=['GET'])
+@login_required
 def stats():
     # Handle stats logic here
     return render_template('stats/stats.html')
@@ -12,6 +13,7 @@ def leaderboard():
     return render_template('stats/leaderboard.html')
 
 @application.route('/shared_stats', methods=['GET'])
+@login_required
 def shared_stats():
     # Handle stats logic here
     return render_template('stats/shared_stats.html')

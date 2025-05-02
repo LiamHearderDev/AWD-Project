@@ -9,17 +9,28 @@
 {% block content %}
     <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 100px;">
         <form id="login_form" class="container-lg" method="post" action="" novalidate>
+            {{ form.hidden_tag() }}
             <div id="login-title">
                 <h1> Sign in </h1>
-            </div> <br>
+            </div> 
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="error_message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <br>
             <div id="form_username" class="login_field">
                 <label for="login_input_username">
                     Username
                 </label> <br>
                 <div>
                     {{ form.username(size=32, id="login_input_username", placeholder="your-username") }}
-                    <!-- <input type="text" name="username" id="login_input_username" required placeholder="your-username"> -->
                 </div>
+                {% for error in form.username.errors %}
+                <p class="error_message">[{{ error }}]</p>
+                {% endfor %}
             </div> <br>
             <div id="form_password" class="login_field">
                 <label for="login_input_password">
@@ -27,8 +38,10 @@
                 </label> <br>
                 <div>
                     {{ form.password(size=32, id="login_input_password", placeholder="********") }}
-                    <!-- <input type="password" name="password" id="login_input_password" required placeholder="******"> -->
                 </div>
+                {% for error in form.password.errors %}
+                <p class="error_message">[{{ error }}]</p>
+                {% endfor %}
             </div> <br>
             <div id="form_remember_me" class="login_field" style="display: flex; justify-content: space-between; align-items: center;">
                 <div > {{ form.remember_me.label(style="position: relative;") }} </div>
@@ -36,7 +49,6 @@
             </div> <br>
             <div class="login_field_submit">
                 {{ form.submit(class="login_input_submit", id="login_input_submit") }}
-                <!-- <input type="submit" id="login_input_submit" class="login_input_submit" value="Sign in" method="POST"> -->
             </div>
         </form> <br>
     </section>
@@ -45,11 +57,3 @@
         <a href="{{ url_for('register') }}">Register here!</a>
     </section>
 {% endblock %}
-
-
-<!--             
-            div
-                label
-                input-wrapper
-                Invalid-text
- -->
