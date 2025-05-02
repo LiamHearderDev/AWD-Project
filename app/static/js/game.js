@@ -14,7 +14,13 @@ function statistic(description, value) {
     this.description = description;
     this.value = value;
     this.toString = function() {
-        return this.description + ': ' + this.value;
+        if (this.value && typeof this.value === 'object' && !Array.isArray(this.value)) {
+            const formatted = Object.entries(this.value)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(', ');
+            return `${this.description}: ${formatted}`;
+        }
+        return `${this.description}: ${this.value}`;
     };
 }
 
@@ -61,6 +67,7 @@ function startGame(elementId, resultId, timerId, text) {
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
     let index = 0;
+    let wordIndex = 0;
     const maxIndex = text.length-1;
     let mistakes = 0;
 
@@ -69,6 +76,15 @@ function startGame(elementId, resultId, timerId, text) {
 
     let stats = []
     let interval;
+
+    // used for collecting words and characters user never makes mistake on
+    let word_list = test.split(' ');
+    let char_list = test.split('');
+    let word_check = new Array(word_list.length).fill(true);
+    let char_check = new Array(char_list.length).fill(true);
+
+    let wrong_char_dict = {};
+    let wrong_word_dict = {};
 
     $('#' + elementId).on('keydown', function (e) {
         const key = e.key;
@@ -89,6 +105,10 @@ function startGame(elementId, resultId, timerId, text) {
                 }
                 $letter.addClass('wrong-char');
                 mistakes += 1;
+                char_check[index] = false;
+                word_check[wordIndex] = false;
+                incrementDict(wrong_char_dict, key);
+                incrementDict(wrong_word_dict, $word.text());
             }
             if ($letter.next().length === 0) { // signal to move on to next word
                 if ($word.next().length === 0 && mistakes === 0) { // end of game if no more words
@@ -102,6 +122,10 @@ function startGame(elementId, resultId, timerId, text) {
                     stats.push(new statistic('characters per minute', Math.round((text.length / ((Date.now() - startTime) / 60000)))));
                     stats.push(new statistic('total mistakes', mistakes));
                     stats.push(new statistic('finished at', new Date().toLocaleTimeString()));
+                    stats.push(new statistic('correct characters', getCorrectDicts(char_list, char_check)));
+                    stats.push(new statistic('correct words', getCorrectDicts(word_list, word_check)));
+                    stats.push(new statistic('wrong characters', wrong_char_dict));
+                    stats.push(new statistic('wrong words', wrong_word_dict));
                     readResults(resultId, stats);
                     return;
                 }
@@ -109,6 +133,7 @@ function startGame(elementId, resultId, timerId, text) {
                     console.log("moving on to next word");
                     $word = $word.next();
                     $letter = $word.children().eq(0);
+                    wordIndex += 1;
                 }
                 else if ($word.next().length === 0 && mistakes > 0) { // no more words but not end of game
                     console.log("no more words but not end of game");
@@ -120,12 +145,13 @@ function startGame(elementId, resultId, timerId, text) {
             }
             index += 1;
         } else if (key === 'Backspace' && index > 0) { // handle backspace
-            if (!($word.next().length === 0 && mistakes > 0 && ($letter.hasClass('right-char') || $letter.hasClass('wrong-char')))) {
+            if (!($word.next().length === 0 && mistakes > 0 && ($letter.hasClass('right-char') || $letter.hasClass('wrong-char')))) { // not at end of text
                 console.log("backspace not at end");
                 $letter = $letter.prev();
                 if ($letter.length === 0) {
                     $word = $word.prev();
                     $letter = $word.children().last();
+                    wordIndex -= 1;
                 }
                 index -= 1;
             }
@@ -140,10 +166,6 @@ function startGame(elementId, resultId, timerId, text) {
                 mistakes -= 1;
             }
         }
-        console.log("index: " + index);
-        console.log("mistakes: " + mistakes);
-        console.log("current word: " + $word.text());
-        console.log("current letter: " + $letter.text());
     });
   }
 
@@ -164,4 +186,25 @@ function readResults(resultId, stats) {
     $list[0].focus();
 }
 
+function getCorrectDicts(element_list, element_check) {
+    let element_dict = {};
+    for (let i = 0; i < element_list.length; i++) {
+        if (element_check[i]) {
+            if (element_list[i] in element_dict) {
+                element_dict[element_list[i]] += 1;
+            } else {
+                element_dict[element_list[i]] = 1;
+            }
+        }
+    }
+    return element_dict;
+}
+
+function incrementDict(dict, key) {
+    if (key in dict) {
+        dict[key] += 1;
+    } else {
+        dict[key] = 1;
+    }
+}
  
