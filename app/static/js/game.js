@@ -221,7 +221,7 @@ function incrementDict(dict, key) {
 function sendData(statistics) {
     $.ajax({
         type: 'POST',
-        url: '/save_statistics',
+        url: '/submit-instance-statistics',
         data: JSON.stringify(statistics),
         contentType: 'application/json',
         success: function(response) {
