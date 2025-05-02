@@ -176,28 +176,3 @@ function displayLoginErrors(loginStatus) {
     }
     return 0;
 }
-
-
-// Once the page has loaded, this executes
-window.onload = () => {
-
-    // This code should only execute on the login and registry pages.
-
-    // If there is a form called "login_form" then this is the login page.
-    const $loginForm = document.getElementById("login_form");
-    if ($loginForm != null) { 
-        $loginForm.addEventListener("submit", handleLoginSubmit);
-    }
-
-    const $registryForm = document.getElementById("register_form");
-    if ($registryForm != null) {
-        $registryForm.addEventListener("submit", handleRegistrySubmit);
-    }
-
-    const $registrySuccessButton = document.getElementById("register_success_button");
-    if ($registrySuccessButton != null) {
-        $registrySuccessButton.onclick = () => {
-            window.location.href = "/login";
-        }
-    }
-}
