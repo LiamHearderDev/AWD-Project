@@ -34,7 +34,7 @@ class Paragraph(db.Model):
     __tablename__ = 'paragraph'
     paragraph_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     body = db.Column(db.String(300), nullable=False)
-    type = db.Column(db.String(32), nullable=True)
+    type = db.Column(db.String(32), nullable=True) # "normal", "gibberish", "coding"
 
     def __repr__(self):
         return '<Paragraph {}>'.format(self.body)

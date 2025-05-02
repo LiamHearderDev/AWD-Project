@@ -1,8 +1,4 @@
-const test = "beans on toast";
-
-const test2 = "Golden autumn leaves drift across the silent pond's surface, each ripple catching amber light as a lone heron glides overhead.";
-
-const test3 = "Sunlight filtered through the high canopy of oak and maple, scattering golden patterns across the forest floor. A gentle breeze carried the scent of damp earth and wildflowers, while distant birdsong wove a delicate soundtrack through the trees. Beneath a fallen log, a family of salamanders stirred among the moss and decaying leaves, their slick bodies glinting in the dappled light. Nearby, a solitary mushroom unfurled its cap, releasing spores into the air like tiny drifting lanterns. Somewhere overhead, a squirrel chattered as it leapt from branch to branch in search of acorns. In this quiet woodland glade, time seemed to slow, inviting any wanderer to pause, breathe deeply, and marvel at nature’s subtle choreography.";
+const placeholder = "placeholder text, paragraph was not loaded correctly";
 
 const gameId = 'gameElement';
 const resultId = 'resultElement';
@@ -39,14 +35,22 @@ function updateTimerDisplay(timerId, startTime) {
 }
 
 function callGame() {
-    const $button = $('#' + buttonId);
-    const $game = $('#' + gameContainerId);
-    $button.css('display', 'none');
-    $game.css('display', 'block');
-    setupGame(gameId, resultId, timerId, test);
-}
+    $.getJSON('/random‑paragraph')
+      .done(para => {
+        $('#' + buttonId).hide();
+        $('#' + gameContainerId).show();
+        setupGame(gameId, resultId, timerId, para.body, para.paragraph_id);
+      })
+      .fail((status, error) => {
+        console.error('Could not load paragraph:', status, error);
+        //alert('Sorry, could not load a paragraph.');
+        $('#' + buttonId).hide();
+        $('#' + gameContainerId).show();
+        setupGame(gameId, resultId, timerId, placeholder, -1);
+      });
+  }
 
-function setupGame(elementId, resultId, timerId, text) {
+function setupGame(elementId, resultId, timerId, text, paragraphId) {
     // adds words to game element
 
     const $screen = $('#' + elementId).empty();
@@ -67,10 +71,10 @@ function setupGame(elementId, resultId, timerId, text) {
 
     $screen.focus();
 
-    startGame(elementId, resultId, timerId, text);
+    startGame(elementId, resultId, timerId, text, paragraphId);
 }
 
-function startGame(elementId, resultId, timerId, text) {
+function startGame(elementId, resultId, timerId, text, paragraphId) {
     // starts game logic
 
     let $word = $('#' + elementId).children().eq(0);
@@ -87,8 +91,8 @@ function startGame(elementId, resultId, timerId, text) {
     let interval;
 
     // used for collecting words and characters user never makes mistake on
-    let word_list = test.split(' ');
-    let char_list = test.split('');
+    let word_list = text.split(' ');
+    let char_list = text.split('');
     let word_check = new Array(word_list.length).fill(true);
     let char_check = new Array(char_list.length).fill(true);
 
@@ -135,8 +139,11 @@ function startGame(elementId, resultId, timerId, text) {
                     stats.push(new statistic('correct words', getCorrectDicts(word_list, word_check)));
                     stats.push(new statistic('wrong characters', wrong_char_dict));
                     stats.push(new statistic('wrong words', wrong_word_dict));
+                    stats.push(new statistic('paragraph id', paragraphId));
                     readResults(resultId, stats);
-                    //sendData(stats);
+                    if (paragraphId !== -1) {
+                        //sendData(stats);
+                    }
                     return;
                 }
                 else if ($word.next().length != 0) { // not end of game, move to next word
