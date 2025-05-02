@@ -31,9 +31,18 @@ def display_results_for_user(user_id): # display all results for a specific user
         print(f"Timestamp: {r.timestamp}")
         print("-" * 40)
 
-def display_results_context(user_id): # need to do it in context of app
+
+def purge_result_table():
     if __name__ == "__main__":
         with application.app_context():
-            display_results_for_user(1)
+            num_deleted = db.session.query(TypingResult).delete()
+            db.session.commit()
+            print(f"Deleted {num_deleted} rows from result table.")
 
 
+if __name__ == "__main__":
+    with application.app_context():
+        # functions go here
+        # add_paragraph("This is a test paragraph.", "normal")
+        # purge_result_table()
+        # display_results_for_user(1)
