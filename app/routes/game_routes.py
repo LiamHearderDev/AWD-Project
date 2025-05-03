@@ -46,6 +46,11 @@ def submit_results():
         timestamp           = datetime.now()
     )
 
+    # If the user is logged in, and they just beat their high-score, then update their highest_wpm.
+    if (current_user.is_authenticated):
+        if (result.wpm > current_user.highest_wpm):
+            current_user.highest_wpm = result.wpm
+
     db.session.add(result) # add to database
     db.session.commit()
 
