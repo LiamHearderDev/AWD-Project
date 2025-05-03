@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    color: var(--base-colour-3);
+}
+
+h1 {
+    text-align: center;
+    color: var(--base-colour-1);
+    margin-bottom: 20px;
+}
+
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+table, th, td {
+    border: 1px solid var(--base-colour-3);
+}
+
+th {
+    background-color: var(--base-colour-2);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    color: var(--base-colour-1);
+}
+
+canvas {
+    margin: 30px auto;
+    display: block;
+    max-width: 800px;
+    max-height: 400px;
+}
