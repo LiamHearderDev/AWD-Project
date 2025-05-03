@@ -1,126 +1,103 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <style>
-        h1 {
-            margin-bottom: 5px;
-        }
-        .user-id {
-            margin-bottom: 20px;
-        }
-        .filter-buttons button {
-            margin-right: 10px;
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        .table-section {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 20px;
-        }
-        .nav-buttons {
-            margin-top: 40px;
-        }
-        .nav-buttons a {
-            display: inline-block;
-            margin-right: 20px;
-            padding: 10px 15px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .nav-buttons a:hover {
-            background-color: #0056b3;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #888;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/stats.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
 
 {% block content %}
+  <h1>Statistics</h1>
+  <div class="user-id">User ID: abc</div>
 
-    
+  <div class="filter-buttons">
+    <button onclick="showTable('today')">Today</button>
+    <button onclick="showTable('7')">Last 7 Days</button>
+    <button onclick="showTable('28')">Last 28 Days</button>
+    <button onclick="showTable('all')">All</button>
+  </div>
 
-    <h1>Statistics</h1>
-    <div class="user-id">User ID: abc</div>
+  <div class="table-section" id="tableContainer">
+    <!-- Today's stats -->
+    <table id="tableToday" style="display: none;">
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today %}
+        <tr>
+          <td>{{ row.metric }}</td>
+          <td>{{ row.value }}</td>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.paragraph }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <canvas id="chartToday" width="400" height="200" style="display: none;"></canvas>
 
-    <div class="filter-buttons">
-        <button onclick="showTable('7')">Last 7 Days</button>
-        <button onclick="showTable('28')">Last 28 Days</button>
-        <button onclick="showTable('all')">All</button>
-    </div>
+    <!-- Last 7 Days stats -->
+    <table id="table7" style="display: none;">
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
+      </thead>
+      <tbody>
+        {% for row in last7days %}
+        <tr>
+          <td>{{ row.metric }}</td>
+          <td>{{ row.value }}</td>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.paragraph }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <canvas id="chart7" width="400" height="200" style="display: none;"
+            data-labels='{{ last7_labels    | tojson }}'
+            data-wpm='{{ last7_wpm       | tojson }}'
+            data-accuracy='{{ last7_accuracy | tojson }}'></canvas>
 
-    <div class="table-section" id="tableContainer">
-        <!-- Table for Last 7 Days -->
-        <table id="table7">
-            <tr>
-                <th>Metric</th><th>Value</th><th>Time</th><th>Paragraph No.</th>
-            </tr>
-            <tr><td>Total Attempts</td><td>5</td><td>-</td><td>-</td></tr>
-            <tr><td>Best WPM</td><td>78.5</td><td>23:14 p.m. 04/15/2025</td><td>3</td></tr>
-            <tr><td>Best Accuracy</td><td>96.4%</td><td>23:14 p.m. 04/15/2025</td><td>3</td></tr>
-            <tr><td>Best Word Count</td><td>325</td><td>23:14 p.m. 04/15/2025</td><td>3</td></tr>
-            <tr><td>Best Correct Words Count</td><td>312</td><td>23:14 p.m. 04/15/2025</td><td>3</td></tr>
-            <tr><td>Least Mistakes in Words</td><td>3</td><td>23:14 p.m. 04/15/2025</td><td>3</td></tr>
-        </table>
+    <!-- Last 28 Days stats -->
+    <table id="table28" style="display: none;">
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
+      </thead>
+      <tbody>
+        {% for row in last28days %}
+        <tr>
+          <td>{{ row.metric }}</td>
+          <td>{{ row.value }}</td>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.paragraph }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <canvas id="chart28" width="400" height="200" style="display: none;"
+            data-labels='{{ last28_labels    | tojson }}'
+            data-wpm='{{ last28_wpm       | tojson }}'
+            data-accuracy='{{ last28_accuracy | tojson }}'></canvas>
 
-        <!-- Table for Last 28 Days -->
-        <table id="table28" style="display: none;">
-            <tr>
-                <th>Metric</th><th>Value</th><th>Time</th><th>Paragraph No.</th>
-            </tr>
-            <tr><td>Total Attempts</td><td>12</td><td>-</td><td>-</td></tr>
-            <tr><td>Best WPM</td><td>84.2</td><td>19:02 p.m. 04/05/2025</td><td>4</td></tr>
-            <tr><td>Best Accuracy</td><td>97.1%</td><td>19:02 p.m. 04/05/2025</td><td>4</td></tr>
-            <tr><td>Best Word Count</td><td>355</td><td>19:02 p.m. 04/05/2025</td><td>4</td></tr>
-            <tr><td>Best Correct Words Count</td><td>345</td><td>19:02 p.m. 04/05/2025</td><td>4</td></tr>
-            <tr><td>Least Mistakes in Words</td><td>2</td><td>19:02 p.m. 04/05/2025</td><td>4</td></tr>
-        </table>
+    <!-- All-time stats -->
+    <table id="tableAll" style="display: none;">
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
+      </thead>
+      <tbody>
+        {% for row in alltime %}
+        <tr>
+          <td>{{ row.metric }}</td>
+          <td>{{ row.value }}</td>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.paragraph }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <canvas id="chartAll" width="400" height="200" style="display: none;"></canvas>
+  </div>
 
-        <!-- Table for All Time -->
-        <table id="tableAll" style="display: none;">
-            <tr>
-                <th>Metric</th><th>Value</th><th>Time</th><th>Paragraph No.</th>
-            </tr>
-            <tr><td>Total Attempts</td><td>37</td><td>-</td><td>-</td></tr>
-            <tr><td>Best WPM</td><td>88.9</td><td>15:45 p.m. 03/10/2025</td><td>2</td></tr>
-            <tr><td>Best Accuracy</td><td>98.5%</td><td>15:45 p.m. 03/10/2025</td><td>2</td></tr>
-            <tr><td>Best Word Count</td><td>382</td><td>15:45 p.m. 03/10/2025</td><td>2</td></tr>
-            <tr><td>Best Correct Words Count</td><td>377</td><td>15:45 p.m. 03/10/2025</td><td>2</td></tr>
-            <tr><td>Least Mistakes in Words</td><td>1</td><td>15:45 p.m. 03/10/2025</td><td>2</td></tr>
-        </table>
-    </div>
-
-    <div class="nav-buttons">
-        <a href="allattempts.html">View all attempts</a>
-        <a href="report.html">Generate a report to share with your friends</a>
-    </div>
-
-    <script>
-        function showTable(period) {
-            document.getElementById('table7').style.display = 'none';
-            document.getElementById('table28').style.display = 'none';
-            document.getElementById('tableAll').style.display = 'none';
-
-            if (period === '7') {
-                document.getElementById('table7').style.display = 'table';
-            } else if (period === '28') {
-                document.getElementById('table28').style.display = 'table';
-            } else {
-                document.getElementById('tableAll').style.display = 'table';
-            }
-        }
-    </script>
-
+  <div class="nav-buttons">
+    <button type="button" id="generateReportBtn" class="green-button">Generate a report to share with your friends</button>
+  </div>
 {% endblock %}
