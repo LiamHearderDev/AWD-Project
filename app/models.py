@@ -45,9 +45,8 @@ class TypingResult(db.Model):
     paragraph_id = db.Column(db.Integer, db.ForeignKey('paragraph.paragraph_id'), nullable=False)
     wpm = db.Column(db.Integer, default=0)
     total_characters = db.Column(db.Integer,nullable=False)
-    characters = db.Column(JSON, nullable=False)
+    correct_characters = db.Column(JSON, nullable=False)
     total_words = db.Column(db.Integer, nullable=False)
-    words = db.Column(JSON, nullable=False)
     correct_words = db.Column(JSON, nullable=False)
     total_mistakes = db.Column(db.Integer, nullable=False)
     mistake_characters = db.Column(JSON, nullable=False)
@@ -62,7 +61,7 @@ class Paragraph(db.Model):
     __tablename__ = 'paragraph'
     paragraph_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     body = db.Column(db.String(300), nullable=False)
-    type = db.Column(db.String(32), nullable=True)
+    type = db.Column(db.String(32), nullable=True) # "normal", "gibberish", "coding"
 
     def __repr__(self):
         return '<Paragraph {}>'.format(self.body)
