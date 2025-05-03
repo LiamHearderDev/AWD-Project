@@ -3,6 +3,7 @@ import string
 import json
 from app import application
 from flask import render_template, request, redirect, url_for, jsonify
+from app.models import User
 
 @application.route('/stats', methods=['GET'])
 def stats():
@@ -117,5 +118,16 @@ def all_attempts():
 
 @application.route('/leaderboard', methods=['GET'])
 def leaderboard():
+    #top_users = User.query.order_by(User.highest_wpm.desc()).limit(10).all()
     return render_template('stats/leaderboard.html')
+
+@application.route('/api/leaderboard')
+def get_leaderboard():
+    top_users = User.query.order_by(User.highest_wpm.desc()).limit(10).all()
+
+    data = {
+        'username': [user.username for user in top_users],
+        'wpm': [user.highest_wpm for user in top_users]
+    }
+    return jsonify(data)
 
