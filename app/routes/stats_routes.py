@@ -10,6 +10,8 @@ from sqlalchemy import func
 from app import application, db
 from app.models import TypingResult, User
 
+import ast      # This allows us to convert string literals into their respective types, like dictionaries.
+
 
 
 
@@ -47,7 +49,7 @@ def compute_user_stats(user_id, days: int = None):
     # Compute accuracy per result (percentage)
     acc_values = []
     for r in results:
-        correct = r.correct_characters  # already a Python list or dict
+        correct = ast.literal_eval(r.correct_characters) # Need to convert to a dict by eval string literal
         if isinstance(correct, dict):
             correct_count = sum(correct.values())
         else:
@@ -96,7 +98,7 @@ def get_series(user_id, days=None):
     wpms = [r.wpm for r in rows]
     accs = []
     for r in rows:
-        correct = r.correct_characters
+        correct = ast.literal_eval(r.correct_characters)
         if isinstance(correct, dict):
             correct_count = sum(correct.values())
         else:
