@@ -22,8 +22,9 @@ def compute_user_stats(user_id, days: int = None):
     """
     # Base query for this user
     q = TypingResult.query.filter(TypingResult.user_id == user_id)
-    if days is not None and days > 0:
-        since = datetime.utcnow() - timedelta(days=days)
+    if days is not None :
+        # since = datetime.utcnow() - timedelta(days=days)
+        since = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) if days==0 else datetime.utcnow()-timedelta(days=days)
         q = q.filter(TypingResult.timestamp >= since)
 
     # Fetch all matching results
@@ -118,7 +119,8 @@ def stats():
     since28 = now - timedelta(days=28)
 
     # Compute stats per period
-    stats_today  = compute_user_stats(uid, days=None if False else today_start)
+    # stats_today  = compute_user_stats(uid, days=None if False else today_start)
+    stats_today = compute_user_stats(uid, days=0)
     stats_7days  = compute_user_stats(uid, days=7)
     stats_28days = compute_user_stats(uid, days=28)
     stats_all    = compute_user_stats(uid, days=None)
