@@ -14,14 +14,19 @@ import ast      # This allows us to convert string literals into their respectiv
 
 
 
-"""
-Calculate key statistics for a user over the given time window.
 
-Returns:
-    A dict with total_attempts, avg_wpm, best_wpm, avg_acc, best_acc
-"""
 def compute_user_stats(days: int = None) -> dict:
-    
+    """
+    This function calculates key statistics for a user over a given time window. To be used within `stats.html`, the output must first go through the function `format_data()`.
+    Parameters:
+        days (int): An integer that determines how long ago each TypingResult is allowed to be. Anything outside of this range is not included in the result. A value of None will allow all results.
+    Returns:
+      user_stats (dict): A dict with total_attempts, average words per minute, best words per minute, all words per minute results, avg accuracy, best accuracy, and all accuracy results.
+    """
+
+    # This ensures that days is not negative. If it is negative, make it None.
+    days = days if days == None or days >= 0 else None
+
     # Base query for this user
     query = TypingResult.query.filter(TypingResult.user_id == current_user.user_id)
     if days is not None :
@@ -78,8 +83,17 @@ def compute_user_stats(days: int = None) -> dict:
         "result_timestamps": result_timestamps
     }
 
-# This function converts the input dictionary into a format suitable for the table or chart
+
 def format_data(stats_dict: dict, format: str):
+    """
+    This function converts the input dictionary into a format suitable for the table or chart.
+    Parameters:
+        stats_dict      (dict): This is a dictionary of user statistics. This should always be the output of the function `compute_user_stats()`.
+        format          (str):  A string representing the format which the function should output. Should be either `"table"` or `"chart"`. Anything else will cause this function to output a value of `None`.
+    Returns:
+        formatted_data  (dict / list):     Depending on the value of the parameter `format`, this function either returns a list of dictionaries suitable for tables, or a dictionary suitable for charts. If `format` is incorrectly set, the output will be `None`.
+    """
+
     match format:
         case "table":
             return [
