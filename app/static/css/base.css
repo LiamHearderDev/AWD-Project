@@ -24,10 +24,18 @@ footer {
     flex-shrink: 0;
 }
 
-
 .header-link {
     padding: 10px;
 }
+
+.bg-0 { background-color: var(--base-colour-0); }
+.bg-1 { background-color: var(--base-colour-1); }
+.bg-2 { background-color: var(--base-colour-2); }
+.bg-3 { background-color: var(--base-colour-3); }
+.text-0 { color: var(--base-colour-0); }
+.text-1 { color: var(--base-colour-1); }
+.text-2 { color: var(--base-colour-2); }
+.text-3 { color: var(--base-colour-3); }
 
 /* This is only for mobile-adjustments when the screen is too small */
 @media only screen and (max-width: 500px) {
