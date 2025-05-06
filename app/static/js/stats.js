@@ -39,14 +39,7 @@ function readCanvasData(canvasID) {
 // Initialize all charts once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
 
-  const maxChartHeight = 150;
-  // TODAY BAR CHART
-
-  // get chart elements
-  // Loop over
-    // read canvas data
-    // create a new chart with the chart element as the context
-
+  // Loop over every chart element and populate them with data
   const $charts = $(".statsChart");
   for (let i = 0; i < $charts.length; i++){
     const chart = $charts[i];                   // Converts into DOM object
@@ -56,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const canvasData = readCanvasData(chart.id);
-
+    const maxChartHeight = Math.max(100, ...canvasData.wpm);
+    
     new Chart(chart.getContext('2d'), {
       type: 'line',
       data: {

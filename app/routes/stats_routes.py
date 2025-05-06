@@ -36,49 +36,89 @@ def compute_user_stats(days: int = None) -> dict:
 
     # Fetch all matching results
     results = query.all()
-    total = len(results)
-    if total == 0:
+    if len(results) == 0:
         return {
             "total_attempts": 0,
             "avg_wpm": 0.0,
             "best_wpm": 0.0,
+            "best_wpm_timestamp" : None,
             "all_wpm": [],
             "avg_acc": "0.0%",
             "best_acc": "0.0%",
+            "best_acc_timestamp": None,
             "all_accuracy": [],
             "result_timestamps": []
         }
 
-    # Compute WPM stats
-    wpms = [r.wpm for r in results]
-    result_timestamps = [r.timestamp.strftime("%b %d %H:%M") for r in results]
-    avg_wpm = sum(wpms) / total
-    best_wpm = max(wpms)
+    # This is to be used when needing to flash an error to the screen in the following loop
+    def flash_error(field: str, id: int):
+        flash(f'An unexpected error occurred. Could not parse data for field [{field}]. Corrupted data found at TypingResult id: {id}')
+        return
 
-    # Compute accuracy per result (percentage)
-    acc_values = []
-    for r in results:
-        correct = ast.literal_eval(r.correct_characters) # Need to convert to a dict by eval string literal
-        if isinstance(correct, dict):
-            correct_count = sum(correct.values())
-        else:
-            flash("Could not correctly parse data for [TypingResult.correct_characters]. Corrupted data found at TypingResult id: " + r.result_id)
+    # Compute data for each result
+    acc_values: list = []
+    best_acc: int = 0
+    best_acc_timestamp: datetime = None
+    best_acc_paragraph: int = None
+    wpms: list = []
+    result_timestamps: list = []
+    best_wpm: int = 0
+    best_wpm_timestamp: datetime = None
+    best_wpm_paragraph: int = None
+
+
+    # Loop over every TypingResult
+    for result in results:
+        correct = ast.literal_eval(result.correct_characters) # Need to convert to a dict by eval string literal
+
+        # Check for any issues
+        if not isinstance(correct, dict):
+            flash_error("correct_characters", result.result_id)
             continue
-        if r.total_characters > 0:
-            acc_values.append((correct_count / r.total_characters) * 100)
-    if not acc_values:
-        avg_acc = best_acc = 0.0
+        if result.total_characters <= 0:
+            flash_error("total_characters", result.result_id)
+            continue
+        if result.wpm < 0:
+            flash_error("wpm", result.result_id)
+            continue
+        
+        # Cache data
+        result_timestamps.append(result.timestamp.strftime("%H:%M, %d/%m/%Y"))
+        correct_count = sum(correct.values())
+        this_acc = (correct_count / result.total_characters) * 100
+
+        acc_values.append(this_acc)
+        if this_acc >= best_acc:
+            best_acc = this_acc
+            best_acc_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
+            best_acc_paragraph = result.paragraph_id
+
+        wpms.append(result.wpm)
+        if result.wpm >= best_wpm:
+            best_wpm = result.wpm
+            best_wpm_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
+            best_wpm_paragraph = result.paragraph_id
+        
+    if len(acc_values) <= 0:
+        avg_acc = 0.0
+        best_acc = 0.0
     else:
         avg_acc = sum(acc_values) / len(acc_values)
         best_acc = max(acc_values)
 
+    avg_wpm = sum(wpms) / len(results)
+
     return {
-        "total_attempts": total,
+        "total_attempts": len(results),
         "avg_wpm": round(avg_wpm, 1),
         "best_wpm": round(best_wpm, 1),
+        "best_wpm_timestamp": best_wpm_timestamp,
+        "best_wpm_paragraph": best_wpm_paragraph,
         "all_wpm": wpms,
         "avg_accuracy": f"{round(avg_acc, 1)}%",
         "best_accuracy": f"{round(best_acc, 1)}%",
+        "best_accuracy_timestamp": best_acc_timestamp,
+        "best_accuracy_paragraph": best_acc_paragraph,
         "all_accuracy": acc_values,
         "result_timestamps": result_timestamps
     }
@@ -100,8 +140,8 @@ def format_data(stats_dict: dict, format: str):
                 {"metric": "Total Attempts",       "value": stats_dict["total_attempts"],   "timestamp": "-", "paragraph": "-"},
                 {"metric": "Average WPM",          "value": stats_dict["avg_wpm"],          "timestamp": "-", "paragraph": "-"},
                 {"metric": "Average Accuracy",     "value": stats_dict["avg_accuracy"],     "timestamp": "-", "paragraph": "-"},
-                {"metric": "Best WPM",             "value": stats_dict["best_wpm"],         "timestamp": "-", "paragraph": "-"},
-                {"metric": "Best Accuracy",        "value": stats_dict["best_accuracy"],    "timestamp": "-", "paragraph": "-"}
+                {"metric": "Best WPM",             "value": stats_dict["best_wpm"],         "timestamp": stats_dict["best_wpm_timestamp"] if stats_dict["best_wpm_timestamp"] != None else "-",             "paragraph": stats_dict["best_wpm_paragraph"] if stats_dict["best_wpm_paragraph"] != None else "-"},
+                {"metric": "Best Accuracy",        "value": stats_dict["best_accuracy"],    "timestamp": stats_dict["best_accuracy_timestamp"] if stats_dict["best_accuracy_timestamp"] != None else "-",   "paragraph": stats_dict["best_accuracy_paragraph"] if stats_dict["best_accuracy_paragraph"] != None else "-"}
             ]
         case "chart":
             return {
