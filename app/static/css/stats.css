@@ -12,7 +12,6 @@
     margin-right: 10px;
     padding: 8px 16px;
     cursor: pointer;
-    background-color: var(--base-colour-0);
     color: white;
     border: none;
     border-radius: 5px;
@@ -59,15 +58,16 @@
     border: 1px solid var(--base-colour-3);
 }
 
+.statsChart {
+    padding-top: 25px;
+}
+
 .statsTable th, .statsTable td {
     border: 1px solid var(--base-colour-3);
-}
-
-th {
-    background-color: var(--base-colour-2);
-}
-
-th, td {
     padding: 10px;
     text-align: left;
+}
+
+.statsTable th {
+    background-color: var(--base-colour-2);
 }
