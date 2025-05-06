@@ -1,9 +1,4 @@
-body {
-    font-family: Arial, sans-serif;
-    color: var(--base-colour-3);
-}
-
-h1 {
+.statsPageTitle {
     margin-bottom: 5px;
     color: var(--base-colour-1);
 }
@@ -57,13 +52,14 @@ h1 {
     background-color: #2da564;
 }
 
-table {
+.statsTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    border: 1px solid var(--base-colour-3);
 }
 
-table, th, td {
+.statsTable th, .statsTable td {
     border: 1px solid var(--base-colour-3);
 }
 
