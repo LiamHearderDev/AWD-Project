@@ -109,17 +109,22 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 interval = setInterval(() => updateTimerDisplay(timerId, startTime), 10); // update timer every 10ms
             }
             if (key === $letter.text()) { // style inputs accordingly with classes
+                // correct input
                 if ($letter.hasClass('wrong-char')) {
                     $letter.removeClass('wrong-char');
+                    mistakes -= 1; // update mistakes
                 }
                 $letter.addClass('right-char');
             } else {
+                // incorrect input
                 if ($letter.hasClass('right-char')) {
                     $letter.removeClass('right-char');
                 }
+                if (!$letter.hasClass('wrong-char')) {
+                    mistakes += 1; // update mistakes
+                }
                 $letter.addClass('wrong-char');
                 // update info on mistake
-                mistakes += 1;
                 char_check[index] = false;
                 word_check[wordIndex] = false;
                 incrementDict(wrong_char_dict, key);
@@ -183,6 +188,11 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 mistakes -= 1; // update mistakes
             }
         }
+        console.log("index: " + index);
+        console.log("wordIndex: " + wordIndex);
+        console.log("mistakes: " + mistakes);
+        console.log("word: " + $word.text());
+        console.log("letter: " + $letter.text());
     });
   }
 
