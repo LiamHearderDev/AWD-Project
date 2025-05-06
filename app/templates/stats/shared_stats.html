@@ -8,7 +8,10 @@
 
 {% block content %}
   <h1>Shared Statistics – {{ data.period|capitalize }}</h1>
-
+  <div class="user-id">
+    Shared by: {{ username }} (ID: {{ user_id }})
+  </div>
+  
   <div class="table-section">
     <table id="statsTable">
       <thead>
