@@ -32,9 +32,12 @@ function readCanvasData(canvasID) {
   return {
     labels: JSON.parse(canvasElement.dataset.labels || '[]'),
     wpm: JSON.parse(canvasElement.dataset.wpm || '[]'),
-    accuracy: JSON.parse(canvasElement.dataset.accuracy || '[]')
+    avg_wpm: JSON.parse(canvasElement.dataset.averagewpm || '[]'),
+    accuracy: JSON.parse(canvasElement.dataset.accuracy || '[]'),
+    avg_acc: JSON.parse(canvasElement.dataset.averageacc || '[]')
   };
 }
+
 
 // Initialize all charts once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,22 +53,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const canvasData = readCanvasData(chart.id);
     const maxChartHeight = Math.max(100, ...canvasData.wpm);
-    
-    new Chart(chart.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: canvasData.labels,
-        datasets: [
-          { label: 'Average WPM',           data: canvasData.wpm,      borderColor: 'blue',  fill: false },
-          { label: 'Average Accuracy (%)',  data: canvasData.accuracy, borderColor: 'green', fill: false }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true, max: maxChartHeight } }
-      }
-    });
+
+    // If there is 1 data point, make it a bar chart.
+    // If there is >1 data point, make it a line chart.
+    if (canvasData.wpm.length > 1){
+      // Line graph
+      new Chart(chart.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: canvasData.labels,
+          datasets: [
+            { label: 'Words Per Minute (WPM)', data: canvasData.wpm, borderColor: 'blue',  fill: false },
+            { label: 'Accuracy',  data: canvasData.accuracy, borderColor: 'green', fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { 
+            legend: { position: 'top' }
+          },
+          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+        }
+      });
+    } 
+    else {
+      // Bar graph
+      new Chart(chart.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Average WPM','Average Accuracy'],
+          datasets: [
+            {
+              data: [ canvasData.avg_wpm, Number(canvasData.avg_acc.replace("%", ""))],
+              backgroundColor: ['#3CC47CBF','#1E392ABF'],
+              borderColor: ['#3CC47C','#1E392A'],
+              borderWidth: 2,
+              barPercentage: 0.4,
+              categoryPercentage: 0.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+        }
+      });
+    }
   }
 
   // Show 'today' by default
@@ -108,7 +144,13 @@ function showTable(period) {
   // Now we make the filter-buttons a different colour so we know which one we have clicked.
   const $filterButtons = $("[id^=filter-button]");
   for (let i = 0; i < $filterButtons.length; i++) {
-    
+    const filterButton = $filterButtons[i];
+    if (filterButton.id === 'filter-button-' + period){
+      filterButton.classList = "selected";
+    }
+    else {
+      filterButton.classList = "bg-0";
+    }
   }
 
 }

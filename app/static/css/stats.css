@@ -21,6 +21,9 @@
 .filter-buttons button:hover {
     background-color: #2da564;
 }
+.filter-buttons .selected {
+    background-color: #227a4b !important;
+}
 
 .table-section {
     margin-top: 20px;

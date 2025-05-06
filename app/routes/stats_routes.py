@@ -42,10 +42,12 @@ def compute_user_stats(days: int = None) -> dict:
             "avg_wpm": 0.0,
             "best_wpm": 0.0,
             "best_wpm_timestamp" : None,
+            "best_wpm_paragraph": None,
             "all_wpm": [],
-            "avg_acc": "0.0%",
-            "best_acc": "0.0%",
-            "best_acc_timestamp": None,
+            "avg_accuracy": "0.0%",
+            "best_accuracy": "0.0%",
+            "best_accuracy_timestamp": None,
+            "best_accuracy_paragraph": None,
             "all_accuracy": [],
             "result_timestamps": []
         }
