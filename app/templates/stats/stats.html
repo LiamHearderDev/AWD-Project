@@ -3,12 +3,11 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/stats.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
 
 {% block content %}
   <h1>Statistics</h1>
-  <div class="user-id">User ID: abc</div>
+  <div class="user-id">User: {{ username }} (ID: {{ user_id }})</div>
 
   <div class="filter-buttons">
     <button onclick="showTable('today')">Today</button>
@@ -34,7 +33,10 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chartToday" width="400" height="200" style="display: none;"></canvas>
+    <canvas id="chartToday" width="400" height="200" style="display: none;"
+            data-labels='{{ today_labels    | tojson }}'
+            data-wpm='{{ today_wpm       | tojson }}'
+            data-accuracy='{{ today_accuracy | tojson }}'></canvas>
 
     <!-- Last 7 Days stats -->
     <table id="table7" style="display: none;">
@@ -94,10 +96,17 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chartAll" width="400" height="200" style="display: none;"></canvas>
+    <canvas id="chartAll" width="400" height="200" style="display: none;"
+            data-labels='{{ all_labels    | tojson }}'
+            data-wpm='{{ all_wpm       | tojson }}'
+            data-accuracy='{{ all_accuracy | tojson }}'></canvas>
   </div>
 
   <div class="nav-buttons">
-    <button type="button" id="generateReportBtn" class="green-button">Generate a report to share with your friends</button>
+    <button type="button" id="generateReportBtn" class="green-button">
+      Generate a report to share with your friends
+    </button>
   </div>
+
+  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
