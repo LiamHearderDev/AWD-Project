@@ -1,18 +1,20 @@
-from flask import request, jsonify, render_template
-from app import db, application
+from flask import Blueprint, request, jsonify, render_template
+from app.extensions import db
 from app.models import TypingResult, Paragraph
 from flask_login import current_user, login_required
 from datetime import datetime
 import json
 from sqlalchemy.sql.expression import func # SQLite function that returns a random row
 
-@application.route('/game', methods=['GET'])
+game_bp = Blueprint('game', __name__)
+
+@game_bp.route('/game', methods=['GET'])
 def game():
     # Handle game logic here
     return render_template('game/game.html')
 
 
-@application.route('/random-paragraph', methods=['GET'])
+@game_bp.route('/random-paragraph', methods=['GET'])
 def random_paragraph():
     p = Paragraph.query.order_by(func.random()).first() # pick a row at random
     if p is None:
@@ -25,7 +27,7 @@ def random_paragraph():
     }) # return the paragraph as JSON
 
 
-@application.route('/submit-instance-statistics', methods=['POST'])
+@game_bp.route('/submit-instance-statistics', methods=['POST'])
 @login_required
 def submit_results():
     payload = request.get_json() # get the JSON data from the request           
@@ -57,7 +59,7 @@ def submit_results():
     return jsonify({'status': 'saved', 'result_id': result.result_id}) # return the result ID, client prints it in console
 
 # test link
-@application.route('/results', methods=['GET'])
+@game_bp.route('/results', methods=['GET'])
 @login_required
 def all_results():
     results = TypingResult.query.filter_by(user_id=current_user.user_id).all()

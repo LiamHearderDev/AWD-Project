@@ -3,16 +3,17 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from flask import render_template, request, url_for, jsonify, flash
+from flask import render_template, request, url_for, jsonify, flash, Blueprint
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app import application, db
+from app import db
 from app.models import TypingResult, User
 
 import ast      # This allows us to convert string literals into their respective types, like dictionaries.
 
 
+stats_bp = Blueprint('stats', __name__)
 
 
 def compute_user_stats(days: int = None) -> dict:
@@ -156,7 +157,7 @@ def format_data(stats_dict: dict, format: str):
 
 
 
-@application.route('/stats', methods=['GET'])
+@stats_bp.route('/stats', methods=['GET'])
 @login_required
 def stats():
     """User stats dashboard."""
@@ -188,7 +189,7 @@ shared_data = {}
 def generate_random_string(length=10):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
-@application.route('/stats/shared_stats/<userid>/<random_str>', methods=['GET'])
+@stats_bp.route('/stats/shared_stats/<userid>/<random_str>', methods=['GET'])
 def shared_stats(userid, random_str):
     key = userid + random_str
     data = shared_data.get(key, {})
@@ -200,7 +201,7 @@ def shared_stats(userid, random_str):
         username=user.username
     )
 
-@application.route('/stats/generate_report', methods=['POST'])
+@stats_bp.route('/stats/generate_report', methods=['POST'])
 def generate_report():
     userid = request.form['userid']
     period = request.form['period']
@@ -218,11 +219,11 @@ def generate_report():
 
     return jsonify({"url": url_for('shared_stats', userid=userid, random_str=random_str)})
 
-@application.route('/leaderboard', methods=['GET'])
+@stats_bp.route('/leaderboard', methods=['GET'])
 def leaderboard():
     return render_template('stats/leaderboard.html')
 
-@application.route('/api/leaderboard')
+@stats_bp.route('/api/leaderboard')
 def get_leaderboard():
     top_users = User.query.order_by(User.highest_wpm.desc()).limit(10).all()
 

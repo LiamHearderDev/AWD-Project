@@ -1,5 +1,7 @@
-from app import application
+from app import create_app
+from app.config import Config
 
-# Run the app if this script is executed directly
+application = create_app(Config)
+
 if __name__ == "__main__":
     application.run(debug=True)

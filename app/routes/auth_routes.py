@@ -1,13 +1,16 @@
-from app import application, db
-from flask import render_template, redirect, flash, url_for
-from flask_login import current_user, login_user, logout_user
 import sqlalchemy as sa
 from app.models import User
 from app.forms import LoginForm, RegistrationForm
 from datetime import datetime
+from flask import Blueprint, render_template, redirect, url_for, flash
+from app.extensions import db
+from app.models import User
+from flask_login import login_user, logout_user, current_user
+
+auth_bp = Blueprint('auth', __name__)
 
 
-@application.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('intro'))
@@ -42,7 +45,7 @@ def login():
     
     
 
-@application.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
 
     # If the user is already logged in, redirect them to the home page. They can logout there, if they want.
@@ -70,7 +73,7 @@ def register():
     return redirect(url_for('login'))
 
 
-@application.route('/logout')
+@auth_bp.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('intro'))
