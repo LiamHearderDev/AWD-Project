@@ -102,7 +102,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
 
     $('#' + elementId).on('keydown', function (e) {
         const key = e.key;
-        if ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,-'".includes(key)) {
+        if ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,!?-'".includes(key)) {
             if (start) { // start timer on first valid input
                 startTime = Date.now();
                 start = false;
