@@ -5,7 +5,7 @@ from app.extensions import db, migrate, login
 def create_app(config_class=Config):
 
     application = Flask(__name__)
-    application.config.from_object(Config)
+    application.config.from_object(config_class)
     application.config['SECRET_KEY'] = 'you-will-never-guess'
 
     db.init_app(application)
