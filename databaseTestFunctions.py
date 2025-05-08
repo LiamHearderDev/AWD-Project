@@ -3,8 +3,17 @@ from app.models import Paragraph, TypingResult
 import json
 
 def add_paragraph(body, type=None): # add a new paragraph to the database
+
+    # check to not add empty paragraph
     if not body or not body.strip():
         raise ValueError("Paragraph body cannot be empty")
+    
+    # check to see if paragraph has valid / recognisable characters
+    allowed_characters = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,!?-'")
+    for character in body:
+        if character not in allowed_characters:
+            raise ValueError(f"Paragraph contains invalid character {character}")
+
 
     new_paragraph = Paragraph(body=body.strip(), type=type)
     db.session.add(new_paragraph)
