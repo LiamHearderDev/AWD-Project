@@ -1,9 +1,4 @@
-body {
-    font-family: Arial, sans-serif;
-    color: var(--base-colour-3);
-}
-
-h1 {
+.statsPageTitle {
     margin-bottom: 5px;
     color: var(--base-colour-1);
 }
@@ -17,7 +12,6 @@ h1 {
     margin-right: 10px;
     padding: 8px 16px;
     cursor: pointer;
-    background-color: var(--base-colour-0);
     color: white;
     border: none;
     border-radius: 5px;
@@ -26,6 +20,9 @@ h1 {
 
 .filter-buttons button:hover {
     background-color: #2da564;
+}
+.filter-buttons .selected {
+    background-color: #227a4b !important;
 }
 
 .table-section {
@@ -57,21 +54,23 @@ h1 {
     background-color: #2da564;
 }
 
-table {
+.statsTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-}
-
-table, th, td {
     border: 1px solid var(--base-colour-3);
 }
 
-th {
-    background-color: var(--base-colour-2);
+.statsChart {
+    padding-top: 25px;
 }
 
-th, td {
+.statsTable th, .statsTable td {
+    border: 1px solid var(--base-colour-3);
     padding: 10px;
     text-align: left;
+}
+
+.statsTable th {
+    background-color: var(--base-colour-2);
 }

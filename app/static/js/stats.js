@@ -16,159 +16,143 @@ function findMetric(tableId, metricName) {
   return 0;
 }
 
-// Helper: read JSON data attributes from a canvas
-function readCanvasData(canvasId) {
-  const el = document.getElementById(canvasId);
-  if (!el) {
-    console.error(`Canvas element with ID ${canvasId} not found`);
+// Helper: reads JSON data attributes from a canvas
+function readCanvasData(canvasID) {
+
+  // Get the canvas HTML element
+  const canvasElement = document.getElementById(canvasID);
+
+  // If the canvas we're reading doesn't exist, flash an error and return.
+  if (canvasElement == null || canvasElement == undefined) {
+    flash("Canvas element with ID ${" + canvasID + "} not found");
     return { labels: [], wpm: [], accuracy: [] };
   }
   
+  // Extract and return the data
   return {
-    labels: JSON.parse(el.dataset.labels || '[]'),
-    wpm: JSON.parse(el.dataset.wpm || '[]'),
-    accuracy: JSON.parse(el.dataset.accuracy || '[]')
+    labels: JSON.parse(canvasElement.dataset.labels || '[]'),
+    wpm: JSON.parse(canvasElement.dataset.wpm || '[]'),
+    avg_wpm: JSON.parse(canvasElement.dataset.averagewpm || '[]'),
+    accuracy: JSON.parse(canvasElement.dataset.accuracy || '[]'),
+    avg_acc: JSON.parse(canvasElement.dataset.averageacc || '[]')
   };
 }
 
+
 // Initialize all charts once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // TODAY BAR CHART
-  const ctxToday = document.getElementById('chartToday');
-  if (ctxToday) {
-    const dToday = readCanvasData('chartToday');
-    // Use data attributes if available, otherwise fall back to findMetric
-    const wpmValue = dToday.wpm.length > 0 ? dToday.wpm[0] : findMetric('tableToday', 'Average WPM');
-    const accValue = dToday.accuracy.length > 0 ? dToday.accuracy[0] : findMetric('tableToday', 'Average Accuracy');
-    
-    new Chart(ctxToday.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Average WPM','Average Accuracy'],
-        datasets: [{
-          data: [wpmValue, accValue],
-          backgroundColor: ['#3CC47CBF','#1E392ABF'],
-          borderColor: ['#3CC47C','#1E392A'],
-          borderWidth: 2,
-          barPercentage: 0.4,
-          categoryPercentage: 0.5
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, max: 100 } }
-      }
-    });
-  }
 
-  // LAST 7 DAYS LINE CHART
-  const c7 = document.getElementById('chart7');
-  if (c7) {
-    const d7 = readCanvasData('chart7');
-    new Chart(c7.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: d7.labels,
-        datasets: [
-          { label: 'Average WPM',           data: d7.wpm,      borderColor: 'blue',  fill: false },
-          { label: 'Average Accuracy (%)',  data: d7.accuracy, borderColor: 'green', fill: false }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true, max: 100 } }
-      }
-    });
-  }
+  // Loop over every chart element and populate them with data
+  const $charts = $(".statsChart");
+  for (let i = 0; i < $charts.length; i++){
+    const chart = $charts[i];                   // Converts into DOM object
+    if (chart == null || chart == undefined) {  // Catch if invalid
+      flash("An unexpected error occurred while displaying your statistics. Please try again later.");
+      break;
+    }
 
-  // LAST 28 DAYS LINE CHART
-  const c28 = document.getElementById('chart28');
-  if (c28) {
-    const d28 = readCanvasData('chart28');
-    new Chart(c28.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: d28.labels,
-        datasets: [
-          { label: 'Average WPM',           data: d28.wpm,      borderColor: 'blue',  fill: false },
-          { label: 'Average Accuracy (%)',  data: d28.accuracy, borderColor: 'green', fill: false }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true, max: 100 } }
-      }
-    });
-  }
+    const canvasData = readCanvasData(chart.id);
+    const maxChartHeight = Math.max(100, ...canvasData.wpm);
 
-  // ALL-TIME BAR CHART
-  const ctxAll = document.getElementById('chartAll');
-  if (ctxAll) {
-    const dAll = readCanvasData('chartAll');
-    // Use data attributes if available, otherwise fall back to findMetric
-    const wpmValue = dAll.wpm.length > 0 ? dAll.wpm[0] : findMetric('tableAll', 'Average WPM');
-    const accValue = dAll.accuracy.length > 0 ? dAll.accuracy[0] : findMetric('tableAll', 'Average Accuracy');
-    
-    new Chart(ctxAll.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Average WPM','Average Accuracy'],
-        datasets: [{
-          data: [wpmValue, accValue],
-          backgroundColor: ['#3CC47CBF','#1E392ABF'],
-          borderColor: ['#3CC47C','#1E392A'],
-          borderWidth: 2,
-          barPercentage: 0.4,
-          categoryPercentage: 0.5
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, max: 100 } }
-      }
-    });
+    // If there is 1 data point, make it a bar chart.
+    // If there is >1 data point, make it a line chart.
+    if (canvasData.wpm.length > 1){
+      // Line graph
+      new Chart(chart.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: canvasData.labels,
+          datasets: [
+            { label: 'Words Per Minute (WPM)', data: canvasData.wpm, borderColor: 'blue',  fill: false },
+            { label: 'Accuracy',  data: canvasData.accuracy, borderColor: 'green', fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { 
+            legend: { position: 'top' }
+          },
+          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+        }
+      });
+    } 
+    else {
+      // Bar graph
+      new Chart(chart.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Average WPM','Average Accuracy'],
+          datasets: [
+            {
+              data: [ canvasData.avg_wpm, Number(canvasData.avg_acc.replace("%", ""))],
+              backgroundColor: ['#3CC47CBF','#1E392ABF'],
+              borderColor: ['#3CC47C','#1E392A'],
+              borderWidth: 2,
+              barPercentage: 0.4,
+              categoryPercentage: 0.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+        }
+      });
+    }
   }
 
   // Show 'today' by default
-  showTable('today');
+  showTable('1');
   
   // Debug logging to help troubleshoot
-  console.log('Today data:', readCanvasData('chartToday'));
-  console.log('7-day data:', readCanvasData('chart7'));
-  console.log('28-day data:', readCanvasData('chart28'));
-  console.log('All-time data:', readCanvasData('chartAll'));
+  console.log("Today's data:", readCanvasData('chart-1'));
+  console.log('7-day data:', readCanvasData('chart-7'));
+  console.log('28-day data:', readCanvasData('chart-28'));
+  console.log('All-time data:', readCanvasData('chart-all'));
 });
 
 // Keep track of which period is active
-let currentPeriod = 'today';
+let currentPeriod = '1';
 
 // Show/hide tables and canvases
 function showTable(period) {
+  if (typeof(period) !== 'string'){
+    flash("An error occurred when displaying data. Please try again later.")
+    // TODO: Here, hide all tables and charts, and display an error icon.
+    return;
+  }
   currentPeriod = period;
-  ['tableToday','table7','table28','tableAll'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  ['chartToday','chart7','chart28','chartAll'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  
-  const table = document.getElementById('table' + capitalize(period));
-  if (table) table.style.display = 'table';
-  
-  const chart = document.getElementById('chart' + capitalize(period));
-  if (chart) chart.style.display = 'block';
-}
 
-// Utility to capitalize 'today', '7', '28', 'All'
-function capitalize(str) {
-  if (str === '7' || str === '28') return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  // The below code will hide the tables/charts we don't want to see, then show the table/chart we DO want to see.
+
+  const $statTables = $(".statsTable");               // Get all tables with the class "statsTable".
+  const $statCharts = $(".statsChart");               // Get all charts with the class "statsChart". 
+  const $statVisuals = $statTables.add($statCharts);  // Combine the two jQuery results. 
+
+  for (let i = 0; i < $statVisuals.length; i++) {     // Show the table/chart we want, hide the tables we don't want.
+    const element = $statVisuals[i];                  // Getting an array element converts it into a DOM object.
+    if (element.id === "table-" + period || element.id === "chart-" + period) { 
+      element.style.display = element.id === "chart-" + period ? "block" : "table"; // Set display to "table" if it's a table, otherwise set to block.
+    } else {
+      element.style.display = "none"; 
+    }
+  }
+
+  // Now we make the filter-buttons a different colour so we know which one we have clicked.
+  const $filterButtons = $("[id^=filter-button]");
+  for (let i = 0; i < $filterButtons.length; i++) {
+    const filterButton = $filterButtons[i];
+    if (filterButton.id === 'filter-button-' + period){
+      filterButton.classList = "selected";
+    }
+    else {
+      filterButton.classList = "bg-0";
+    }
+  }
+
 }
 
 // Attach generate-report handler
@@ -189,8 +173,8 @@ if (genBtn) genBtn.addEventListener('click', () => {
   }
   
   const userId = userIdMatch[1];
-  const tableId = 'table' + capitalize(currentPeriod);
-  const chartId = 'chart' + currentPeriod;
+  const tableId = 'table-' + currentPeriod;
+  const chartId = 'chart-' + currentPeriod;
   
   const stats = Array.from(document.querySelectorAll(`#${tableId} tbody tr`))
     .map(tr => ({ 
@@ -206,8 +190,8 @@ if (genBtn) genBtn.addEventListener('click', () => {
   } else {
     chartData = { 
       labels: [], 
-      wpm: [findMetric('table' + capitalize(currentPeriod), 'Average WPM')],
-      accuracy: [findMetric('table' + capitalize(currentPeriod), 'Average Accuracy')] 
+      wpm: [findMetric('table-' + currentPeriod, 'Average WPM')],
+      accuracy: [findMetric('table-' + currentPeriod, 'Average Accuracy')] 
     };
   }
   

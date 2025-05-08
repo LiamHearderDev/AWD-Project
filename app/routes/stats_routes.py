@@ -3,7 +3,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from flask import render_template, request, url_for, jsonify
+from flask import render_template, request, url_for, jsonify, flash
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
@@ -15,148 +15,172 @@ import ast      # This allows us to convert string literals into their respectiv
 
 
 
-def compute_user_stats(user_id, days: int = None):
+def compute_user_stats(days: int = None) -> dict:
     """
-    Calculate key statistics for a user over the given time window.
-
+    This function calculates key statistics for a user over a given time window. To be used within `stats.html`, the output must first go through the function `format_data()`.
+    Parameters:
+        days (int): An integer that determines how long ago each TypingResult is allowed to be. Anything outside of this range is not included in the result. A value of None will allow all results.
     Returns:
-      A dict with total_attempts, avg_wpm, best_wpm, avg_acc, best_acc
+      user_stats (dict): A dict with total_attempts, average words per minute, best words per minute, all words per minute results, avg accuracy, best accuracy, and all accuracy results.
     """
+
+    # This ensures that days is not negative. If it is negative, make it None.
+    days = days if days == None or days >= 0 else None
+
     # Base query for this user
-    q = TypingResult.query.filter(TypingResult.user_id == user_id)
+    query = TypingResult.query.filter(TypingResult.user_id == current_user.user_id)
     if days is not None :
         # since = datetime.utcnow() - timedelta(days=days)
-        since = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) if days==0 else datetime.utcnow()-timedelta(days=days)
-        q = q.filter(TypingResult.timestamp >= since)
+        since = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) if days==0 else datetime.now()-timedelta(days=days)
+        query = query.filter(TypingResult.timestamp >= since)
 
     # Fetch all matching results
-    results = q.all()
-    total = len(results)
-    if total == 0:
+    results = query.all()
+    if len(results) == 0:
         return {
             "total_attempts": 0,
             "avg_wpm": 0.0,
             "best_wpm": 0.0,
-            "avg_acc": "0.0%",
-            "best_acc": "0.0%"
+            "best_wpm_timestamp" : None,
+            "best_wpm_paragraph": None,
+            "all_wpm": [],
+            "avg_accuracy": "0.0%",
+            "best_accuracy": "0.0%",
+            "best_accuracy_timestamp": None,
+            "best_accuracy_paragraph": None,
+            "all_accuracy": [],
+            "result_timestamps": []
         }
 
-    # Compute WPM stats
-    wpms = [r.wpm for r in results]
-    avg_wpm = sum(wpms) / total
-    best_wpm = max(wpms)
+    # This is to be used when needing to flash an error to the screen in the following loop
+    def flash_error(field: str, id: int):
+        flash(f'An unexpected error occurred. Could not parse data for field [{field}]. Corrupted data found at TypingResult id: {id}')
+        return
 
-    # Compute accuracy per result (percentage)
-    acc_values = []
-    for r in results:
-        correct = ast.literal_eval(r.correct_characters) # Need to convert to a dict by eval string literal
-        if isinstance(correct, dict):
-            correct_count = sum(correct.values())
-        else:
-            correct_count = len(correct)
-        if r.total_characters:
-            acc_values.append((correct_count / r.total_characters) * 100)
-    if not acc_values:
-        avg_acc = best_acc = 0.0
+    # Compute data for each result
+    acc_values: list = []
+    best_acc: int = 0
+    best_acc_timestamp: datetime = None
+    best_acc_paragraph: int = None
+    wpms: list = []
+    result_timestamps: list = []
+    best_wpm: int = 0
+    best_wpm_timestamp: datetime = None
+    best_wpm_paragraph: int = None
+
+
+    # Loop over every TypingResult
+    for result in results:
+        correct = ast.literal_eval(result.correct_characters) # Need to convert to a dict by eval string literal
+
+        # Check for any issues
+        if not isinstance(correct, dict):
+            flash_error("correct_characters", result.result_id)
+            continue
+        if result.total_characters <= 0:
+            flash_error("total_characters", result.result_id)
+            continue
+        if result.wpm < 0:
+            flash_error("wpm", result.result_id)
+            continue
+        
+        # Cache data
+        result_timestamps.append(result.timestamp.strftime("%H:%M, %d/%m/%Y"))
+        correct_count = sum(correct.values())
+        this_acc = (correct_count / result.total_characters) * 100
+
+        acc_values.append(this_acc)
+        if this_acc >= best_acc:
+            best_acc = this_acc
+            best_acc_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
+            best_acc_paragraph = result.paragraph_id
+
+        wpms.append(result.wpm)
+        if result.wpm >= best_wpm:
+            best_wpm = result.wpm
+            best_wpm_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
+            best_wpm_paragraph = result.paragraph_id
+        
+    if len(acc_values) <= 0:
+        avg_acc = 0.0
+        best_acc = 0.0
     else:
         avg_acc = sum(acc_values) / len(acc_values)
         best_acc = max(acc_values)
 
+    avg_wpm = sum(wpms) / len(results)
+
     return {
-        "total_attempts": total,
+        "total_attempts": len(results),
         "avg_wpm": round(avg_wpm, 1),
         "best_wpm": round(best_wpm, 1),
-        "avg_acc": f"{round(avg_acc, 1)}%",
-        "best_acc": f"{round(best_acc, 1)}%"
+        "best_wpm_timestamp": best_wpm_timestamp,
+        "best_wpm_paragraph": best_wpm_paragraph,
+        "all_wpm": wpms,
+        "avg_accuracy": f"{round(avg_acc, 1)}%",
+        "best_accuracy": f"{round(best_acc, 1)}%",
+        "best_accuracy_timestamp": best_acc_timestamp,
+        "best_accuracy_paragraph": best_acc_paragraph,
+        "all_accuracy": acc_values,
+        "result_timestamps": result_timestamps
     }
 
 
-def make_row_list(stats_dict):
+def format_data(stats_dict: dict, format: str):
     """
-    Convert the stats dictionary into a list of row dicts for the template.
+    This function converts the input dictionary into a format suitable for the table or chart.
+    Parameters:
+        stats_dict      (dict): This is a dictionary of user statistics. This should always be the output of the function `compute_user_stats()`.
+        format          (str):  A string representing the format which the function should output. Should be either `"table"` or `"chart"`. Anything else will cause this function to output a value of `None`.
+    Returns:
+        formatted_data  (dict / list):     Depending on the value of the parameter `format`, this function either returns a list of dictionaries suitable for tables, or a dictionary suitable for charts. If `format` is incorrectly set, the output will be `None`.
     """
-    return [
-        {"metric": "Total Attempts",       "value": stats_dict["total_attempts"], "timestamp": "-", "paragraph": "-"},
-        {"metric": "Average WPM",          "value": stats_dict["avg_wpm"],       "timestamp": "-", "paragraph": "-"},
-        {"metric": "Average Accuracy",     "value": stats_dict["avg_acc"],       "timestamp": "-", "paragraph": "-"},
-        {"metric": "Best WPM",             "value": stats_dict["best_wpm"],      "timestamp": "-", "paragraph": "-"},
-        {"metric": "Best Accuracy",        "value": stats_dict["best_acc"],      "timestamp": "-", "paragraph": "-"}
-    ]
 
-def get_series(user_id, days=None):
-    """
-    CHANGED: Build Chart.js series from DB rows for the given period.
-    Returns labels, wpm_list, accuracy_list.
-    """
-    q = TypingResult.query.filter(TypingResult.user_id == user_id)
-    if days is not None and days > 0:
-        since = datetime.utcnow() - timedelta(days=days)
-        q = q.filter(TypingResult.timestamp >= since)
-    rows = q.order_by(TypingResult.timestamp).all()
+    match format:
+        case "table":
+            return [
+                {"metric": "Total Attempts",       "value": stats_dict["total_attempts"],   "timestamp": "-", "paragraph": "-"},
+                {"metric": "Average WPM",          "value": stats_dict["avg_wpm"],          "timestamp": "-", "paragraph": "-"},
+                {"metric": "Average Accuracy",     "value": stats_dict["avg_accuracy"],     "timestamp": "-", "paragraph": "-"},
+                {"metric": "Best WPM",             "value": stats_dict["best_wpm"],         "timestamp": stats_dict["best_wpm_timestamp"] if stats_dict["best_wpm_timestamp"] != None else "-",             "paragraph": stats_dict["best_wpm_paragraph"] if stats_dict["best_wpm_paragraph"] != None else "-"},
+                {"metric": "Best Accuracy",        "value": stats_dict["best_accuracy"],    "timestamp": stats_dict["best_accuracy_timestamp"] if stats_dict["best_accuracy_timestamp"] != None else "-",   "paragraph": stats_dict["best_accuracy_paragraph"] if stats_dict["best_accuracy_paragraph"] != None else "-"}
+            ]
+        case "chart":
+            return {
+                "labels":   stats_dict["result_timestamps"],
+                "wpm":      stats_dict["all_wpm"],
+                "accuracy": stats_dict["all_accuracy"]
+            }
+        case _:
+            return None
 
-    labels = [r.timestamp.strftime("%b %d %H:%M") for r in rows]
-    wpms = [r.wpm for r in rows]
-    accs = []
-    for r in rows:
-        correct = ast.literal_eval(r.correct_characters)
-        if isinstance(correct, dict):
-            correct_count = sum(correct.values())
-        else:
-            correct_count = len(correct)
-        if r.total_characters:
-            accs.append((correct_count / r.total_characters) * 100)
-    return labels, wpms, accs
+
 
 @application.route('/stats', methods=['GET'])
 @login_required
 def stats():
     """User stats dashboard."""
-    uid = current_user.user_id
-    uname    = current_user.username
-
-    # Calculate cutoffs
-    now = datetime.utcnow()
-    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    since7  = now - timedelta(days=7)
-    since28 = now - timedelta(days=28)
 
     # Compute stats per period
-    # stats_today  = compute_user_stats(uid, days=None if False else today_start)
-    stats_today = compute_user_stats(uid, days=0)
-    stats_7days  = compute_user_stats(uid, days=7)
-    stats_28days = compute_user_stats(uid, days=28)
-    stats_all    = compute_user_stats(uid, days=None)
-
-    # Prepare chart series per period
-    labels_today,  wp_today,  acc_today  = get_series(uid, days=None)
-    labels_7,      wp_7,      acc_7      = get_series(uid, days=7)
-    labels_28,     wp_28,     acc_28     = get_series(uid, days=28)
-    labels_all,    wp_all,    acc_all    = get_series(uid, days=None)
+    stats_today     = compute_user_stats(days=0)
+    stats_7days     = compute_user_stats(days=7)
+    stats_28days    = compute_user_stats(days=28)
+    stats_all       = compute_user_stats(days=None)
 
     # Render template with dynamic data
     return render_template('stats/stats.html',
-        user_id       = uid,                  # CHANGED
-        username      = uname,                # CHANGED
-        today         = make_row_list(stats_today),
-        last7days     = make_row_list(stats_7days),
-        last28days    = make_row_list(stats_28days),
-        alltime       = make_row_list(stats_all),
+                           
+        # Table data
+        today_table         = format_data(stats_today, "table"),
+        last7days_table     = format_data(stats_7days, "table"),
+        last28days_table    = format_data(stats_28days,"table"),
+        alltime_table       = format_data(stats_all,   "table"),
 
-        today_labels    = labels_today,
-        today_wpm       = wp_today,
-        today_accuracy  = acc_today,
-
-        last7_labels    = labels_7,
-        last7_wpm       = wp_7,
-        last7_accuracy  = acc_7,
-
-        last28_labels   = labels_28,
-        last28_wpm      = wp_28,
-        last28_accuracy = acc_28,
-
-        all_labels      = labels_all,
-        all_wpm         = wp_all,
-        all_accuracy    = acc_all
+        # Chart data
+        today_chart         = format_data(stats_today, "chart"),
+        last7days_chart     = format_data(stats_7days, "chart"),
+        last28days_chart    = format_data(stats_28days,"chart"),
+        alltime_chart       = format_data(stats_all,   "chart")
     )
 
 shared_data = {}
@@ -196,7 +220,6 @@ def generate_report():
 
 @application.route('/leaderboard', methods=['GET'])
 def leaderboard():
-    #top_users = User.query.order_by(User.highest_wpm.desc()).limit(10).all()
     return render_template('stats/leaderboard.html')
 
 @application.route('/api/leaderboard')

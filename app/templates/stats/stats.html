@@ -2,28 +2,30 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/stats.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
 
 {% block content %}
   <h1>Statistics</h1>
-  <div class="user-id">User: {{ username }} (ID: {{ user_id }})</div>
+  <div class="user-id">User: {{ current_user.username }}</div>
 
   <div class="filter-buttons">
-    <button onclick="showTable('today')">Today</button>
-    <button onclick="showTable('7')">Last 7 Days</button>
-    <button onclick="showTable('28')">Last 28 Days</button>
-    <button onclick="showTable('all')">All</button>
+    <button class="bg-0" onclick="showTable('1')"    id="filter-button-1">Today</button>
+    <button class="bg-0" onclick="showTable('7')"    id="filter-button-7">Last 7 Days</button>
+    <button class="bg-0" onclick="showTable('28')"   id="filter-button-28">Last 28 Days</button>
+    <button class="bg-0" onclick="showTable('all')"  id="filter-button-all">All</button>
   </div>
 
   <div class="table-section" id="tableContainer">
     <!-- Today's stats -->
-    <table id="tableToday" style="display: none;">
+    <table class="statsTable" id="table-1" style="display: none;">
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
       </thead>
       <tbody>
-        {% for row in today %}
+        {% for row in today_table %}
         <tr>
           <td>{{ row.metric }}</td>
           <td>{{ row.value }}</td>
@@ -33,18 +35,21 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chartToday" width="400" height="200" style="display: none;"
-            data-labels='{{ today_labels    | tojson }}'
-            data-wpm='{{ today_wpm       | tojson }}'
-            data-accuracy='{{ today_accuracy | tojson }}'></canvas>
+    <canvas class="statsChart" id="chart-1" 
+            width="400" height="200" style="display: none;"
+            data-labels='{{ today_chart.labels    | tojson }}'
+            data-wpm='{{ today_chart.wpm       | tojson }}'
+            data-accuracy='{{ today_chart.accuracy | tojson }}'
+            data-averagewpm='{{ today_table[1].value | tojson }}'
+            data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
 
     <!-- Last 7 Days stats -->
-    <table id="table7" style="display: none;">
+    <table class="statsTable" id="table-7" style="display: none;">
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
       </thead>
       <tbody>
-        {% for row in last7days %}
+        {% for row in last7days_table %}
         <tr>
           <td>{{ row.metric }}</td>
           <td>{{ row.value }}</td>
@@ -54,18 +59,21 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chart7" width="400" height="200" style="display: none;"
-            data-labels='{{ last7_labels    | tojson }}'
-            data-wpm='{{ last7_wpm       | tojson }}'
-            data-accuracy='{{ last7_accuracy | tojson }}'></canvas>
+    <canvas class="statsChart" id="chart-7" 
+            width="400" height="200" style="display: none;"
+            data-labels='{{ last7days_chart.labels    | tojson }}'
+            data-wpm='{{ last7days_chart.wpm       | tojson }}'
+            data-accuracy='{{ last7days_chart.accuracy | tojson }}'
+            data-averagewpm='{{ last7days_table[1].value | tojson }}'
+            data-averageacc='{{ last7days_table[2].value | tojson }}'></canvas>
 
     <!-- Last 28 Days stats -->
-    <table id="table28" style="display: none;">
+    <table class="statsTable" id="table-28" style="display: none;">
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
       </thead>
       <tbody>
-        {% for row in last28days %}
+        {% for row in last28days_table %}
         <tr>
           <td>{{ row.metric }}</td>
           <td>{{ row.value }}</td>
@@ -75,18 +83,21 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chart28" width="400" height="200" style="display: none;"
-            data-labels='{{ last28_labels    | tojson }}'
-            data-wpm='{{ last28_wpm       | tojson }}'
-            data-accuracy='{{ last28_accuracy | tojson }}'></canvas>
+    <canvas class="statsChart" id="chart-28" 
+            width="400" height="200" style="display: none;"
+            data-labels='{{ last28days_chart.labels    | tojson }}'
+            data-wpm='{{ last28days_chart.wpm       | tojson }}'
+            data-accuracy='{{ last28days_chart.accuracy | tojson }}'
+            data-averagewpm='{{ last28days_table[1].value | tojson }}'
+            data-averageacc='{{ last28days_table[2].value | tojson }}'></canvas>
 
     <!-- All-time stats -->
-    <table id="tableAll" style="display: none;">
+    <table class="statsTable" id="table-all" style="display: none;">
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
       </thead>
       <tbody>
-        {% for row in alltime %}
+        {% for row in alltime_table %}
         <tr>
           <td>{{ row.metric }}</td>
           <td>{{ row.value }}</td>
@@ -96,10 +107,13 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas id="chartAll" width="400" height="200" style="display: none;"
-            data-labels='{{ all_labels    | tojson }}'
-            data-wpm='{{ all_wpm       | tojson }}'
-            data-accuracy='{{ all_accuracy | tojson }}'></canvas>
+    <canvas class="statsChart" id="chart-all" 
+            width="400" height="200" style="display: none;"
+            data-labels='{{ alltime_chart.labels    | tojson }}'
+            data-wpm='{{ alltime_chart.wpm       | tojson }}'
+            data-accuracy='{{ alltime_chart.accuracy | tojson }}'
+            data-averagewpm='{{ alltime_table[1].value | tojson }}'
+            data-averageacc='{{ alltime_table[2].value | tojson }}'></canvas>
   </div>
 
   <div class="nav-buttons">
@@ -107,6 +121,4 @@
       Generate a report to share with your friends
     </button>
   </div>
-
-  <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
 {% endblock %}
