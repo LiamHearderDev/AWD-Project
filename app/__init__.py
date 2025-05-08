@@ -12,11 +12,16 @@ def create_app(config_class=Config):
     migrate.init_app(application, db)
     login.init_app(application)
 
-    from app import models
-    import app.routes.auth_routes
-    import app.routes.game_routes
-    import app.routes.intro_routes
-    import app.routes.main_routes
-    import app.routes.stats_routes
+    from app.routes.auth_routes import auth_bp
+    from app.routes.game_routes import game_bp
+    from app.routes.intro_routes import intro_bp
+    from app.routes.main_routes import main_bp
+    from app.routes.stats_routes import stats_bp
+
+    application.register_blueprint(auth_bp)
+    application.register_blueprint(game_bp)
+    application.register_blueprint(intro_bp)
+    application.register_blueprint(main_bp)
+    application.register_blueprint(stats_bp)
 
     return application

@@ -217,7 +217,7 @@ def generate_report():
         "accuracy": data["accuracy"]
     }
 
-    return jsonify({"url": url_for('shared_stats', userid=userid, random_str=random_str)})
+    return jsonify({"url": url_for('stats.shared_stats', userid=userid, random_str=random_str)})
 
 @stats_bp.route('/leaderboard', methods=['GET'])
 def leaderboard():

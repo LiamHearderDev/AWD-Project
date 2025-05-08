@@ -13,7 +13,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('intro'))
+        return redirect(url_for('intro.intro'))
     
     # Set the form that we are using. In this case: "LoginForm" from `forms.py`
     form = LoginForm()
@@ -40,7 +40,7 @@ def login():
     
     # If the username was found, and the password correct, we log them in.
     login_user(user, remember=form.remember_me.data)
-    return redirect(url_for('intro'))
+    return redirect(url_for('intro.intro'))
 
     
     
@@ -50,7 +50,7 @@ def register():
 
     # If the user is already logged in, redirect them to the home page. They can logout there, if they want.
     if current_user.is_authenticated:
-        return redirect(url_for('intro'))
+        return redirect(url_for('intro.intro'))
     
     # Set the correct form we will be using.
     form = RegistrationForm()
@@ -70,10 +70,10 @@ def register():
 
     # Redirects them to login
     flash('Congratulations, you are now a registered user!')
-    return redirect(url_for('login'))
+    return redirect(url_for('auth.login'))
 
 
 @auth_bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('intro'))
+    return redirect(url_for('intro.intro'))
