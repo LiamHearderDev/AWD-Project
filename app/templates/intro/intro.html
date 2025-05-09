@@ -1,34 +1,35 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/intro.css') }}">
+{% endblock %}
 {% block content %}
 
 <!-- carousel section -->
-<section style="margin-top: 60px;">
-  <div id="carousel-container" style="position: relative; width: 100%; max-width: 900px; margin: auto; border-radius: 12px; overflow: hidden; box-shadow: 0 0 12px rgba(0,0,0,0.1);">
+<section style="margin-top: 0px;">
+  <div id="carousel-container" class="full-carousel" >
 
     <!-- Slides -->
     <div class="slide" style="display: block; transition: opacity 0.5s ease;">
-      <img src="{{ url_for('static', filename='img/k1.png') }}" style="width: 100%; height: 400px; object-fit: cover;">
-      <div style="position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; color: white; padding: 20px;">
-        <h2 style="font-size: 32px; margin-bottom: 10px;">Welcome to SpeedLogger</h2>
-        <p>Track your typing performance and compete with friends!</p>
+      
+      <div style="position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; color: white; padding: 20px;">  
+        <h2 style="font-size: 48px; margin-bottom: 10px;"><span class="auto-type" style="font-size: 66px;"></span></h2>
+        <p style="font-size: 20px;">Track your typing performance and compete with friends!</p>
         <a href="/game" style="margin-top: 10px; display: inline-block; padding: 10px 24px; border-radius: 25px; border: 2px solid white; color: white; background: transparent; text-decoration: none; font-weight: bold;">Start Playing</a>
       </div>
     </div>
 
     <div class="slide" style="display: none; transition: opacity 0.5s ease;">
-      <img src="{{ url_for('static', filename='img/k1.png') }}" style="width: 100%; height: 400px; object-fit: cover;">
       <div style="position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; color: white; padding: 20px;">
-        <h2 style="font-size: 32px; margin-bottom: 10px;">Typing Challenge</h2>
-        <p>Measure your WPM and accuracy in real time.</p>
+        <h2 style="font-size: 48px; margin-bottom: 10px;">Typing Challenge</h2>
+        <p style="font-size: 20px;">Measure your WPM and accuracy in real time.</p>
       </div>
     </div>
 
     <div class="slide" style="display: none; transition: opacity 0.5s ease;">
-      <img src="{{ url_for('static', filename='img/k1.png') }}" style="width: 100%; height: 400px; object-fit: cover;">
       <div style="position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; color: white; padding: 20px;">
-        <h2 style="font-size: 32px; margin-bottom: 10px;">Leaderboards</h2>
-        <p>Compare yourself with friends and the world.</p>
+        <h2 style="font-size: 48px; margin-bottom: 10px;">Leaderboards</h2>
+        <p style="font-size: 20px;">Compare yourself with friends and the world.</p>
       </div>
     </div>
 
@@ -39,26 +40,7 @@
 </section>
 
 <!-- carousel and buttons style -->
-<style>
-  .carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: transparent;
-    border: none;
-    font-size: 24px;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    z-index: 10;
-    color: white;
-  }
-  .carousel-btn:hover {
-    transform: translateY(-50%) scale(1.1);
-  }
-  .left-btn { left: 20px; }
-  .right-btn { right: 20px; }
-</style>
+
 
 <!-- Script -->
 <script>
@@ -72,19 +54,19 @@
 </script>
 
 <!-- Feature Section with Cards -->
-<section class="text-3 bg-white" style="padding: 60px 20px;">
+<section class="text-3 " style="padding: 60px 20px; margin-top:60vh;background: transparent;">
   <div style="max-width: 1000px; margin: auto;">
-    <h2 class="text-center font-weight-bold" style="margin-bottom: 40px;">Key Features</h2>
+    <h2 class="text-center font-weight-bold" style="margin-bottom: 40px; color: white;font-size:50px;">Key Features</h2>
     <div class="d-flex justify-content-center" style="flex-wrap: wrap; gap: 20px; ">
-      <div style="flex: 1 1 250px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
+      <div class='feature-text'>
         <h3>Typing Game</h3>
         <p>Measure your WPM and accuracy in real time.</p>
       </div>
-      <div style="flex: 1 1 250px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
+      <div class='feature-text' >
         <h3>Performance Dashboard</h3>
         <p>Track your progress and common mistakes over time.</p>
       </div>
-      <div style="flex: 1 1 250px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
+      <div class='feature-text'>
         <h3>Leaderboards</h3>
         <p>See how you rank among others daily or all-time.</p>
       </div>
@@ -93,18 +75,33 @@
 </section>
 
 <!-- About Section -->
-<section class="text-3 bg-white" style="padding: 60px 20px;">
+<section class="text-3 " style="padding: 60px 20px; ">
   <div style="max-width: 800px; margin: auto;">
-    <h2 class="text-center font-weight-bold" style="margin-bottom: 30px;">About</h2>
-    <p style="line-height: 1.6; font-size: 16px;">
+    <h2 class="text-center font-weight-bold" style="margin-bottom: 30px; color: white;">About</h2>
+    <p class="about-text">
       SpeedLogger is a data-driven web application built as part of the CITS3403 Agile Web Development unit at the University of Western Australia.
       It is designed to help users improve their typing skills through real-time tests, performance tracking, and friendly competition via leaderboards.
       Users can monitor their progress over time, analyze their most common mistakes, and share their performance with others.
     </p>
-    <p style="line-height: 1.6; font-size: 16px;">
+    <p class="about-text">
       This project was collaboratively developed by Group 16.
     </p>
   </div>
 </section>
+
+
+<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+
+<script>
+  var typed = new Typed(".auto-type", {
+    strings: ["Welcome to SpeedLogger"],
+    typeSpeed: 66,
+    
+    onComplete: function() {
+      document.querySelector('.typed-cursor').style.display = 'none';
+    }
+    
+  })
+</script>
 
 {% endblock %}

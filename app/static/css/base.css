@@ -1,8 +1,8 @@
 :root {
     --base-colour-0: #3CC47C;
-    --base-colour-1: #1E392A;
-    --base-colour-2: #E9C893;
-    --base-colour-3: #828081;
+    --base-colour-1: #010B16;
+    --base-colour-2: #4717F6;
+    --base-colour-3: #A239CA;
 }
 
 /* makes it so that footer always appears at bottom using flex */
