@@ -1,18 +1,20 @@
-from app import application
-from flask import render_template
+from app import db
+from flask import render_template, Blueprint
 from flask_login import login_required
 
-@application.route('/dashboard', methods=['GET'])
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/dashboard', methods=['GET'])
 def dashboard():
     # Handle main logic here
     return render_template('main/dashboard.html')
 
-@application.route('/profile', methods=['GET'])
+@main_bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
     return render_template('main/profile.html')
 
 # TODO: Add a page in for this:
-# @application.errorhandler(404)
+# @main_bp.errorhandler(404)
 # def page_not_found(e):
 #     return render_template('errors/404.html'), 404
