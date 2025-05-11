@@ -7,4 +7,6 @@
     border-radius: 25px;
 }
 
-
+.d-grid {
+    display: grid !important;
+}

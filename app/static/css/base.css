@@ -61,6 +61,11 @@ footer {
         display: none;
     }
 }
+@media only screen and (max-width: 600px) {
+    .hide-600 {
+        display: none;
+    }
+}
 @media only screen and (max-width: 900px) {
     .hide-900 {
         display: none;
