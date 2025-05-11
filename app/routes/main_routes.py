@@ -13,8 +13,3 @@ def dashboard():
 @login_required
 def profile():
     return render_template('main/profile.html')
-
-# TODO: Add a page in for this:
-# @main_bp.errorhandler(404)
-# def page_not_found(e):
-#     return render_template('errors/404.html'), 404

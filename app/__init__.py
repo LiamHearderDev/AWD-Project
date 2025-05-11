@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from app.config import Config
 from app.extensions import db, migrate, login
 
@@ -23,5 +23,10 @@ def create_app(config_class=Config):
     application.register_blueprint(intro_bp)
     application.register_blueprint(main_bp)
     application.register_blueprint(stats_bp)
+
+    # This creates a global error handler for all 404 errors
+    @application.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
 
     return application
