@@ -232,4 +232,3 @@ def get_leaderboard():
         'wpm': [user.highest_wpm for user in top_users]
     }
     return jsonify(data)
-
