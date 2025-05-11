@@ -17,6 +17,7 @@ def create_app(config_class=Config):
     from app.routes.intro_routes import intro_bp
     from app.routes.main_routes import main_bp
     from app.routes.stats_routes import stats_bp
+    import app.routes.friend_routes
 
     application.register_blueprint(auth_bp)
     application.register_blueprint(game_bp)
