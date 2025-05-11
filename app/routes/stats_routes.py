@@ -3,20 +3,21 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from flask import render_template, request, url_for, jsonify, flash, Blueprint
+from flask import render_template, request, url_for, jsonify, flash, abort, Blueprint
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
-from app import db
-from app.models import TypingResult, User
+from app import application, db
+from app.models import TypingResult, User, Friendship
 
 import ast      # This allows us to convert string literals into their respective types, like dictionaries.
 
 
 stats_bp = Blueprint('stats', __name__)
 
+def compute_user_stats(user_id: int | None, days: int = None) -> dict:
 
-def compute_user_stats(days: int = None) -> dict:
+    # If user_id is None, stats are for current_user; otherwise for that ID
     """
     This function calculates key statistics for a user over a given time window. To be used within `stats.html`, the output must first go through the function `format_data()`.
     Parameters:
@@ -26,10 +27,11 @@ def compute_user_stats(days: int = None) -> dict:
     """
 
     # This ensures that days is not negative. If it is negative, make it None.
-    days = days if days == None or days >= 0 else None
+    days = days if days is None or days >= 0 else None
+    uid  = user_id if user_id is not None else current_user.user_id
 
-    # Base query for this user
-    query = TypingResult.query.filter(TypingResult.user_id == current_user.user_id)
+  # Base query for the specified user
+    query = TypingResult.query.filter(TypingResult.user_id == uid)
     if days is not None :
         # since = datetime.utcnow() - timedelta(days=days)
         since = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) if days==0 else datetime.now()-timedelta(days=days)
@@ -162,11 +164,12 @@ def format_data(stats_dict: dict, format: str):
 def stats():
     """User stats dashboard."""
 
-    # Compute stats per period
-    stats_today     = compute_user_stats(days=0)
-    stats_7days     = compute_user_stats(days=7)
-    stats_28days    = compute_user_stats(days=28)
-    stats_all       = compute_user_stats(days=None)
+    #Compute stats per period   
+    uid = current_user.user_id
+    stats_today  = compute_user_stats(uid, days=0)
+    stats_7days  = compute_user_stats(uid, days=7)
+    stats_28days = compute_user_stats(uid, days=28)
+    stats_all    = compute_user_stats(uid, days=None)
 
     # Render template with dynamic data
     return render_template('stats/stats.html',
@@ -184,40 +187,37 @@ def stats():
         alltime_chart       = format_data(stats_all,   "chart")
     )
 
-shared_data = {}
-#  Generate a random string for generation of the url in the syntax of '/stats/shared_stats/<userid>/<random_str>'
-def generate_random_string(length=10):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+@stats_bp.route('/friends_stats/<int:friend_id>')
+@login_required
+def friends_stats(friend_id):
+    """
+    Shows stats for a friend at /friends_stats/<friend_id>.
+    """
+    # 1) Verify they’re actually your friend
+    rel = Friendship.query.get((current_user.user_id, friend_id))
+    if not rel or not rel.is_requested:
+        abort(403)
 
-@stats_bp.route('/stats/shared_stats/<userid>/<random_str>', methods=['GET'])
-def shared_stats(userid, random_str):
-    key = userid + random_str
-    data = shared_data.get(key, {})
-    # lookup the sharing user:
-    user = User.query.get_or_404(int(userid))
-    return render_template('stats/shared_stats.html',
-        data=data,
-        user_id=user.user_id,
-        username=user.username
+    # 2) Compute exactly as in your /stats route
+    uid = friend_id
+    stats_today  = compute_user_stats(uid, days=0)
+    stats_7days  = compute_user_stats(uid, days=7)
+    stats_28days = compute_user_stats(uid, days=28)
+    stats_all    = compute_user_stats(uid, days=None)
+
+    # 3) Render a special template
+    return render_template(
+        'friends/friends_stats.html',
+        username=User.query.get(uid).username,
+        today_table      = format_data(stats_today,  'table'),
+        last7_table      = format_data(stats_7days,  'table'),
+        last28_table     = format_data(stats_28days, 'table'),
+        alltime_table    = format_data(stats_all,     'table'),
+        today_chart      = format_data(stats_today,   'chart'),
+        last7_chart      = format_data(stats_7days,   'chart'),
+        last28_chart     = format_data(stats_28days,  'chart'),
+        alltime_chart    = format_data(stats_all,     'chart')
     )
-
-@stats_bp.route('/stats/generate_report', methods=['POST'])
-def generate_report():
-    userid = request.form['userid']
-    period = request.form['period']
-    data = json.loads(request.form['data'])
-
-    random_str = generate_random_string()
-    key = userid + random_str
-    shared_data[key] = {
-        "period": period,
-        "stats": data["stats"],
-        "labels": data["labels"],
-        "wpm": data["wpm"],
-        "accuracy": data["accuracy"]
-    }
-
-    return jsonify({"url": url_for('stats.shared_stats', userid=userid, random_str=random_str)})
 
 @stats_bp.route('/leaderboard', methods=['GET'])
 def leaderboard():
@@ -232,3 +232,4 @@ def get_leaderboard():
         'wpm': [user.highest_wpm for user in top_users]
     }
     return jsonify(data)
+
