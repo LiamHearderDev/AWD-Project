@@ -1,7 +1,45 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
+
 {% block content %}
-    <p>
-        This is the Profile page.
-    </p>
+    <section id="profile_main_section" class="d-flex justify-content-between">
+        <!-- Pfp -->
+        <section id="profile_pfp_name" class="d-flex m-0">
+            <border id="pfp_border" class="bg-3 mr-4 text-center align-center text-white">
+                <h1 id="pfp_text" style="min-width: 100px; min-height: 100px; line-height: 100px; margin: auto;">?</h1>
+            </border>
+
+            <!-- Name and registration time -->
+            <div class="d-block mr-4 m-0">
+                <h3 id="username">{{ current_user.username }}</h3>
+            </div>
+        </section>
+        
+
+        <!-- Profile Stats -->
+        <section id="stats">
+            <div class="d-flex align-items-end" style="height: 100%;">
+                <span class="mr-5">
+                    <p>WPM:</p>
+                    <h4>90</h4>
+                </span>
+                <span class="mr-4">
+                    <p>Rank:</p>
+                    <h4>51 / 109</h4>
+                </span>
+                <span class="mr-4">
+                    <p>Friends:</p>
+                    <h4>12</h4>
+                </span>
+                <span class="mr-4">
+                    <p>Account Age:</p>
+                    <h4>45 days</h4>
+                </span>
+            </div>
+        </section>
+    </section>
 {% endblock %}
