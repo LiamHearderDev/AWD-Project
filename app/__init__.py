@@ -6,7 +6,8 @@ def create_app(config_class=Config):
 
     application = Flask(__name__)
     application.config.from_object(config_class)
-    application.config['SECRET_KEY'] = 'you-will-never-guess'
+    application.config['SECRET_KEY'] = 'you-will-never-guess' #TODO: This should not be stored here. Store in an environment variable OUTSIDE of Github.
+    # application.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
     db.init_app(application)
     migrate.init_app(application, db)
@@ -24,7 +25,9 @@ def create_app(config_class=Config):
     application.register_blueprint(main_bp)
     application.register_blueprint(stats_bp)
 
-    # This creates a global error handler for all 404 errors
+    # This creates a global error handler for all 404 errors. 
+    # Blueprints may override each other, so storing it here will trigger this function regardless of which
+    #   blueprint may have caused the error.
     @application.errorhandler(404)
     def page_not_found(e):
         return render_template('errors/404.html'), 404
