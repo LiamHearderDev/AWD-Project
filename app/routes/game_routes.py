@@ -67,6 +67,11 @@ def submit_results():
             return jsonify(error=f"Value for '{desc}' must be non-negative"), 400
 
         data[desc] = val # add valid statistic to data dictionary
+    
+    # validate paragraph exists (unless it’s -1 for placeholder)
+    pid = data.get('paragraph id', -1)
+    if pid != -1 and Paragraph.query.get(pid) is None:
+        return jsonify(error=f"No paragraph found with id {pid}"), 400
 
     # Build TypingResult record
     result = TypingResult(
