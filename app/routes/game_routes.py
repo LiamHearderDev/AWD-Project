@@ -27,14 +27,15 @@ def random_paragraph():
     }) # return the paragraph as JSON
 
 ALLOWED_STATS = { # whitelist dictionary with correct datatypes of each column
-    'paragraph id':      int,
-    'words per minute':  int,
-    'total characters':  int,
-    'correct characters': dict,
-    'total words':       int,
-    'correct words':     dict,
-    'total mistakes':    int,
-    'wrong characters':  dict
+    'paragraph id':         int,
+    'words per minute':     int,
+    'total characters':     int,
+    'correct characters':   dict,
+    'total words':          int,
+    'correct words':        dict,
+    'total mistakes':       int,
+    'wrong characters':     dict,
+    'wrong words':          dict
 }
 
 @game_bp.route('/submit-instance-statistics', methods=['POST'])
@@ -84,6 +85,7 @@ def submit_results():
         correct_words       = json.dumps(data.get('correct words', {})),
         total_mistakes      = data.get('total mistakes', 0),
         mistake_characters  = json.dumps(data.get('wrong characters', {})),
+        mistake_words       = json.dumps(data.get('wrong words', {})),
         timestamp           = datetime.now()
     )
 
@@ -95,4 +97,4 @@ def submit_results():
     db.session.add(result) # add to database
     db.session.commit()
 
-    return jsonify({'status': 'saved', 'result_id': result.result_id}) # return the result ID, client prints it in console
+    return jsonify({'status': 'saved', 'result_id': result.result_id}), 200 # return the result ID, client prints it in console
