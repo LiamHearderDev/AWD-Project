@@ -45,11 +45,12 @@ class TypingResult(db.Model):
     paragraph_id        = db.Column(db.Integer, db.ForeignKey('paragraph.paragraph_id'), nullable=False)
     wpm                 = db.Column(db.Integer, default=0)
     total_characters    = db.Column(db.Integer,nullable=False)
-    correct_characters  = db.Column(JSON, nullable=False)
     total_words         = db.Column(db.Integer, nullable=False)
+    correct_characters  = db.Column(JSON, nullable=False)
     correct_words       = db.Column(JSON, nullable=False)
     total_mistakes      = db.Column(db.Integer, nullable=False)
     mistake_characters  = db.Column(JSON, nullable=False)
+    mistake_words       = db.Column(JSON, nullable=False)
     timestamp           = db.Column(db.DateTime, nullable=False)
     
     def __repr__(self):
