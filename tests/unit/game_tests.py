@@ -2,6 +2,7 @@ import unittest
 from app import create_app, db
 from app.config import TestingConfig
 from app.models import Paragraph
+from flask import json
 
 class GameBlueprintTestCase(unittest.TestCase):
     def setUp(self):
@@ -42,6 +43,49 @@ class GameBlueprintTestCase(unittest.TestCase):
         self.assertEqual(data['body'], 'Test paragraph')
         self.assertEqual(data['type'], 'test')
 
+    def test_handle_db_error(self): # checks if error handler for database commit errors is working
+        # import the handler directly
+        from app.routes.game_routes import game_bp
+        from sqlalchemy.exc import SQLAlchemyError
+        rv, status = game_bp.handle_db_error(SQLAlchemyError('oops')) # manually cause error
+        self.assertEqual(status, 500)
+        json_data = json.loads(rv[0].data)
+        self.assertEqual(json_data['error'], 'Database error, please try again')
+
+    # NOTE: accepted data to game_routes.py is JSON such that is list with first element being dictionary with all info
+
+    def test_submit_results_non_list(self): # try sending non-JSON data, not list
+        response = self.client.post(
+            '/submit-instance-statistics',
+            json={'not': 'a list'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Expected a JSON array of stats', response.get_json()['error'])
+
+    def test_submit_results_item_not_object(self): # try sending non-JSON data, list but non dictionary element
+        response = self.client.post(
+            '/submit-instance-statistics',
+            json=['string']
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Item 0 must be an object", response.get_json()['error'])
+
+    def test_submit_results_unexpected_description(self): # send data with invalid / unexpected statistic
+        payload = [{'description': 'invalid', 'value': 1}]
+        response = self.client.post(
+            '/submit-instance-statistics', json=payload
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Unexpected stat description", response.get_json()['error'])
+
+    def test_submit_results_negative_value(self): # check if any negative numbers
+        payload = [{'description': 'total words', 'value': -5}]
+        response = self.client.post(
+            '/submit-instance-statistics', json=payload
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("must be non-negative", response.get_json()['error'])
     
+
 if __name__ == '__main__':
     unittest.main()
