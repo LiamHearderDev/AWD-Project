@@ -1,6 +1,9 @@
-from app import db, application
+from app import db, create_app
 from app.models import Paragraph, TypingResult
+from app.config import ProductionConfig
 import json
+
+application = create_app(ProductionConfig)
 
 def add_paragraph(body, type=None): # add a new paragraph to the database
 
@@ -53,7 +56,8 @@ if __name__ == "__main__":
     with application.app_context():
         # functions to run in console go here
 
-        # add_paragraph("This is a test paragraph.", "normal")
+        # add_paragraph("beans on toast", "normal")
+        # add_paragraph("bingus ongus", "normal")
         # purge_result_table()
         # display_results_for_user(1)
         pass

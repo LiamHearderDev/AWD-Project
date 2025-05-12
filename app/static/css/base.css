@@ -1,8 +1,14 @@
 :root {
-    --base-colour-0: #3CC47C;
+    --base-colour-0: #E7DFDD;
     --base-colour-1: #010B16;
     --base-colour-2: #4717F6;
     --base-colour-3: #A239CA;
+
+    --base-colour-0-hover: #2f9d62; /*  10%  darker  */
+    --base-colour-1-hover: #2c543e; /*  8%   lighter */
+    --base-colour-2-hover: #e1b36b; /*  10%  darker  */
+    --base-colour-3-hover: #676566; /*  10%  darker  */
+
 }
 
 /* makes it so that footer always appears at bottom using flex */
@@ -37,9 +43,28 @@ footer {
 .text-2 { color: var(--base-colour-2); }
 .text-3 { color: var(--base-colour-3); }
 
+.base-button {
+    border: 1px solid black; 
+    border-radius: 10px; 
+    overflow: hidden;
+}
+
+/* This is used to darken/lighten buttons, based on their colour, when hovered. */
+.bg-0.base-button:hover { background-color: var(--base-colour-0-hover); }
+.bg-1.base-button:hover { background-color: var(--base-colour-1-hover); }
+.bg-2.base-button:hover { background-color: var(--base-colour-2-hover); }
+.bg-3.base-button:hover { background-color: var(--base-colour-3-hover); }
+
+
+
 /* This is only for mobile-adjustments when the screen is too small */
 @media only screen and (max-width: 500px) {
     .hide-500 {
+        display: none;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .hide-600 {
         display: none;
     }
 }
