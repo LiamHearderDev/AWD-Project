@@ -1,12 +1,13 @@
 from flask import Flask
 from app.config import Config
 from app.extensions import db, migrate, login
+import os
 
 def create_app(config_class=Config):
 
     application = Flask(__name__)
     application.config.from_object(config_class)
-    application.config['SECRET_KEY'] = 'you-will-never-guess'
+    application.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
     db.init_app(application)
     migrate.init_app(application, db)

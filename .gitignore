@@ -181,3 +181,6 @@ pyrightconfig.json
 
 # Local database file
 app.db
+
+# Enviroment-specific files
+.flaskenv
