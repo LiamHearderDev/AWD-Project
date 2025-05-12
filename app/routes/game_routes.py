@@ -94,7 +94,11 @@ def submit_results():
         if (result.wpm > current_user.highest_wpm):
             current_user.highest_wpm = result.wpm
 
-    db.session.add(result) # add to database
-    db.session.commit()
+    try: # try to add data to database
+        db.session.add(result)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(error="Could not save result"), 500
 
     return jsonify({'status': 'saved', 'result_id': result.result_id}), 200 # return the result ID, client prints it in console
