@@ -5,6 +5,8 @@ from flask_login import current_user, login_required
 from datetime import datetime
 import json
 from sqlalchemy.sql.expression import func # SQLite function that returns a random row
+from sqlalchemy.exc import SQLAlchemyError
+
 
 game_bp = Blueprint('game', __name__)
 
@@ -12,6 +14,12 @@ game_bp = Blueprint('game', __name__)
 def game():
     # Handle game logic here
     return render_template('game/game.html')
+
+
+@game_bp.errorhandler(SQLAlchemyError) # runs if adding to database causes error
+def handle_db_error(e):
+    db.session.rollback()
+    return jsonify(error="Database error, please try again"), 500
 
 
 @game_bp.route('/random-paragraph', methods=['GET'])
@@ -94,11 +102,7 @@ def submit_results():
         if (result.wpm > current_user.highest_wpm):
             current_user.highest_wpm = result.wpm
 
-    try: # try to add data to database
-        db.session.add(result)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(error="Could not save result"), 500
+    db.session.add(result)
+    db.session.commit()
 
     return jsonify({'status': 'saved', 'result_id': result.result_id}), 200 # return the result ID, client prints it in console
