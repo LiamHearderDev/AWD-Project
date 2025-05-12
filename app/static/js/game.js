@@ -6,6 +6,11 @@ const timerId = 'timerElement';
 const buttonId = 'startButton';
 const gameContainerId = 'gameContainer';
 
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // get csrf token from header
+$.ajaxSetup({ // makes so that all future AJAX communications to server add CSRF automatically
+    headers: { 'X-CSRFToken': csrfToken }
+});
+
 function statistic(description, value) { // constructor for statistics
     this.description = description;
     this.value = value;
