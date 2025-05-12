@@ -5,14 +5,14 @@ from app.models import Paragraph
 from flask import json
 
 class GameBlueprintTestCase(unittest.TestCase):
-    def setUp(self):
+    def setUp(self): # setup testing environment
         # create app with test config and context
         self.app = create_app(TestingConfig)
         self.client = self.app.test_client()
         with self.app.app_context():
             db.create_all()
 
-    def tearDown(self):
+    def tearDown(self): # reset testing environment
         # reset database
         with self.app.app_context():
             db.session.remove()
@@ -86,6 +86,5 @@ class GameBlueprintTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("must be non-negative", response.get_json()['error'])
     
-
 if __name__ == '__main__':
     unittest.main()
