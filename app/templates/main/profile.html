@@ -1,7 +1,46 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
+
 {% block content %}
-    <p>
-        This is the Profile page.
-    </p>
+    <section id="profile_main_section" class="justify-content-between d-lg-flex d-md-block">
+        <!-- pfp and username -->
+        <section id="profile_pfp_name" class="d-sm-flex align-items-sm-center justify-content-center justify-content-md-left m-0" style="display: grid">
+            <!-- pfp -->
+            <border id="pfp_border" class="mr-sm-4 m-0 bg-3 d-inline-block text-center align-center text-white">
+                <h1 id="pfp_text" style="min-width: 100px; min-height: 100px; line-height: 100px; margin: auto;">?</h1>
+            </border>
+
+            <!-- Username -->
+            <div class="d-block mr-sm-4 m-0 text-center text-md-left">
+                <h3 id="username">{{ current_user.username }}</h3>
+            </div>
+        </section>
+        
+
+        <!-- Profile Stats -->
+        <section id="stats">
+            <div class="container m-0 mt-5 p-0 d-md-flex d-sm-block align-items-end text-center text-md-left">
+                <span class="m-0 col-3">
+                    <p>WPM:</p>
+                    <h4>{{ wpm }}</h4>
+                </span>
+                <span class="m-0 col-3">
+                    <p>Rank:</p>
+                    <h4>{{ rank }} / {{ max_rank }}</h4>
+                </span>
+                <span class="m-0 col-3">
+                    <p>Friends:</p>
+                    <h4>{{ friends_count }}</h4>
+                </span>
+                <span class="m-0 col-4">
+                    <p>Account Age:</p>
+                    <h4>{{ account_age }}</h4>
+                </span>
+            </div>
+        </section>
+    </section>
 {% endblock %}
