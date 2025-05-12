@@ -78,6 +78,10 @@ class Friendship(db.Model):
     is_requested        = db.Column(db.Boolean, nullable=False)
     requesting_user     = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
 
+    sender = db.relationship('User', foreign_keys=[requesting_user], backref='sent_requests')
+    friend = db.relationship('User', foreign_keys=[friend_id], backref='friends')
+
+
     def __repr__(self):
         return f"<Friendship: {self.user_id}> and {self.friend_id}, requested={self.is_requested}"
     
