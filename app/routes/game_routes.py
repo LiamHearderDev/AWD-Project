@@ -57,16 +57,3 @@ def submit_results():
     db.session.commit()
 
     return jsonify({'status': 'saved', 'result_id': result.result_id}) # return the result ID, client prints it in console
-
-# test link
-@game_bp.route('/results', methods=['GET'])
-@login_required
-def all_results():
-    results = TypingResult.query.filter_by(user_id=current_user.user_id).all()
-    return jsonify([
-        {
-          'result_id': r.result_id,
-          'wpm': r.wpm,
-          'timestamp': r.timestamp.isoformat()
-        } for r in results
-    ])
