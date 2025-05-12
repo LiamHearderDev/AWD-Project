@@ -26,13 +26,47 @@ def random_paragraph():
         'type':         p.type
     }) # return the paragraph as JSON
 
+ALLOWED_STATS = { # whitelist dictionary with correct datatypes of each column
+    'paragraph id':      int,
+    'words per minute':  int,
+    'total characters':  int,
+    'correct characters': dict,
+    'total words':       int,
+    'correct words':     dict,
+    'total mistakes':    int,
+    'wrong characters':  dict
+}
 
 @game_bp.route('/submit-instance-statistics', methods=['POST'])
 @login_required
 def submit_results():
     payload = request.get_json() # get the JSON data from the request           
+    if not isinstance(payload, list):
+        return jsonify(error="Expected a JSON array of stats"), 400
 
-    data = { stat['description']: stat['value'] for stat in payload }
+    data = {}
+    for i, stat in enumerate(payload):
+        # must be an object with exactly description+value
+        if not isinstance(stat, dict) or 'description' not in stat or 'value' not in stat:
+            return jsonify(error=f"Item {i} must be an object with 'description' and 'value'"), 400
+
+        desc = stat['description']
+        val  = stat['value']
+
+        # description must be in our whitelist
+        if desc not in ALLOWED_STATS:
+            return jsonify(error=f"Unexpected stat description: '{desc}'"), 400
+
+        # value must be the right type
+        expected_type = ALLOWED_STATS[desc]
+        if not isinstance(val, expected_type):
+            return jsonify(error=f"Value for '{desc}' must be a {expected_type.__name__}"), 400
+
+        # is numeric, must be valid in context
+        if expected_type is int and val < 0:
+            return jsonify(error=f"Value for '{desc}' must be non-negative"), 400
+
+        data[desc] = val # add valid statistic to data dictionary
 
     # Build TypingResult record
     result = TypingResult(
