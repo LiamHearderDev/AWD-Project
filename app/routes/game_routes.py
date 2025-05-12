@@ -41,8 +41,8 @@ ALLOWED_STATS = { # whitelist dictionary with correct datatypes of each column
 @game_bp.route('/submit-instance-statistics', methods=['POST'])
 @login_required
 def submit_results():
-    payload = request.get_json() # get the JSON data from the request           
-    if not isinstance(payload, list):
+    payload = request.get_json(silent=True) # get the JSON data from the request, even if invalid          
+    if not isinstance(payload, list): # check if is actually JSON
         return jsonify(error="Expected a JSON array of stats"), 400
 
     data = {}
@@ -74,18 +74,18 @@ def submit_results():
     if pid != -1 and Paragraph.query.get(pid) is None:
         return jsonify(error=f"No paragraph found with id {pid}"), 400
 
-    # Build TypingResult record
+    # Build TypingResult record with validated data
     result = TypingResult(
         user_id             = current_user.user_id,
-        paragraph_id        = data.get('paragraph id', 1), 
-        wpm                 = data.get('words per minute', 0),
-        total_characters    = data.get('total characters', 0),
-        correct_characters  = json.dumps(data.get('correct characters', {})),
-        total_words         = data.get('total words', 0),
-        correct_words       = json.dumps(data.get('correct words', {})),
-        total_mistakes      = data.get('total mistakes', 0),
-        mistake_characters  = json.dumps(data.get('wrong characters', {})),
-        mistake_words       = json.dumps(data.get('wrong words', {})),
+        paragraph_id        = pid,
+        wpm                 = data['words per minute'],
+        total_characters    = data['total characters'],
+        total_words         = data['total words'],
+        correct_characters  = json.dumps(data['correct characters']),
+        correct_words       = json.dumps(data['correct words']),
+        total_mistakes      = data['total mistakes'],
+        mistake_characters  = json.dumps(data['wrong characters']),
+        mistake_words       = json.dumps(data['wrong words']),
         timestamp           = datetime.now()
     )
 
