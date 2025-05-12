@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 import sqlalchemy as sa
 from app import db
@@ -31,3 +31,7 @@ class RegistrationForm(FlaskForm):
             User.email == email.data))
         if user is not None:
             raise ValidationError('An account is already registered to this email.')
+            
+class FriendRequestForm(FlaskForm):
+    user_id  = IntegerField('User ID', validators=[DataRequired()])
+    submit = SubmitField('Send Request')
