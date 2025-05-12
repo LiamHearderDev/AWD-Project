@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from app.config import Config
-from app.extensions import db, migrate, login
+from app.extensions import db, migrate, login, csrf
 
 def create_app(config_class=Config):
 
@@ -12,6 +12,7 @@ def create_app(config_class=Config):
     db.init_app(application)
     migrate.init_app(application, db)
     login.init_app(application)
+    csrf.init_app(application)
 
     from app.routes.auth_routes import auth_bp
     from app.routes.game_routes import game_bp
