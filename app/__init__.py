@@ -12,7 +12,9 @@ def create_app(config_class=ProductionConfig):
     db.init_app(application)
     migrate.init_app(application, db)
     login.init_app(application)
-    csrf.init_app(application)
+
+    if not application.config.get("TESTING", False):
+        csrf.init_app(application)
 
     from app.routes.auth_routes import auth_bp
     from app.routes.game_routes import game_bp
