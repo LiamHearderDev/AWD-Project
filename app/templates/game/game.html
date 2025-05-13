@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block content %}
+    <!-- purely for Selenium tests -->
+    <span id="Game_ID" hidden></span>
+
     <div class="start-wrapper">
         <button class="start" id="startButton" onclick="callGame()">Start Game</button>
     </div>

@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block content %}
+
+    <!-- purely for Selenium tests -->
+    <span id="Login_ID" hidden></span>
+
     <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 50px;">
         <form id="login_form" class="container-lg" method="post" action="" novalidate>
             {{ form.hidden_tag() }}
