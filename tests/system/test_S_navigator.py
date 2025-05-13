@@ -18,16 +18,26 @@ class NavigationTestsNoLogin(BaseSeleniumTests):
 
         # wait until URL ends with our expected path
         self.wait.until(lambda d: d.current_url.endswith(expected_path),
-                        message=f"URL did not end with {expected_path}")
+                        message=f"URL did not end with {expected_path}"
+        )
 
     def test_home(self):
         # click to go to home page and wait for URL
         self.click_and_assert(link_id='Base_Home', expected_path='/intro')
-
         # then wait for the Home page’s unique element to appear
         self.wait.until(EC.presence_of_element_located((By.ID, 'Home_ID')))
-        home_el = self.driver.find_element(By.ID, 'Home_ID')
-        self.assertIsNotNone(home_el)
+
+    def test_game(self):
+        self.click_and_assert(link_id='Base_Game', expected_path='/game')
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Game_ID')))
+
+    def test_leaderboard(self):
+        self.click_and_assert(link_id='Base_Leaderboard', expected_path='/leaderboard')
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Leaderboard_ID')))
+
+    def test_login(self):
+        self.click_and_assert(link_id='Base_Login', expected_path='/login')
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))
 
 if __name__ == '__main__':
     unittest.main()
