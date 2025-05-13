@@ -118,15 +118,96 @@
     <div class="leaderboard-table-section">
 
     <canvas id="mistake-words-chart"
-        data-labels-today='{{ today_typing_labels | tojson }}'
-        data-counts-today='{{ today_typing_counts | tojson }}'
-        data-labels-last7='{{ last7days_typing_labels | tojson }}'
-        data-counts-last7='{{ last7days_typing_counts | tojson }}'
-        data-labels-last28='{{ last28days_typing_labels | tojson }}'
-        data-counts-last28='{{ last28days_typing_counts | tojson }}'
-        data-labels-all='{{ alltime_typing_labels | tojson }}'
-        data-counts-all='{{ alltime_typing_counts | tojson }}'
-    </canvas>
+        data-labels-today='{{ today_mistake_labels | tojson }}'
+        data-counts-today='{{ today_mistake_counts | tojson }}'
+        data-labels-last7='{{ last7days_mistake_labels | tojson }}'
+        data-counts-last7='{{ last7days_mistake_counts | tojson }}'
+        data-labels-last28='{{ last28days_mistake_labels | tojson }}'
+        data-counts-last28='{{ last28days_mistake_counts | tojson }}'
+        data-labels-all='{{ alltime_mistake_labels | tojson }}'
+        data-counts-all='{{ alltime_mistake_counts | tojson }}'></canvas>
+
+    <canvas id="correct-words-chart"
+        data-labels-today='{{ today_correct_labels | tojson }}'
+        data-counts-today='{{ today_correct_counts | tojson }}'
+        data-labels-last7='{{ last7days_correct_labels | tojson }}'
+        data-counts-last7='{{ last7days_correct_counts | tojson }}'
+        data-labels-last28='{{ last28days_correct_labels | tojson }}'
+        data-counts-last28='{{ last28days_correct_counts | tojson }}'
+        data-labels-all='{{ alltime_correct_labels | tojson }}'
+        data-counts-all='{{ alltime_correct_counts | tojson }}'></canvas>
+
+    <!-- Paragraph stats (today) -->
+    <table class="paragraphStatsTable" id="para-table-1" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paragraph stats (today) -->
+    <table class="paragraphStatsTable" id="para-table-7" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paragraph stats (today) -->
+    <table class="paragraphStatsTable" id="para-table-28" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paragraph stats (today) -->
+    <table class="paragraphStatsTable" id="para-table-all" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+
+
     </div>
   </div>
 

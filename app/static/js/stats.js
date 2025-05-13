@@ -140,12 +140,17 @@ function showTable(period) {
       element.style.display = "none"; 
     }
   }
-    showDoughnutChart(period); 
+    showDoughnutChart(period);
+    showCorrectDoughnutChart(period);
+    const $paraTables = $(".paragraphStatsTable");
+    $paraTables.each((_, tbl) => {
+      tbl.style.display = tbl.id === "para-table-" + period ? "table" : "none";
+    });
+
 }
 
 
 let mistakeWordsChartInstance = null;
-
 
 function showDoughnutChart(period) {
   const canvas = document.getElementById('mistake-words-chart');
@@ -187,6 +192,42 @@ function showDoughnutChart(period) {
       plugins: {
         legend: { position: 'top' },
         title: { display: true, text: 'Most Mistyped Words' }
+      }
+    }
+  });
+}
+
+let correctWordsChartInstance = null;
+
+function showCorrectDoughnutChart(period) {
+  const canvas = document.getElementById('correct-words-chart');
+  if (!canvas) return;
+
+  const suffixMap = { '1': 'today', '7': 'last7', '28': 'last28', 'all': 'all' };
+  const suffix = suffixMap[period];
+
+  const labels = JSON.parse(canvas.dataset[`labels${capitalize(suffix)}`] || "[]");
+  const counts = JSON.parse(canvas.dataset[`counts${capitalize(suffix)}`] || "[]");
+
+  if (!labels.length || !counts.length) return;
+
+  if (correctWordsChartInstance) correctWordsChartInstance.destroy();
+
+  correctWordsChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Most Correct Words",
+        data: counts,
+        backgroundColor: labels.map(() => `hsl(${Math.random() * 360}, 60%, 70%)`)
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Most Correct Words' }
       }
     }
   });
