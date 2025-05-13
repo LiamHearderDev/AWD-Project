@@ -16,7 +16,7 @@ import ast      # This allows us to convert string literals into their respectiv
 stats_bp = Blueprint('stats', __name__)
 
 
-def compute_user_stats(user_id: int | None, days: int = None) -> dict:
+def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
 
     # If user_id is None, stats are for current_user; otherwise for that ID
     """
