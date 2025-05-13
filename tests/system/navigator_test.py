@@ -6,11 +6,11 @@ class NavigationTestsNoLogin(BaseSeleniumTests):
 
     def setUp(self):
         super().setUp()
-        # Always start from the home page
+        # always start from the home page
         self.driver.get(f'{self.base_url}/')
     
     def click_and_assert(self, link_id, expected_path, verify_locator):
-        # find the nav link by its visible text and click it
+        # find the nav link by its id and click it
         nav_link = self.driver.find_element(By.ID, link_id)
         nav_link.click()
 
@@ -22,8 +22,8 @@ class NavigationTestsNoLogin(BaseSeleniumTests):
                         f"Expected URL to end with {expected_path} but was {self.driver.current_url}")
 
     def test_home(self):
-        self.click_and_assert(link_id='home', expected_path='/')
-        self.driver.find_element(By.ID, 'about')
+        self.click_and_assert(link_id='Base_Home', expected_path='/')
+        self.driver.find_element(By.ID, 'Home_ID')
 
 if __name__ == '__main__':
     unittest.main()
