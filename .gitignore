@@ -181,3 +181,6 @@ pyrightconfig.json
 
 # Local database file
 app.db
+
+# The flask environment config file. This is to hide the secret key.
+.flaskenv

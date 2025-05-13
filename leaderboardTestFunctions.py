@@ -49,8 +49,8 @@ def create_test_typing_results():
                 correct_words=random.randint(10,100),
                 total_mistakes=random.randint(0, 10),
                 mistake_characters={"a": random.randint(0, 10), "b": random.randint(0, 10)}, 
-                
-                timestamp=datetime.utcnow()
+                mistake_words={},
+                timestamp=datetime.now()
             )
             db.session.add(result)
     db.session.commit()
