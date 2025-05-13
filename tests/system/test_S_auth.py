@@ -43,7 +43,37 @@ class TestLogin(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'Base_Logout').click() # logout
         self.check_logged_out() # check if logged out
 
+    def test_register_duplicate_username(self):
+        # first registration
+        self.attempt_register('dupuser', 'dup@example.com', 'Dup12345')
+        self.wait.until(EC.url_contains('/login'))
 
+        # second registration with same username
+        self.attempt_register('dupuser', 'newemail@example.com', 'Dup12345')
+        self.wait.until(EC.url_contains('/register'))
+
+    def test_register_duplicate_email(self):
+        # first registration
+        self.attempt_register('uniqueuser', 'same@example.com', 'Uniq12345')
+        self.wait.until(EC.url_contains('/login'))
+
+        # second registration with same email
+        self.attempt_register('anotheruser', 'same@example.com', 'Other12345')
+        self.wait.until(EC.url_contains('/register'))
+
+    def test_login_invalid_credentials(self):
+        # seed user via UI or directly in DB
+        self.attempt_register('loginuser', 'login@example.com', 'RightPass1')
+        self.wait.until(EC.url_contains('/login'))
+
+        # attempt login with wrong password
+        self.attempt_login('loginuser', 'WrongPass')
+        self.wait.until(EC.url_contains('/login'))
+
+    def test_login_nonexistent_user(self):
+        # no registration step → attempt login
+        self.attempt_login('noone', 'doesntmatter')
+        self.wait.until(EC.url_contains('/login'))
 
 
 if __name__ == '__main__':
