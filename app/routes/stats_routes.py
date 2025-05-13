@@ -18,7 +18,9 @@ from collections import Counter  # This allows us to do some statistics on the d
 stats_bp = Blueprint('stats', __name__)
 
 
-def compute_user_stats(days: int = None) -> dict:
+def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
+
+    # If user_id is None, stats are for current_user; otherwise for that ID
     """
     This function calculates key statistics for a user over a given time window. To be used within `stats.html`, the output must first go through the function `format_data()`.
     Parameters:
@@ -28,10 +30,11 @@ def compute_user_stats(days: int = None) -> dict:
     """
 
     # This ensures that days is not negative. If it is negative, make it None.
-    days = days if days == None or days >= 0 else None
+    days = days if days is None or days >= 0 else None
+    uid  = user_id if user_id is not None else current_user.user_id
 
-    # Base query for this user
-    query = TypingResult.query.filter(TypingResult.user_id == current_user.user_id)
+  # Base query for the specified user
+    query = TypingResult.query.filter(TypingResult.user_id == uid)
     if days is not None :
         # since = datetime.utcnow() - timedelta(days=days)
         since = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) if days==0 else datetime.now()-timedelta(days=days)
@@ -149,6 +152,7 @@ def compute_user_stats(days: int = None) -> dict:
         "most_incorrect_words_counts": mistake_words_counts,
 
     }
+
 
 
 def format_data(stats_dict: dict, format: str):
