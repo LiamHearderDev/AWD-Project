@@ -140,20 +140,63 @@ function showTable(period) {
       element.style.display = "none"; 
     }
   }
+    showDoughnutChart(period); 
+}
 
-  // Now we make the filter-buttons a different colour so we know which one we have clicked.
-  const $filterButtons = $("[id^=filter-button]");
-  for (let i = 0; i < $filterButtons.length; i++) {
-    const filterButton = $filterButtons[i];
-    if (filterButton.id === 'filter-button-' + period){
-      filterButton.classList = "selected";
-    }
-    else {
-      filterButton.classList = "bg-0";
-    }
+
+let mistakeWordsChartInstance = null;
+
+
+function showDoughnutChart(period) {
+  const canvas = document.getElementById('mistake-words-chart');
+  if (!canvas) return;
+
+  const suffixMap = {
+    '1': 'today',
+    '7': 'last7',
+    '28': 'last28',
+    'all': 'all'
+  };
+  const suffix = suffixMap[period];
+
+  const labels = JSON.parse(canvas.dataset[`labels${capitalize(suffix)}`] || "[]");
+  const counts = JSON.parse(canvas.dataset[`counts${capitalize(suffix)}`] || "[]");
+
+  if (!labels.length || !counts.length) {
+    console.warn("No mistake word data found for period:", period);
+    return;
   }
 
+  // clear the canvas before drawing
+  if (mistakeWordsChartInstance) {
+    mistakeWordsChartInstance.destroy();
+  }
+
+  mistakeWordsChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Most Mistyped Words",
+        data: counts,
+        backgroundColor: labels.map(() => `hsl(${Math.random() * 360}, 70%, 70%)`)
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Most Mistyped Words' }
+      }
+    }
+  });
 }
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
 
 // Attach generate-report handler
 const genBtn = document.getElementById('generateReportBtn');

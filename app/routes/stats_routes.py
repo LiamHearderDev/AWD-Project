@@ -12,6 +12,8 @@ from app.models import TypingResult, User
 
 import ast      # This allows us to convert string literals into their respective types, like dictionaries.
 
+from collections import Counter  # This allows us to do some statistics on the data
+
 
 stats_bp = Blueprint('stats', __name__)
 
@@ -37,6 +39,7 @@ def compute_user_stats(days: int = None) -> dict:
 
     # Fetch all matching results
     results = query.all()
+    print(f"[DEBUG] Days={days}, Found results: {len(results)}")
     if len(results) == 0:
         return {
             "total_attempts": 0,
@@ -50,7 +53,8 @@ def compute_user_stats(days: int = None) -> dict:
             "best_accuracy_timestamp": None,
             "best_accuracy_paragraph": None,
             "all_accuracy": [],
-            "result_timestamps": []
+            "result_timestamps": [],
+            "most_incorrect_words": []
         }
 
     # This is to be used when needing to flash an error to the screen in the following loop
@@ -69,14 +73,20 @@ def compute_user_stats(days: int = None) -> dict:
     best_wpm_timestamp: datetime = None
     best_wpm_paragraph: int = None
 
+    mistake_words_counter = Counter()
+    mistake_words_values: list = []
 
     # Loop over every TypingResult
     for result in results:
         correct = ast.literal_eval(result.correct_characters) # Need to convert to a dict by eval string literal
+        mistake_words = ast.literal_eval(result.mistake_words) 
 
         # Check for any issues
         if not isinstance(correct, dict):
             flash_error("correct_characters", result.result_id)
+            continue
+        if not isinstance(mistake_words, dict):
+            flash_error("mistake_words", result.result_id)
             continue
         if result.total_characters <= 0:
             flash_error("total_characters", result.result_id)
@@ -101,6 +111,17 @@ def compute_user_stats(days: int = None) -> dict:
             best_wpm = result.wpm
             best_wpm_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
             best_wpm_paragraph = result.paragraph_id
+
+        if result.mistake_words:
+            mistake_words_counter.update(mistake_words)
+
+    most_incorrect_words = mistake_words_counter.most_common(8)
+    mistake_words_labels = [word for word, count in most_incorrect_words]
+    mistake_words_counts = [count for word, count in most_incorrect_words]
+ 
+
+        
+        
         
     if len(acc_values) <= 0:
         avg_acc = 0.0
@@ -123,7 +144,10 @@ def compute_user_stats(days: int = None) -> dict:
         "best_accuracy_timestamp": best_acc_timestamp,
         "best_accuracy_paragraph": best_acc_paragraph,
         "all_accuracy": acc_values,
-        "result_timestamps": result_timestamps
+        "result_timestamps": result_timestamps,
+        "most_incorrect_words_labels": mistake_words_labels,
+        "most_incorrect_words_counts": mistake_words_counts,
+
     }
 
 
@@ -181,8 +205,20 @@ def stats():
         today_chart         = format_data(stats_today, "chart"),
         last7days_chart     = format_data(stats_7days, "chart"),
         last28days_chart    = format_data(stats_28days,"chart"),
-        alltime_chart       = format_data(stats_all,   "chart")
+        alltime_chart       = format_data(stats_all,   "chart"),
+
+        # Words leaderboard data
+        today_typing_labels = stats_today["most_incorrect_words_labels"],
+        today_typing_counts = stats_today["most_incorrect_words_counts"],
+        last7days_typing_labels = stats_7days["most_incorrect_words_labels"],
+        last7days_typing_counts = stats_7days["most_incorrect_words_counts"],
+        last28days_typing_labels = stats_28days["most_incorrect_words_labels"],
+        last28days_typing_counts = stats_28days["most_incorrect_words_counts"],
+        alltime_typing_labels = stats_all["most_incorrect_words_labels"],
+        alltime_typing_counts = stats_all["most_incorrect_words_counts"],
     )
+
+
 
 shared_data = {}
 #  Generate a random string for generation of the url in the syntax of '/stats/shared_stats/<userid>/<random_str>'

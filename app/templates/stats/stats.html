@@ -114,8 +114,25 @@
             data-accuracy='{{ alltime_chart.accuracy | tojson }}'
             data-averagewpm='{{ alltime_table[1].value | tojson }}'
             data-averageacc='{{ alltime_table[2].value | tojson }}'></canvas>
+
+    <div class="leaderboard-table-section">
+
+    <canvas id="mistake-words-chart"
+        data-labels-today='{{ today_typing_labels | tojson }}'
+        data-counts-today='{{ today_typing_counts | tojson }}'
+        data-labels-last7='{{ last7days_typing_labels | tojson }}'
+        data-counts-last7='{{ last7days_typing_counts | tojson }}'
+        data-labels-last28='{{ last28days_typing_labels | tojson }}'
+        data-counts-last28='{{ last28days_typing_counts | tojson }}'
+        data-labels-all='{{ alltime_typing_labels | tojson }}'
+        data-counts-all='{{ alltime_typing_counts | tojson }}'
+    </canvas>
+    </div>
   </div>
 
+
+
+  
   <div class="nav-buttons">
     <button type="button" id="generateReportBtn" class="green-button">
       Generate a report to share with your friends
