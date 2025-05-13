@@ -1,8 +1,8 @@
 from flask import Flask, render_template
-from app.config import Config
+from app.config import Config, ProductionConfig
 from app.extensions import db, migrate, login, csrf
 
-def create_app(config_class=Config):
+def create_app(config_class=ProductionConfig):
 
     application = Flask(__name__)
     application.config.from_object(config_class)
