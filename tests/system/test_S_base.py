@@ -1,18 +1,26 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 import threading, time, unittest
+import logging
 
 from app import create_app
 from app.config import TestingConfig
 from app.extensions import db
 
 class BaseSeleniumTests(unittest.TestCase): 
+
+    wait_for_load = False
+
     # this is how application is setup for all selenium test files
     # all selenium tests should reference BaseSeleniumTests as parent class
     @classmethod
     def setUpClass(cls):
+        # don't want to see flask app info for every request
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+
         # Start Flask server in background thread
         cls.app = create_app(TestingConfig)
         cls.app.testing = True
@@ -22,13 +30,21 @@ class BaseSeleniumTests(unittest.TestCase):
         )
         cls.server_thread.daemon = True
         cls.server_thread.start()
-        time.sleep(1)  # give server time to start
+        if cls.wait_for_load: time.sleep(1)  # give server time to start
 
-        # headless Chrome
+        # Configure headless Chrome properly
         opts = Options()
-        opts.headless = True
+        opts.add_argument("--headless=new")      
+
+        # Additional flags to improve stability in headless mode
+        opts.add_argument("--disable-gpu")
+        opts.add_argument("--no-sandbox")
+        opts.add_argument("--disable-dev-shm-usage")
+
         cls.driver = webdriver.Chrome(options=opts)
-        cls.base_url = 'http://localhost:5001'
+        cls.base_url = "http://localhost:5001"
+
+        cls.wait = WebDriverWait(cls.driver, 1)
 
     @classmethod
     def tearDownClass(cls):
