@@ -7,6 +7,9 @@
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/speedlogger_icon.png')}}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 
+        <!-- CSRF -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
         <!-- Bootstrap -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">  <!-- Latest compiled and minified CSS -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>               <!-- jQuery library -->
@@ -30,6 +33,7 @@
             <a id='Base_Home' class="header-link text-white font-weight-bold" href="{{ url_for('intro.intro') }}">Home</a>
             <a id='Base_Game' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('game.game') }}">Game</a>
             <a id='Base_Stats' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.stats') }}">Stats</a>
+            <a id='Base_Friends' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('friends.friends') }}">Friends</a>
             <a id='Base_Leaderboard' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.leaderboard') }}">Leaderboard</a>
         </nav>
 

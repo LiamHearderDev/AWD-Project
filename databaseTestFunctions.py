@@ -2,6 +2,9 @@ from app import db, create_app
 from app.models import Paragraph, TypingResult
 from app.config import ProductionConfig
 import json
+from app.config import ProductionConfig
+
+application = create_app(ProductionConfig)
 
 application = create_app(ProductionConfig)
 
@@ -55,9 +58,4 @@ def purge_result_table():
 if __name__ == "__main__":
     with application.app_context():
         # functions to run in console go here
-
-        # add_paragraph("beans on toast", "normal")
-        # add_paragraph("bingus ongus", "normal")
-        # purge_result_table()
-        # display_results_for_user(1)
         pass

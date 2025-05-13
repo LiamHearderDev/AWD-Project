@@ -12,6 +12,7 @@ class ProductionConfig(Config):
         os.environ.get('DATABASE_URL')
         or 'sqlite:///' + os.path.join(basedir, 'app.db')
     )
+    WTF_CSRF_ENABLED = True
 
 class TestingConfig(Config):
     TESTING = True # Use for running automated tests

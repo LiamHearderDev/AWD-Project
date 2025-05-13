@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <script src="{{ url_for('static', filename='js/friends.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <h2>Pending Requests</h2>
+  <ul id="incomingRequests">
+    {% for req in incoming %}
+      <li data-sender-id="{{ req.requesting_user }}">
+        {{ req.sender.username }} ({{ req.requesting_user }})
+        sent you a friend request.
+
+        <button
+          class="accept-btn btn btn-sm btn-success"
+          data-sender-id="{{ req.requesting_user }}">
+          Accept
+        </button>
+
+        <button
+          class="reject-btn btn btn-sm btn-danger"
+          data-sender-id="{{ req.requesting_user }}">
+          Reject
+        </button>
+      </li>
+    {% else %}
+      <li><em>No pending requests.</em></li>
+    {% endfor %}
+  </ul>
+
+    <h2>Send a Friend Request</h2>
+  <form id="friendRequestForm" method="POST"
+        action="{{ url_for('friends.friends') }}">
+    {{ form.hidden_tag() }}
+    {{ form.user_id.label }}  
+    {{ form.user_id(size=20) }}
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+
+
+  <h2>Your Friends</h2>
+  <ul>
+    {% for f in my_friends %}
+      <li>
+        {{ f.friend.username }} ({{ f.friend_id }})
+        <a href="{{ url_for('friends.view_friend_stats', friend_id=f.friend_id) }}"
+        class="btn btn-sm btn-info"
+        >View Stats</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
