@@ -38,7 +38,7 @@ class TestLogin(BaseSeleniumTests):
     
     def test_successful_login(self):
         self.attempt_register('selenium_user', 'sel@gmail.com', 'Password123') # register
-        self.attempt_login('selenium_user', 'sel@gmail.com', 'Password123') # login
+        self.attempt_login('selenium_user', 'Password123') # login
         self.check_logged_in() # check if logged in
         self.driver.find_element(By.ID, 'Base_Logout').click() # logout
         self.check_logged_out() # check if logged out
