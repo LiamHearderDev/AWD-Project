@@ -9,7 +9,7 @@ class NavigationTestsNoLogin(BaseSeleniumTests):
         # always start from the home page
         self.driver.get(f'{self.base_url}/')
     
-    def click_and_assert(self, link_id, expected_path, verify_locator):
+    def click_and_assert(self, link_id, expected_path):
         # find the nav link by its id and click it
         nav_link = self.driver.find_element(By.ID, link_id)
         nav_link.click()
