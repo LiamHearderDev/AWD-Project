@@ -53,7 +53,6 @@ class TestLogin(BaseSeleniumTests):
         self.wait.until(EC.url_contains('/register'))
 
     def test_register_duplicate_email(self):
-        # first registration
         self.attempt_register('uniqueuser', 'same@example.com', 'Uniq12345')
         self.wait.until(EC.url_contains('/login'))
 
@@ -62,7 +61,7 @@ class TestLogin(BaseSeleniumTests):
         self.wait.until(EC.url_contains('/register'))
 
     def test_login_invalid_credentials(self):
-        # seed user via UI or directly in DB
+        # register
         self.attempt_register('loginuser', 'login@example.com', 'RightPass1')
         self.wait.until(EC.url_contains('/login'))
 
@@ -71,7 +70,7 @@ class TestLogin(BaseSeleniumTests):
         self.wait.until(EC.url_contains('/login'))
 
     def test_login_nonexistent_user(self):
-        # no registration step → attempt login
+        # login without registering
         self.attempt_login('noone', 'doesntmatter')
         self.wait.until(EC.url_contains('/login'))
 
