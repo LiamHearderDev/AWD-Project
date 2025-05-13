@@ -142,11 +142,11 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     // add statistics
                     stats.push(new statistic('total characters', text.length));
                     stats.push(new statistic('total words', text.split(' ').length));
-                    stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000)));
+                    // stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000))); not needed
                     stats.push(new statistic('words per minute', Math.round((text.split(' ').length / ((Date.now() - startTime) / 60000)))));
-                    stats.push(new statistic('characters per minute', Math.round((text.length / ((Date.now() - startTime) / 60000)))));
+                    // stats.push(new statistic('characters per minute', Math.round((text.length / ((Date.now() - startTime) / 60000))))); not needed
                     stats.push(new statistic('total mistakes', mistakes));
-                    stats.push(new statistic('finished at', new Date().toLocaleTimeString()));
+                    // stats.push(new statistic('finished at', new Date().toLocaleTimeString())); not needed
                     stats.push(new statistic('correct characters', getCorrectDicts(char_list, char_check)));
                     stats.push(new statistic('correct words', getCorrectDicts(word_list, word_check)));
                     stats.push(new statistic('wrong characters', wrong_char_dict));

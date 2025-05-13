@@ -19,12 +19,14 @@ def create_app(config_class=Config):
     from app.routes.intro_routes import intro_bp
     from app.routes.main_routes import main_bp
     from app.routes.stats_routes import stats_bp
+    from app.routes.friend_routes import friends_bp 
 
     application.register_blueprint(auth_bp)
     application.register_blueprint(game_bp)
     application.register_blueprint(intro_bp)
     application.register_blueprint(main_bp)
     application.register_blueprint(stats_bp)
+    application.register_blueprint(friends_bp)
 
     # This creates a global error handler for all 404 errors. 
     # Blueprints may override each other, so storing it here will trigger this function regardless of which

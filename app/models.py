@@ -45,11 +45,12 @@ class TypingResult(db.Model):
     paragraph_id        = db.Column(db.Integer, db.ForeignKey('paragraph.paragraph_id'), nullable=False)
     wpm                 = db.Column(db.Integer, default=0)
     total_characters    = db.Column(db.Integer,nullable=False)
-    correct_characters  = db.Column(JSON, nullable=False)
     total_words         = db.Column(db.Integer, nullable=False)
+    correct_characters  = db.Column(JSON, nullable=False)
     correct_words       = db.Column(JSON, nullable=False)
     total_mistakes      = db.Column(db.Integer, nullable=False)
     mistake_characters  = db.Column(JSON, nullable=False)
+    mistake_words       = db.Column(JSON, nullable=False)
     timestamp           = db.Column(db.DateTime, nullable=False)
     
     def __repr__(self):
@@ -77,6 +78,10 @@ class Friendship(db.Model):
     friend_id           = db.Column(db.Integer,db.ForeignKey('user.user_id'),primary_key=True, nullable=False)
     is_requested        = db.Column(db.Boolean, nullable=False)
     requesting_user     = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+
+    sender = db.relationship('User', foreign_keys=[requesting_user], backref='sent_requests')
+    friend = db.relationship('User', foreign_keys=[friend_id], backref='friends')
+
 
     def __repr__(self):
         return f"<Friendship: {self.user_id}> and {self.friend_id}, requested={self.is_requested}"
