@@ -60,7 +60,7 @@ class NavigationTestsLogin(BaseSeleniumTests):
         cls.driver.get(f'{cls.base_url}/register')
         cls.wait.until(EC.presence_of_element_located((By.ID, 'Register_ID')))
         cls.driver.find_element(By.ID, 'register_username').send_keys('selenium_user')
-        cls.driver.find_element(By.ID, 'register_email').send_keys('sel@example.com')
+        cls.driver.find_element(By.ID, 'register_email').send_keys('sel@gmail.com')
         cls.driver.find_element(By.ID, 'register_password').send_keys('Password123')
         cls.driver.find_element(By.ID, 'register_password2').send_keys('Password123')
         cls.driver.find_element(By.ID, 'register_submit').click()
@@ -74,6 +74,9 @@ class NavigationTestsLogin(BaseSeleniumTests):
         # now we should see Profile & Logout links
         cls.wait.until(EC.presence_of_element_located((By.ID, 'Base_Profile')))
         cls.wait.until(EC.presence_of_element_located((By.ID, 'Base_Logout')))
+
+    def setUp(self): # overide setUp in base, don't want to reset database
+        pass
 
     def click_and_assert(self, link_id, expected_path, expected_id):
         # same helper here too

@@ -1,9 +1,10 @@
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 import threading, time, unittest
 import logging
+from werkzeug.serving import make_server
+
 
 from app import create_app
 from app.config import TestingConfig
@@ -24,12 +25,14 @@ class BaseSeleniumTests(unittest.TestCase):
         # Start Flask server in background thread
         cls.app = create_app(TestingConfig)
         cls.app.testing = True
+    
+        cls._srv = make_server('localhost', 5001, cls.app)
         cls.server_thread = threading.Thread(
-            target=cls.app.run,
-            kwargs={'port': 5001, 'use_reloader': False}
+            target=cls._srv.serve_forever,
+            daemon=True
         )
-        cls.server_thread.daemon = True
         cls.server_thread.start()
+
         if cls.wait_for_load: time.sleep(1)  # give server time to start
 
         # Configure headless Chrome properly
@@ -48,8 +51,16 @@ class BaseSeleniumTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # Close browser; server stops when main thread ends
+        # 1) Quit the Selenium browser
         cls.driver.quit()
+
+        # 2) Shut down the Werkzeug server
+        cls._srv.shutdown()
+        cls.server_thread.join()
+
+        # 3) Drop the DB schema and pop the app context
+        with cls.app.app_context():
+            db.drop_all()
 
     def setUp(self):
         # reset DB for each test
@@ -57,4 +68,3 @@ class BaseSeleniumTests(unittest.TestCase):
         with self.app.app_context():
             db.drop_all()
             db.create_all()
-

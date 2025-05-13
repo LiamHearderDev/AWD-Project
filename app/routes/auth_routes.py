@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from app.models import User
 from app.forms import LoginForm, RegistrationForm
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.extensions import db
 from app.models import User
 from flask_login import login_user, logout_user, current_user
@@ -57,7 +57,7 @@ def register():
 
     # If the form does not validate, render the normal page.
     if not form.validate_on_submit():
-        print("not validated")
+        # print("not validated") 
         return render_template('auth/register.html', form=form)
     
     # Create a new user object to go into the database
@@ -70,6 +70,7 @@ def register():
 
     # Redirects them to login
     flash('Congratulations, you are now a registered user!')
+
     return redirect(url_for('auth.login'))
 
 
