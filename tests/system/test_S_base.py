@@ -22,7 +22,7 @@ class BaseSeleniumTests(unittest.TestCase):
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-        # Start Flask server in background thread
+        # start Flask server in background thread
         cls.app = create_app(TestingConfig)
         cls.app.testing = True
     
@@ -35,11 +35,11 @@ class BaseSeleniumTests(unittest.TestCase):
 
         if cls.wait_for_load: time.sleep(1)  # give server time to start
 
-        # Configure headless Chrome properly
+        # configure headless Chrome properly
         opts = Options()
         opts.add_argument("--headless=new")      
 
-        # Additional flags to improve stability in headless mode
+        # additional flags to improve stability in headless mode
         opts.add_argument("--disable-gpu")
         opts.add_argument("--no-sandbox")
         opts.add_argument("--disable-dev-shm-usage")
@@ -51,14 +51,14 @@ class BaseSeleniumTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # 1) Quit the Selenium browser
+        # quit the Selenium browser
         cls.driver.quit()
 
-        # 2) Shut down the Werkzeug server
+        # shut down the Werkzeug server
         cls._srv.shutdown()
         cls.server_thread.join()
 
-        # 3) Drop the DB schema and pop the app context
+        # drop the DB schema and pop the app context
         with cls.app.app_context():
             db.drop_all()
 
