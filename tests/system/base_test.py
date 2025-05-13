@@ -37,6 +37,7 @@ class BaseSeleniumTests(unittest.TestCase):
 
     def setUp(self):
         # reset DB for each test
+        # can override this method in tests, but need to call super().setup() to ensure DB is reset
         with self.app.app_context():
             db.drop_all()
             db.create_all()
