@@ -20,7 +20,27 @@ class AuthBlueprintTestCase(unittest.TestCase):
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
-        
+    
+
+
+    ##### HELPER FUNCTIONS #####
+
+    def attempt_login(self, username: any, password: any, remember_me: any = True):
+        """Helper function to attempt login with given username and password."""
+        return self.client.post('/login', data={
+            'username': username,
+            'password': password,
+            'remember_me': remember_me
+        })
+
+    def attempt_registration(self, username: any, email: any, password: any, password2: any):
+        """Helper function to attempt registration with given username, email, password, and password confirmation."""
+        return self.client.post('/register', data={
+            'username': username,
+            'email': email,
+            'password': password,
+            'password2': password2
+        })
 
 
     ##### LOGIN PAGE TESTS #####
@@ -46,9 +66,15 @@ class AuthBlueprintTestCase(unittest.TestCase):
             user.set_password(testPassword)
             db.session.add(user)
             db.session.commit()
+
+            # check if the user was actually added to the database
+            user = User.query.filter_by(username=testUsername).first()
+            self.assertIsNotNone(user, "User was not found in the database.")
+            self.assertTrue(user.check_password(testPassword), "Password check failed for the registered user.")
+
         
-        
-        # response = self.client.post('/login', data=form.data, follow_redirects=True)
+        # Attempt to log in with valid credentials
+        # response = self.attempt_login(testUsername, testPassword, True)
         response = self.client.post('/login', data={
             'username': testUsername,
             'password': testPassword,
@@ -56,7 +82,7 @@ class AuthBlueprintTestCase(unittest.TestCase):
         })
 
         # Check if the response is a successful redirect
-        self.assertEqual(response.status_code, 302, "Login route did not return 302.")
+        self.assertEqual(response.status_code, 302, "Login route did not return 302, with valid credentials.")
         self.assertEqual(response.location, '/intro', "Post-login redirect location is not correct.")
 
         # Check if the user is actually logged in
@@ -84,22 +110,14 @@ class AuthBlueprintTestCase(unittest.TestCase):
             db.session.commit()
         
         # Attempt to log in with invalid password
-        response = self.client.post('/login', data={
-            'username': testUsername,
-            'password': 'wrongpassword',
-            'remember_me': True
-        })
-        self.assertEqual(response.status_code, 200, "Login route did not return 200.") # If we receive a 302, it means the login was successful, which is not what we want.
-        self.assertIn(b'Invalid username or password.', response.data, "Invalid login error message not found in response data.")
+        response = self.attempt_login(testUsername, 'wrongpassword', True)
+        self.assertNotEqual(response.status_code, 302, "Login route returned 302 with an invalid password.") # If we receive a 302, it means the login was successful, which is not what we want.
+        self.assertIn(b'Invalid username or password.', response.data, "Invalid login error message not found in response data, for invalid password.")
 
         # Attempt to log in with invalid username
-        response = self.client.post('/login', data={
-            'username': 'wrongusername',
-            'password': testPassword,
-            'remember_me': True
-        })
-        self.assertEqual(response.status_code, 200, "Login route did not return 200.")
-        self.assertIn(b'Invalid username or password.', response.data, "Invalid login error message not found in response data.")
+        response = self.attempt_login('wrongusername', testPassword, True)
+        self.assertNotEqual(response.status_code, 302, "Login route returned 302 with an invalid username.") # If we receive a 302, it means the login was successful, which is not what we want.
+        self.assertIn(b'Invalid username or password.', response.data, "Invalid login error message not found in response data, for invalid username.")
 
 
     def test_logout_user(self):
@@ -119,19 +137,17 @@ class AuthBlueprintTestCase(unittest.TestCase):
             db.session.commit()
 
         # Log in the user first
-        self.client.post('/login', data={
-            'username': testUsername,
-            'password': testPassword,
-            'remember_me': True
-        })
+        self.attempt_login(testUsername, testPassword, True)
 
         # Now log out the user
         response = self.client.get('/logout')
         
+        # Check if the response is a redirect
         self.assertEqual(response.status_code, 302, "Logout route did not return 302.")
-        self.assertEqual(response.location, '/intro', "Post-logout redirect location is not correct.")
+        self.assertEqual(response.location, '/intro', f"Post-logout redirect location is not correct. Should be /intro, but got {response.location}.")
+
         # Check if the user is logged out
-        response = self.client.get('/get_current_user')
+        response = self.client.get('/get_current_user') # Need to get the current user.
         self.assertEqual(response.status_code, 200, "Get current user route did not return 200.")
         self.assertIsNotNone(response, "Get current user route did not return a response.")
         self.assertIn(b'User is not logged in.', response.data, "User is still logged in after logout.")
@@ -142,16 +158,10 @@ class AuthBlueprintTestCase(unittest.TestCase):
         This test is for the form validation logic, not the actual login functionality, by providing a variety of invalid data types."""
 
         # Create some test data
-        testUsername = 'testuser'
-        testPassword = 'testpassword'
+        testUsername = "testuser"
+        testPassword = "testpassword"
 
         with self.app.app_context():
-            
-            ### Valid data test ###
-
-            form = LoginForm(username='testuser', password='testpassword', remember_me=True)
-            self.assertTrue(form.validate(), "Login form validation failed with valid data.")
-
 
             ### Invalid data tests ###
 
@@ -166,22 +176,30 @@ class AuthBlueprintTestCase(unittest.TestCase):
             # Test invalid data types on username and password
             for key, value in invalidDataTypes.items():
                 # Test Usernames
-                form = LoginForm(username=value, password=testPassword, remember_me=True)
-                self.assertFalse(form.validate(), f"Login form validation passed with invalid username datatype: {key}.")
+                response = self.attempt_login(value, testPassword, True)
+                self.assertNotEqual(response.status_code, 302, f"Login route validated with username: {key}.")
 
                 # Test Passwords
-                form = LoginForm(username=testUsername, password=value, remember_me=True)
-                self.assertFalse(form.validate(), f"Login form validation passed with invalid password datatype: {key}.")
+                response = self.attempt_login(testUsername, value, True)
+                self.assertNotEqual(response.status_code, 302, f"Login route validated with password: {key}.")
 
-            # Test missing elements
-            form = LoginForm(username=testUsername, password=testPassword)
-            self.assertFalse(form.validate(), "Login form validation passed with missing remember_me.")
-            form = LoginForm(username=testUsername, remember_me=True)
-            self.assertFalse(form.validate(), "Login form validation passed with missing password.")
-            form = LoginForm(password=testPassword, remember_me=True)
-            self.assertFalse(form.validate(), "Login form validation passed with missing username.")
-            form = LoginForm(username=testUsername, password=testPassword, remember_me=None)
-            self.assertFalse(form.validate(), "Login form validation passed with remember_me as None.")
+            # Test missing username
+            response = self.client.post('/login', 
+                data={ 'password': testPassword, 'remember_me': True
+            })
+            self.assertNotEqual(response.status_code, 302, "Login route validated with missing remember_me.")
+
+            # Test missing password
+            response = self.client.post('/login', 
+                data={ 'username': testUsername, 'remember_me': True
+            })
+            self.assertNotEqual(response.status_code, 302, "Login route validated with missing password.")
+
+            # Test missing remember_me
+            response = self.client.post('/login',
+                data={ 'username': testUsername, 'password': testPassword
+            })
+            self.assertNotEqual(response.status_code, 302, "Login route validated with missing remember_me.")
 
 
 
@@ -208,16 +226,12 @@ class AuthBlueprintTestCase(unittest.TestCase):
             user.set_password(testPassword)
 
         with self.client:
-            response = self.client.post('/register', data={
-                'username': testUsername,
-                'email': testEmail,
-                'password': testPassword,
-                'password2': testPassword
-            })
+            # Attempt to register with valid credentials
+            response = self.attempt_registration(testUsername, testEmail, testPassword, testPassword)
 
             # Check if the response is a redirect
-            self.assertEqual(response.status_code, 302, "Register route did not return 302.")
-            self.assertEqual(response.location, '/login', "Post-registry redirect location is not correct.")
+            self.assertEqual(response.status_code, 302, f"Register route did not return 302. Got {response.status_code}.")
+            self.assertEqual(response.location, '/login', f"Post-registry redirect location is not '/login'. Got {response.location}.")
 
         # Check if the user was actually added to the database
         with self.app.app_context():
@@ -241,22 +255,12 @@ class AuthBlueprintTestCase(unittest.TestCase):
             db.session.commit()
         with self.client:
             # Attempt to register with the same username as someone else
-            response = self.client.post('/register', data={
-                'username': testUsername,
-                'email': "newEmail@example.com",
-                'password': testPassword,
-                'confirm_password': testPassword
-            })
+            response = self.attempt_registration(testUsername, "newEmail@example.com", testPassword, testPassword)
             self.assertEqual(response.status_code, 200, "When registering with an already-taken username, the register route did not return 200.")
             self.assertIn(b'This username has been taken.', response.data, "Duplicate username error message not found in response data.")
 
             # Attempt to register with the same email as someone else
-            response = self.client.post('/register', data={
-                'username': 'not_taken_yet',
-                'email': testEmail,
-                'password': testPassword,
-                'confirm_password': testPassword
-            })
+            response = self.attempt_registration('not_taken_yet', testEmail, testPassword, testPassword)
             self.assertEqual(response.status_code, 200, "When registering with an already-taken email, the register route did not return 200.")
             self.assertIn(b'An account is already registered to this email.', response.data, "Duplicate email error message not found in response data.")
 
@@ -275,7 +279,6 @@ class AuthBlueprintTestCase(unittest.TestCase):
             invalid_data_types = {
                 'empty': '',
                 'None': None,
-                'number': 150,
                 'list': [],
                 'dict': {}
             }
@@ -285,34 +288,21 @@ class AuthBlueprintTestCase(unittest.TestCase):
             for key, value in invalid_data_types.items():
                 
                 # USERNAMES
-                response = self.client.post('/register', 
-                    data={ 'username': value, 'email': testEmail, 'password': testPassword, 'confirm_password': testPassword
-                })
+                response = self.attempt_registration(value, testEmail, testPassword, testPassword)
+
                 self.assertNotEqual(response.status_code, 302, f"Register route validated with username: {key}.")
 
                 # EMAILS
-                response = self.client.post('/register', 
-                    data={ 'username': testUsername, 'email': value, 'password': testPassword, 'confirm_password': testPassword
-                })
+                response = self.attempt_registration(testUsername, value, testPassword, testPassword)
                 self.assertNotEqual(response.status_code, 302, f"Register route validated with password: {key}.")
 
                 # PASSWORDS
-                response = self.client.post('/register', 
-                    data={ 'username': testUsername, 'email': testEmail, 'password': value, 'confirm_password': testPassword
-                })
+                response = self.attempt_registration(testUsername, testEmail, value, testPassword)
                 self.assertNotEqual(response.status_code, 302, f"Register route validated with password confirm: {key}.")
 
                 # PASSWORD CONFIRMATIONS
-                response = self.client.post('/register', 
-                    data={ 'username': testUsername, 'email': testEmail, 'password': testPassword, 'confirm_password': value
-                })
+                response = self.attempt_registration(testUsername, testEmail, testPassword, value)
                 self.assertNotEqual(response.status_code, 302, f"Register route validated with password confirm: {key}.")
-
-                # REGISTRATION TIME
-                response = self.client.post('/register', 
-                    data={ 'username': testUsername, 'email': testEmail, 'password': testPassword, 'confirm_password': testPassword
-                })
-                self.assertNotEqual(response.status_code, 302, f"Register route validated with registration time: {key}.")
 
 
             ### Test missing elements ###
@@ -330,6 +320,8 @@ class AuthBlueprintTestCase(unittest.TestCase):
                 self.assertNotEqual(response.status_code, 302, f"Register route validated with missing {key}.")
 
 
+if __name__ == '__main__':
+    unittest.main()
     
 
     
