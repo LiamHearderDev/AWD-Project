@@ -14,7 +14,7 @@ import ast      # This allows us to convert string literals into their respectiv
 
 from collections import Counter  # This allows us to do some statistics on the data
 from collections import defaultdict
-paragraph_stats = defaultdict(list)
+
 
 stats_bp = Blueprint('stats', __name__)
 
@@ -84,8 +84,10 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
     best_wpm_paragraph: int = None
 
     mistake_words_counter = Counter()
-    mistake_words_values: list = []
     correct_words_counter = Counter()
+
+    processed_paragraphs = set()
+    paragraph_stats = defaultdict(list)
 
     # Loop over every TypingResult
     for result in results:
