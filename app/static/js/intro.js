@@ -53,3 +53,14 @@ window.onload = () => {
     document.querySelector('.right-btn').addEventListener('click',  () => {  changeSlide(1); });
     document.querySelector('.left-btn').addEventListener('click',   () => {  changeSlide(-1); });
 }
+
+// Reveal on scroll
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.reveal').forEach((reveal) => {
+        const rect = reveal.getBoundingClientRect();
+        const triggerBottom = window.innerHeight * 0.8;
+        if (rect.top < triggerBottom) {
+            reveal.classList.add('active');
+        } 
+    });
+});

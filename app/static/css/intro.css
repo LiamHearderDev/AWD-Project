@@ -18,6 +18,10 @@ body::after {
     z-index: -1;
 }
 
+.text-3 {
+    margin-bottom: 180px;
+}
+
 .feature-text {
     flex: 1 1 250px; 
     background: transparent; 
@@ -26,6 +30,9 @@ body::after {
     text-align: center;
     color:white;
     background-color: var(--base-colour-1);
+    border: 2px solid var(--base-colour-3);
+}
+.feature-text:hover {
     box-shadow: 0 0 18px rgba(155, 48, 255, 0.6);
     border: 2px solid var(--base-colour-3);
 }
@@ -82,4 +89,15 @@ body::after {
     100% {
         transform: translateX(-66.666%);
     }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
 }
