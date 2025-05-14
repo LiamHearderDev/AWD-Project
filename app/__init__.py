@@ -1,9 +1,9 @@
 from flask import Flask, render_template
-from app.config import Config
+from app.config import Config, ProductionConfig
 from app.extensions import db, migrate, login, csrf
 from dotenv import load_dotenv
 
-def create_app(config_class=Config):
+def create_app(config_class=ProductionConfig):
 
     # Loads configuration variables from the environment
     load_dotenv()

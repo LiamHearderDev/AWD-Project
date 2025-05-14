@@ -204,7 +204,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
 function readResults(resultId, stats) { // function to display results, dynamically creating HTML list with data in statistics
     const $result = $('#' + resultId).empty(); // reset results
     $result.show();
-    const $list = $('<ul></ul>').appendTo($result); // create list
+    const $list = $('<ul id="proof_game_finished"></ul>').appendTo($result); // create list
     for (let i = 0; i < stats.length; i++) { // add point for each statistic
         const stat = stats[i];
         $('<li></li>')

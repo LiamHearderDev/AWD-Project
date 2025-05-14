@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+  <!-- purely for Selenium tests -->
+  <span id="Friends_ID" hidden></span>
+
   <h2>Pending Requests</h2>
   <ul id="incomingRequests">
     {% for req in incoming %}
