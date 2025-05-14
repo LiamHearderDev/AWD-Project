@@ -40,9 +40,9 @@ class LoginForm(FlaskForm):
     The form uses Flask-WTF for CSRF protection and WTForms for validation. """
 
     # Fields
-    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
-    password    = PasswordField('Password', validators=[DataRequired(), validate_datatype(str, True)])
-    remember_me = BooleanField('Remember Me', default=False, validators=[DataRequired(), validate_datatype(bool)])
+    username    = StringField('Username',                   validators=[DataRequired(), validate_datatype(str, True)])
+    password    = PasswordField('Password',                 validators=[DataRequired(), validate_datatype(str, True)])
+    remember_me = BooleanField('Remember Me', default=False,validators=[DataRequired(), validate_datatype(bool)])
     submit      = SubmitField('Sign In')
 
 
@@ -50,10 +50,10 @@ class RegistrationForm(FlaskForm):
     """Form for user registration. Contains fields for username, email, password, and password confirmation."""
 
     # Fields
-    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str)])
-    email       = StringField('Email', validators=[DataRequired(), validate_datatype(str), Email()])
-    password    = PasswordField('Password', validators=[DataRequired(), validate_datatype(str)])
-    password2   = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password'), validate_datatype(str)])
+    username    = StringField('Username',           validators=[DataRequired(), validate_datatype(str, True)])
+    email       = StringField('Email',              validators=[DataRequired(), validate_datatype(str), Email()])
+    password    = PasswordField('Password',         validators=[DataRequired(), validate_datatype(str, True)])
+    password2   = PasswordField('Repeat Password',  validators=[DataRequired(), EqualTo('password'), validate_datatype(str, True)])
     submit      = SubmitField('Register')
 
     # Validation
@@ -73,5 +73,5 @@ class FriendRequestForm(FlaskForm):
     """Form for sending a friend request. Contains a field for the user_id of the user to send the request to."""
 
     # Fields
-    user_id     = IntegerField('User ID', validators=[DataRequired(), validate_datatype(int)])
+    user_id     = IntegerField('User ID', validators=[DataRequired(), validate_datatype(int, True)])
     submit      = SubmitField('Send Request')
