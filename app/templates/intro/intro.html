@@ -2,6 +2,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/intro.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/intro.js') }}"></script>
 {% endblock %}
 {% block content %}
 
@@ -38,39 +39,6 @@
   <button onclick="changeSlide(1)" class="carousel-btn right-btn">⟶</button>
 </section>
 
-<!-- carousel and buttons style -->
-
-
-<!-- Script -->
-<script>
-  let currentSlide = 0; // Track the current slide index
-
-  function changeSlide(offset) {
-    const carousel = document.getElementById("carousel-container");
-    const totalSlides = carousel.children.length;
-
-    // Update the current slide index
-    currentSlide += offset;
-    
-    document.querySelector('.right-btn').style.display = currentSlide === totalSlides - 1 ? 'none' : 'block';
-    document.querySelector('.left-btn').style.display = currentSlide === 0 ? 'none' : 'block';
-
-    // Ensure the slide index wraps around (circular carousel)
-    if (currentSlide < 0) {
-        currentSlide = totalSlides - 1;
-    } else if (currentSlide >= totalSlides) {
-        currentSlide = 0;
-    }
-
-    // Calculate the new translateX value
-    const translateX = -(currentSlide * 100) / totalSlides;
-
-    // Apply the transform to move the carousel
-    carousel.style.transition = "transform 0.5s ease"; // Smooth transition
-    carousel.style.transform = `translateX(${translateX}%)`;
-  }
-</script>
-
 <!-- Feature Section with Cards -->
 <section class="text-3 " style="padding: 60px 20px; margin-top:60vh;background: transparent;">
   <div style="max-width: 1000px; margin: auto;">
@@ -106,20 +74,5 @@
     </p>
   </div>
 </section>
-
-
-<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
-
-<script>
-  var typed = new Typed(".auto-type", {
-    strings: ["Welcome to SpeedLogger"],
-    typeSpeed: 66,
-    
-    onComplete: function() {
-      document.querySelector('.typed-cursor').style.display = 'none';
-    }
-    
-  })
-</script>
 
 {% endblock %}
