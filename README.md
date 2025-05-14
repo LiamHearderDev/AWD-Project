@@ -60,14 +60,7 @@ source venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### 4. Create the database:
-```bash
-python -m flask db init
-python -m flask db migrate
-python -m flask db upgrade
-```
-
-### 5. Create environment variables:
+### 4. Create environment variables:
 ```bash
 echo > .flaskenv "FLASK_APP=run.py" && echo >> .flaskenv "FLASK_ENV=development" && echo >> .flaskenv "SECRET_KEY=<insert_your_super_secret_key>" 
 ```
@@ -76,6 +69,13 @@ or, alternatively:
 export FLASK_APP=run.py
 export FLASK_ENV=development
 export SECRET_KEY=<insert_your_super_secret_key>
+```
+
+### 5. Create the database:
+```bash
+python -m flask db init
+python -m flask db migrate
+python -m flask db upgrade
 ```
 
 ### 6. Run the application:
