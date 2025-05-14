@@ -175,6 +175,10 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 $letter = $letter.next(); // move to next letter
             }
             index += 1;
+            const progress = Math.round((index / maxIndex) * 100);
+            $('#progressBar').val(progress);
+            $('#runner').css('left', `calc(${progress}% - 20px)`);
+            
         } else if (key === 'Backspace' && index > 0) { // handle backspace
             if (!($word.next().length === 0 && mistakes > 0 && ($letter.hasClass('right-char') || $letter.hasClass('wrong-char')))) { // not at end of text
                 $letter = $letter.prev();

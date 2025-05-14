@@ -18,7 +18,7 @@ body {
     display: block;           
     width: fit-content;       
     margin: 0 auto;           
-    
+    margin-bottom:10px;
     padding: 0.25em 0.5em;
     font-size: 2em;
     text-align: center;
@@ -76,3 +76,32 @@ body {
     font-weight: bold;
 }
 
+#progressBar {
+    appearance: none;
+    border: none;
+    border-radius: 8px;
+    background-color: #ddd;
+    margin-top:30px;
+}
+#progressBar::-webkit-progress-bar {
+    background-color: #333;
+    border-radius: 8px;
+}
+#progressBar::-webkit-progress-value {
+    background: radial-gradient(circle,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    border-radius: 8px;
+}
+
+.progress-container {
+    position: relative;
+    margin-top: 50px;
+
+}
+#runner {
+  transition: left 0.1s ease-out;
+  left: 0%;
+  position: absolute;
+  bottom: 100%;
+  width: auto;
+  height: 120px;
+}
