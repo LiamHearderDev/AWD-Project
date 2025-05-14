@@ -10,14 +10,17 @@ let currentSlide = 0; // Track the current slide index
  * @param {number} offset - The offset to change the slide by (1 for next, -1 for previous) 
  */
 function changeSlide(offset) {
+    console.log("Change slide called with offset:", offset);
     const carousel = document.getElementById("carousel-container");
     const totalSlides = carousel.children.length;
 
     // Update the current slide index
     currentSlide += offset;
 
-    document.querySelector('.right-btn').style.display = currentSlide === totalSlides - 1 ? 'none' : 'block';
-    document.querySelector('.left-btn').style.display = currentSlide === 0 ? 'none' : 'block';
+    // Update the visibility of the buttons based on the current slide
+    // Hide the right button if on the last slide, hide the left button if on the first slide
+    //document.querySelector('.right-btn').style.display = currentSlide === totalSlides - 1 ? 'none' : 'block';
+    //document.querySelector('.left-btn').style.display = currentSlide === 0 ? 'none' : 'block';
 
     // Ensure the slide index wraps around (circular carousel)
     if (currentSlide < 0) {
@@ -45,4 +48,8 @@ window.onload = () => {
             document.querySelector('.typed-cursor').style.display = 'none';
         }
     });
+
+    // This handles the carousel button click events
+    document.querySelector('.right-btn').addEventListener('click',  () => {  changeSlide(1); });
+    document.querySelector('.left-btn').addEventListener('click',   () => {  changeSlide(-1); });
 }
