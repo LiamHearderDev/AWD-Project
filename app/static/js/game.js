@@ -217,6 +217,9 @@ function readResults(resultId, stats) { // function to display results, dynamica
         block: 'center'       
       });
     $list[0].focus();
+
+    // add button to link to stats page
+    $('#statsLinkWrapper').show();
 }
 
 function getCorrectDicts(element_list, element_check) { 

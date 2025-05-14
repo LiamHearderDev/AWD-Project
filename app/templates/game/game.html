@@ -21,4 +21,8 @@
     <p class="game-text" id="resultElement" style="display: none;">
         <!-- This is where the game result will be displayed. -->
     </p>
+    <div id="statsLinkWrapper" style="display: none; text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('stats.stats') }}" id="statsLink" class="green-button">View More Stats</a>
+    </div>
+    
 {% endblock %}
