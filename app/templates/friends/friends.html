@@ -34,7 +34,7 @@
       <li data-sender-id="{{ request.requesting_user }}">
         {{ request.friend.username }} sent you a friend request.
         <button class="accept-btn btn btn-sm btn-success" data-sender-id="{{ request.requesting_user }}">Accept</button>
-        <button class="reject-btn btn btn-sm btn-danger" data-sender-id="{{ request.requesting_user }}">Reject</button>
+        <button class="reject-btn btn btn-sm btn-secondary" data-sender-id="{{ request.requesting_user }}">Ignore</button>
       </li>
     {% else %}
       <li><em>No pending requests.</em></li>
