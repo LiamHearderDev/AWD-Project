@@ -13,54 +13,62 @@ friends_bp = Blueprint('friends', __name__)
 @friends_bp.route('/friends', methods=['GET','POST'])
 @login_required
 def friends():
-    """
-    GET: display the friend-request form, incoming requests, and friends list
-    POST: handle new friend request (returns JSON for AJAX calls)
-    """
-    form = FriendRequestForm()
+    # two prefixes to avoid name collisions
+    id_form = FriendRequestForm(prefix='id')
+    username_form = FriendRequestByUsernameForm(prefix='username')
 
-    # handle AJAX send-request
-    if form.validate_on_submit():
-        target_id = form.user_id.data
-        # look up by ID
+     # 1) Handle the id
+    if id_form.validate_on_submit() and id_form.submit.data:
+        target_id = id_form.user_id.data
         target = User.query.get(target_id)
-
-        # error if no such user or they try to add themselves
         if not target or target.user_id == current_user.user_id:
-            return jsonify(
-                success=False,
-                message=f'User with ID {target_id} not found.'
-            )
-
-        # cross-request check: if the target already sent you a pending request
-        incoming_req = Friendship.query.get((target_id, current_user.user_id))
-        if incoming_req and incoming_req.is_requested is False:
-            return jsonify(
-                success=False,
-                message='The target user has already sent you a request.'
-            )
-
-        # prevent duplicate outgoing or already-friends
+            return jsonify(success=False,
+                           message=f'User with ID {target_id} not found.')
+        incoming = Friendship.query.get((target_id, current_user.user_id))
+        if incoming and not incoming.is_requested:
+            return jsonify(success=False,
+                           message='They already sent you a request.')
         existing = Friendship.query.get((current_user.user_id, target_id))
         if existing:
-            return jsonify(
-                success=False,
-                message="Request already sent or you're already friends."
-            )
-
-        # create the pending row
-        friend_request = Friendship(
+            return jsonify(success=False,
+                           message="Request already sent or you're already friends.")
+        fr = Friendship(
             user_id=current_user.user_id,
             friend_id=target_id,
             is_requested=False,
             requesting_user=current_user.user_id
         )
-        db.session.add(friend_request)
+        db.session.add(fr)
         db.session.commit()
         return jsonify(success=True)
 
-    # GET: load lists
-    incoming   = Friendship.query.filter_by(
+    # 2) Handle the username submission 
+    if username_form.validate_on_submit() and username_form.submit.data:
+        uname = username_form.username.data.strip()
+        target = User.query.filter_by(username=uname).first()
+        if not target or target.user_id == current_user.user_id:
+            return jsonify(success=False,
+                           message=f'User "{uname}" not found.')
+        incoming = Friendship.query.get((target.user_id, current_user.user_id))
+        if incoming and not incoming.is_requested:
+            return jsonify(success=False,
+                           message='They already sent you a request.')
+        existing = Friendship.query.get((current_user.user_id, target.user_id))
+        if existing:
+            return jsonify(success=False,
+                           message="Request already sent or you're already friends.")
+        fr = Friendship(
+            user_id=current_user.user_id,
+            friend_id=target.user_id,
+            is_requested=False,
+            requesting_user=current_user.user_id
+        )
+        db.session.add(fr)
+        db.session.commit()
+        return jsonify(success=True)
+
+    # GET: load pending & accepted lists
+    incoming = Friendship.query.filter_by(
         friend_id=current_user.user_id,
         is_requested=False
     ).all()
@@ -71,10 +79,12 @@ def friends():
 
     return render_template(
         'friends/friends.html',
-        form=form,
+        id_form=id_form,
+        username_form=username_form,
         incoming=incoming,
         my_friends=my_friends
     )
+
 
 @friends_bp.route('/friends/accept/<int:sender_id>', methods=['POST'])
 @login_required
@@ -89,7 +99,7 @@ def accept_friend(sender_id):
     # If it doesn’t exist OR it’s already accepted (is_requested=True), reject
     if not relation or relation.is_requested:
         ##X-Requested-With is a convention many JavaScript libraries (and browsers’ fetch when you set it) use to label AJAX/XHR calls.
-        ## By checking == 'XMLHttpRequest', your server knows “this came from JS, not a direct browser navigation or form submit
+        ## By checking == 'XMLHttpRequest',  server knows “this came from JS, not a direct browser navigation or form submit
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest': 
             return jsonify(success=False, message='Invalid request.')
         abort(404)
@@ -160,3 +170,30 @@ def view_friend_stats(friend_id):
         last28_chart=format_data(stats_28days, 'chart'),
         alltime_chart=format_data(stats_all, 'chart')
     )
+
+@friends_bp.route('/friends/remove/<int:friend_id>', methods=['POST'])
+@login_required
+def remove_friend(friend_id):
+    """
+    Unfriend: delete both A→B and B→A rows.
+    """
+    # find both sides
+    relationship1 = Friendship.query.get((current_user.user_id, friend_id))
+    relationship2 = Friendship.query.get((friend_id, current_user.user_id))
+
+    # if either side is missing or not “accepted”, error out
+    if not relationship1 or not relationship2 or not relationship1.is_requested or not relationship2.is_requested:
+        return jsonify(success=False, message="You're not currently friends."), 400
+
+    # delete both
+    db.session.delete(relationship1)
+    db.session.delete(relationship2)
+    db.session.commit()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify(success=True)
+
+    # fallback for normal form
+    flash('Friend removed.', 'info')
+    return redirect(url_for('friends.friends'))
+
