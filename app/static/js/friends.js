@@ -1,28 +1,54 @@
 // AJAXify the friends page: send, accept & reject without reload
 
 document.addEventListener('DOMContentLoaded', () => {
-  const requestForm = document.getElementById('friendRequestForm');
-  if (requestForm) {
-    requestForm.addEventListener('submit', async e => {
-      e.preventDefault(); // stop the browser from reloading the page
-      const formData = new FormData(requestForm);
+  // Handle username-based friend request separately
+  const usernameForm = document.getElementById('friendRequestFormUsername');
+  if (usernameForm) {
+    usernameForm.addEventListener('submit', async e => {
+      e.preventDefault();
       try {
-        const res  = await fetch(requestForm.action, {
-          method:  'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },// mark this as an AJAX request
-          body: formData
+        const response = await fetch(usernameForm.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(usernameForm),
+          credentials: 'same-origin'
         });
-        const json = await res.json();
-
+        const json = await response.json();
         if (json.success) {
-          alert('Request sent!');
-          requestForm.reset();  // reset the entire form (clears the input)
+          alert('Friend request by username sent!');
+          usernameForm.reset();
         } else {
-          alert(json.message || 'Failed to send request.');
+          alert(json.message || 'Failed to send username request.');
         }
       } catch (err) {
         console.error(err);
-        alert('Network error.');
+        alert('Network error sending username request.');
+      }
+    });
+  }
+
+  // Handle ID-based friend request separately
+  const idForm = document.getElementById('friendRequestFormID');
+  if (idForm) {
+    idForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        const response = await fetch(idForm.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(idForm),
+          credentials: 'same-origin'
+        });
+        const json = await response.json();
+        if (json.success) {
+          alert('Friend request by ID sent!');
+          idForm.reset();
+        } else {
+          alert(json.message || 'Failed to send ID request.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Network error sending ID request.');
       }
     });
   }
