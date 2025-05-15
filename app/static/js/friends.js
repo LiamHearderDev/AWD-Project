@@ -1,90 +1,49 @@
 // AJAXify the friends page: send, accept & reject without reload
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Handle username-based friend request separately
-  const usernameForm = document.getElementById('friendRequestFormUsername');
-  if (usernameForm) {
-    usernameForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      try {
-        const response = await fetch(usernameForm.action, {
-          method: 'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },
-          body: new FormData(usernameForm),
-          credentials: 'same-origin'
-        });
-        const json = await response.json();
-        if (json.success) {
-          alert('Friend request by username sent!');
-          usernameForm.reset();
-        } else {
-          alert(json.message || 'Failed to send username request.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Network error sending username request.');
-      }
-    });
-  }
+window.onload = () => {
 
-  // Handle ID-based friend request separately
-  const idForm = document.getElementById('friendRequestFormID');
-  if (idForm) {
-    idForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      try {
-        const response = await fetch(idForm.action, {
-          method: 'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },
-          body: new FormData(idForm),
-          credentials: 'same-origin'
-        });
-        const json = await response.json();
-        if (json.success) {
-          alert('Friend request by ID sent!');
-          idForm.reset();
-        } else {
-          alert(json.message || 'Failed to send ID request.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Network error sending ID request.');
-      }
-    });
-  }
+  // makes so that all future AJAX communications to server add CSRF automatically
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // get csrf token from header
+  $.ajaxSetup({ headers: { 'X-CSRFToken': csrfToken } });
 
   // accept & block logic unchanged
   const pendingList = document.getElementById('incomingRequests');
   if (pendingList) {
-    pendingList.addEventListener('click', async e => {
+
+    // Add an event listener to clicking accept or reject friend request
+    pendingList.addEventListener('click', (e) => {
+
+
       const btn = e.target;
       if (!btn.classList.contains('accept-btn') &&
           !btn.classList.contains('reject-btn')) {
         return;
       }
+      
+      // Extract the friend request sender's ID from the button, populated by Jinja
+      const sender_id = btn.dataset.senderId;
 
-      const senderId = btn.dataset.senderId;
-      const isAccept = btn.classList.contains('accept-btn');
-      const url      = isAccept
-        ? `/friends/accept/${senderId}`
-        : `/friends/reject/${senderId}`;
+      // Create the URL we will be sending an AJAX POST request to
+      const url = btn.classList.contains('accept-btn') ? '/friends/accept-request' : '/friends/reject-request';
 
-      try {
-        const response  = await fetch(url, {
-          method:  'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        const json = await response.json();
-        if (response.ok && json.success) {
-          const li = btn.closest('li');  //li reflects the fact that it holds an <li> element
-          if (li) li.remove();
-        } else {
-          alert(json.message || 'Action failed.');
+      // Send the request
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: JSON.stringify({ "sender_id": sender_id }),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log('Friend request handled successfully:', response);
+            window.location.reload();
+        },
+        error: function(error) {
+            console.error('An error occurred while handling friend request:', error);
+            window.location.reload();
         }
-      } catch (err) {
-        console.error(err);
-        alert('Network error.');
-      }
+      });
+
+      
     });
   }
-});
+}
+

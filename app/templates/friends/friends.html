@@ -3,44 +3,38 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/friends.css') }}">
   <script src="{{ url_for('static', filename='js/friends.js') }}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 {% endblock %}
 
 {% block content %}
   <h2>Send a Friend Request</h2>
-  <form
-    id="friendRequestFormUsername"
-    method="POST"
-    action="{{ url_for('friends.friends') }}"
-  >
-    {{ username_form.hidden_tag() }}
+  <form id="friendRequestForm" method="POST" action="">
+    {{ form.hidden_tag() }}
     <div class="form-group">
-      {{ username_form.username.label }}
-      {{ username_form.username(size=20, placeholder="Username") }}
+      {{ form.username.label }}
+      {{ form.username(size=20, placeholder="Username") }}
     </div>
-    {{ username_form.submit(class="btn btn-primary") }}
+    {{ form.submit(class="btn btn-primary") }}
   </form>
-
-  <form
-    id="friendRequestFormID"
-    class="mt-3"
-    method="POST"
-    action="{{ url_for('friends.friends') }}"
-  >
-    {{ id_form.hidden_tag() }}
-    <div class="form-group">
-      {{ id_form.user_id.label }}
-      {{ id_form.user_id(size=20, placeholder="User ID") }}
-    </div>
-    {{ id_form.submit(class="btn btn-primary") }}
-  </form>
-
+  
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+      </ul>
+      <br>
+    {% endif %}
+  {% endwith %}
+  
   <h2 class="mt-5">Pending Requests</h2>
   <ul id="incomingRequests">
-    {% for req in incoming %}
-      <li data-sender-id="{{ req.requesting_user }}">
-        {{ req.sender.username }} ({{ req.requesting_user }}) sent you a friend request.
-        <button class="accept-btn btn btn-sm btn-success" data-sender-id="{{ req.requesting_user }}">Accept</button>
-        <button class="reject-btn btn btn-sm btn-danger" data-sender-id="{{ req.requesting_user }}">Reject</button>
+    {% for request in friend_requests %}
+      <li data-sender-id="{{ request.requesting_user }}">
+        {{ request.friend.username }} sent you a friend request.
+        <button class="accept-btn btn btn-sm btn-success" data-sender-id="{{ request.requesting_user }}">Accept</button>
+        <button class="reject-btn btn btn-sm btn-secondary" data-sender-id="{{ request.requesting_user }}">Ignore</button>
       </li>
     {% else %}
       <li><em>No pending requests.</em></li>
@@ -49,25 +43,15 @@
 
 <h2>Your Friends</h2>
 <ul id="friendsList">
-  {% for f in my_friends %}
+  {% for friendship in friends %}
     <li>
-      {{ f.friend.username }} ({{ f.friend_id }})
-      <a href="{{ url_for('friends.view_friend_stats', friend_id=f.friend_id) }}"
-         class="btn btn-sm btn-info">
-        View Stats
-      </a>
-      <a href="{{ url_for('main.profile', user_id=f.friend_id) }}"
-         class="btn btn-sm btn-secondary">
-        View Profile
-      </a>
-      <button class="remove-btn btn btn-sm btn-danger"
-              data-friend-id="{{ f.friend_id }}">
-        Remove Friend
-      </button>
+      <span>{{ friendship.friend.username }}</span>
+      <a href="{{ url_for('friends.view_friend_stats', friend_username=friendship.friend.username) }}" class="btn btn-sm btn-info">View Stats</a>
+      <a href="{{ url_for('main.profile', user_id=friendship.friend_id) }}" class="btn btn-sm btn-secondary">View Profile</a>
+      <a href="{{ url_for('friends.remove_friend', friend_id=friendship.friend_id) }}" class="remove-btn btn btn-sm btn-danger">Remove Friend</a>
     </li>
   {% else %}
     <li><em>You have no friends yet.</em></li>
   {% endfor %}
 </ul>
 {% endblock %}
-

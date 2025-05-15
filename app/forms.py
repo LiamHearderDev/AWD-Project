@@ -69,9 +69,8 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('An account is already registered to this email.')
 
 
-class FriendRequestForm(FlaskForm):
-    """Form for sending a friend request. Contains a field for the user_id of the user to send the request to."""
-
+class FriendRequestForm(FlaskForm): # Using user id
+    """Form for sending a friend request. Contains a field for the username of the user to send the request to."""
     # Fields
-    user_id     = IntegerField('User ID', validators=[DataRequired(), validate_datatype(int, True)])
+    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
     submit      = SubmitField('Send Request')
