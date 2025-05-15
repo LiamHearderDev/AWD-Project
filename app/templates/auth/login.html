@@ -12,8 +12,8 @@
     <!-- purely for Selenium tests -->
     <span id="Login_ID" hidden></span>
 
-    <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 20px;">
-        <div id="login_form_wrapper">
+    <section id="login_section">
+        <div id="login_form_wrapper" class="blur_section">
             <form id="login_form" class="container-lg" method="post" action="" novalidate>
             {{ form.hidden_tag() }}
             <div id="login-title">
@@ -60,9 +60,18 @@
             </div>
         </form> <br>
         </div>
+        <br>
+        <section id="register_section" class="align-items-center justify-content-center text-0 blur_section" style="display: grid;">
+            <br>
+            <h5> Don't have an account? </h5>
+            <!-- <a id='Login_Register' href="{{ url_for('auth.register') }}" class="base-button bg-1 text-black text-center">Register here!</a> -->
+            <a href="{{ url_for('auth.register') }}" class="d-flex align-center justify-content-center mt-3">
+            <button id="register_here_button" class="container base-button bg-2 text-0" style="box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                Register Here!
+            </button>
+        </a>
+            <br>
+        </section>
     </section>
-    <section id="register_section" style="display: grid; align-items: center; justify-content: center;">
-        <p> Don't have an account? </p>
-        <a id='Login_Register' href="{{ url_for('auth.register') }}">Register here!</a>
-    </section>
+    
 {% endblock %}

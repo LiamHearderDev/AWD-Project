@@ -2,16 +2,37 @@ body {
     background-image: url('/static/img/purple_background.jpg');
 }
 
-#login_form_wrapper {
-    padding: 30px;
+.blur_section {
     backdrop-filter: blur(4px);
     border: 1px solid white;
     border-radius: 10px; 
     background-color: rgba(0, 0, 0, 0.11);
 }
 
+#login_section {
+    display: grid;
+    align-items: center; 
+    justify-content: center; 
+}
+
+#login_form_wrapper {
+    padding: 30px;
+}
+
 input[id^=login] {
     background-color: rgba(0, 0, 0, 0);
+    color: var(--base-colour-0);
+}
+
+input[id^=login]::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: var(--base-colour-0);
+}
+
+input[id^=login]:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: var(--base-colour-0);
+}
+
+input[id^=login]:-ms-input-placeholder { /* Microsoft Edge */
     color: var(--base-colour-0);
 }
 
