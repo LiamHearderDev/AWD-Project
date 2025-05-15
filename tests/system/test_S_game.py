@@ -55,6 +55,7 @@ class TestLogin(BaseSeleniumTests):
         self.wait.until(EC.presence_of_element_located((By.ID, 'proof_game_finished'))) # check if results displayed
 
     def test_stats_update(self): # checks if playing the game dynamically changes stats and leaderboard
+        
         text = 'beans on toast'
         self.add_paragraph(body=text, type='normal') # add paragraph to database
 
@@ -89,10 +90,7 @@ class TestLogin(BaseSeleniumTests):
         self.click_and_assert('Base_Game', '/game', 'Game_ID') # click to game page
         self.driver.find_element(By.ID, 'startButton').click() # start game
         gameText = self.driver.find_element(By.ID, 'gameElement')
-        self.wait.until(
-            EC.element_to_be_clickable((By.ID, 'gameElement')),
-            message="gameElement never became clickable"
-        )
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'gameElement')))
         gameText.send_keys(text) # type paragraph
         self.wait.until(EC.presence_of_element_located((By.ID, 'proof_game_finished'))) # check if results displayed
 

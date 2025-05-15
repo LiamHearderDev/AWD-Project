@@ -7,12 +7,10 @@ from werkzeug.serving import make_server
 
 
 from app import create_app
-from app.config import TestingConfig
+from app.config import TestingConfig, ProductionConfig
 from app.extensions import db
 
 class BaseSeleniumTests(unittest.TestCase): 
-
-    wait_for_load = False
 
     # this is how application is setup for all selenium test files
     # all selenium tests should reference BaseSeleniumTests as parent class
@@ -33,11 +31,11 @@ class BaseSeleniumTests(unittest.TestCase):
         )
         cls.server_thread.start()
 
-        if cls.wait_for_load: time.sleep(1)  # give server time to start
+        time.sleep(1)  # give server time to start
 
         # configure headless Chrome properly
         opts = Options()
-        opts.add_argument("--headless=new")      
+        #opts.add_argument("--headless=new")      
 
         # additional flags to improve stability in headless mode
         opts.add_argument("--disable-gpu")
@@ -47,7 +45,7 @@ class BaseSeleniumTests(unittest.TestCase):
         cls.driver = webdriver.Chrome(options=opts)
         cls.base_url = "http://localhost:5001"
 
-        cls.wait = WebDriverWait(cls.driver, 1)
+        cls.wait = WebDriverWait(cls.driver, 10)
 
     @classmethod
     def tearDownClass(cls):

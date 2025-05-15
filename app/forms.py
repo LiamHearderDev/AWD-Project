@@ -40,9 +40,9 @@ class LoginForm(FlaskForm):
     The form uses Flask-WTF for CSRF protection and WTForms for validation. """
 
     # Fields
-    username    = StringField('Username',                   validators=[DataRequired(), validate_datatype(str, True)])
-    password    = PasswordField('Password',                 validators=[DataRequired(), validate_datatype(str, True)])
-    remember_me = BooleanField('Remember Me', default=False,validators=[validate_datatype(bool)])
+    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
+    password    = PasswordField('Password', validators=[DataRequired(), validate_datatype(str, True)])
+    remember_me = BooleanField('Remember Me', default=False, validators=[validate_datatype(bool)])
     submit      = SubmitField('Sign In')
 
 

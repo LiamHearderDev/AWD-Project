@@ -16,9 +16,9 @@
     {{ form.hidden_tag() }}
     <div class="form-group">
       {{ form.username.label }}
-      {{ form.username(size=20, placeholder="Username") }}
+      {{ form.username(size=20, placeholder="Username", id="friend_type") }}
     </div>
-    {{ form.submit(class="btn btn-primary") }}
+    {{ form.submit(class="btn btn-primary", id="friend_submit") }}
   </form>
   
   {% with messages = get_flashed_messages(with_categories=true) %}
