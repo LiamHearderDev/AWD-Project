@@ -14,76 +14,62 @@ friends_bp = Blueprint('friends', __name__)
 @login_required
 def friends():
     # two prefixes to avoid name collisions
-    id_form = FriendRequestForm(prefix='id')
-    username_form = FriendRequestByUsernameForm(prefix='username')
+    form = FriendRequestForm()
 
-     # 1) Handle the id
-    if id_form.validate_on_submit() and id_form.submit.data:
-        target_id = id_form.user_id.data
-        target = User.query.get(target_id)
-        if not target or target.user_id == current_user.user_id:
-            return jsonify(success=False,
-                           message=f'User with ID {target_id} not found.')
-        incoming = Friendship.query.get((target_id, current_user.user_id))
-        if incoming and not incoming.is_requested:
-            return jsonify(success=False,
-                           message='They already sent you a request.')
-        existing = Friendship.query.get((current_user.user_id, target_id))
-        if existing:
-            return jsonify(success=False,
-                           message="Request already sent or you're already friends.")
-        fr = Friendship(
-            user_id=current_user.user_id,
-            friend_id=target_id,
-            is_requested=False,
-            requesting_user=current_user.user_id
+    # Get all current friends
+    friends = Friendship.query.filter_by(user_id=current_user.user_id, is_requested=False).all()
+
+    # Get all incoming friend requests
+    friend_requests = Friendship.query.filter_by(friend_id=current_user.user_id, is_requested=True).all()
+
+    # Short helper function to avoid repeated code
+    def render_friends_page():
+        return render_template('friends/friends.html',
+            form=form,
+            friend_requests=friend_requests,
+            friends=friends
         )
-        db.session.add(fr)
-        db.session.commit()
-        return jsonify(success=True)
+    
+    # Check if the form isn't validated. If not, load the page as normal.
+    if not form.validate_on_submit():
+        return render_friends_page()
+    
+    # Get the user we are sending a friend request to.
 
-    # 2) Handle the username submission 
-    if username_form.validate_on_submit() and username_form.submit.data:
-        uname = username_form.username.data.strip()
-        target = User.query.filter_by(username=uname).first()
-        if not target or target.user_id == current_user.user_id:
-            return jsonify(success=False,
-                           message=f'User "{uname}" not found.')
-        incoming = Friendship.query.get((target.user_id, current_user.user_id))
-        if incoming and not incoming.is_requested:
-            return jsonify(success=False,
-                           message='They already sent you a request.')
-        existing = Friendship.query.get((current_user.user_id, target.user_id))
-        if existing:
-            return jsonify(success=False,
-                           message="Request already sent or you're already friends.")
-        fr = Friendship(
-            user_id=current_user.user_id,
-            friend_id=target.user_id,
-            is_requested=False,
-            requesting_user=current_user.user_id
-        )
-        db.session.add(fr)
-        db.session.commit()
-        return jsonify(success=True)
+    target_username = form.username.data
+    target_user = User.query.filter_by(username=target_username).first()
 
-    # GET: load pending & accepted lists
-    incoming = Friendship.query.filter_by(
-        friend_id=current_user.user_id,
-        is_requested=False
-    ).all()
-    my_friends = Friendship.query.filter_by(
+    if not target_user:
+        flash("User not found.")
+        return render_friends_page()
+    
+    if target_user.user_id == current_user.user_id:
+        flash("You cannot send a request to yourself.")
+        return render_friends_page()
+    
+    # Stops the request if you already sent them a request, or are already friends.
+    existing_friendship = Friendship.query.get((current_user.user_id, target_user.user_id))
+    if existing_friendship:
+        if existing_friendship.is_requested == True:
+            flash(f"You have already sent {target_user.username} user a friend request.")
+        else:
+            flash(f"You are already friends with this {target_user.username}.")
+        return render_friends_page()
+    
+    # Creates a new friendship object
+    friendship_object = Friendship(
         user_id=current_user.user_id,
-        is_requested=True
-    ).all()
-
-    return render_template(
-        'friends/friends.html',
-        id_form=id_form,
-        username_form=username_form,
-        incoming=incoming,
-        my_friends=my_friends
+        friend_id=target_user.user_id,
+        is_requested=True,
+        requesting_user=current_user.user_id
     )
+
+    # Commits it to the db
+    db.session.add(friendship_object)
+    db.session.commit()
+
+    flash("Friend request sent!")
+    return render_friends_page()
 
 
 @friends_bp.route('/friends/accept/<int:sender_id>', methods=['POST'])

@@ -70,12 +70,7 @@ class RegistrationForm(FlaskForm):
 
 
 class FriendRequestForm(FlaskForm): # Using user id
-    """Form for sending a friend request. Contains a field for the user_id of the user to send the request to."""
-
+    """Form for sending a friend request. Contains a field for the username of the user to send the request to."""
     # Fields
-    user_id     = IntegerField('User ID', validators=[DataRequired(), validate_datatype(int, True)])
+    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
     submit      = SubmitField('Send Request')
-
-class FriendRequestByUsernameForm(FlaskForm): # Using user name 
-    username = StringField('Username', validators=[DataRequired()])
-    submit   = SubmitField('Send Request')
