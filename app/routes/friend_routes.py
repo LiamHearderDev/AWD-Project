@@ -83,7 +83,7 @@ def friends():
 
 @friends_bp.route('/friends/<acceptance>-request', methods=['POST'])
 @login_required
-def accept_friend(acceptance: str):
+def handle_friend_request(acceptance: str):
     """
     Accept or reject a pending request from sender -> current_user.
     """
@@ -117,14 +117,19 @@ def accept_friend(acceptance: str):
     if friend_relation.is_requested == False or current_user_relation.is_requested == False:
         flash("This friend request has already been accepted.", "error")
         return jsonify(success=False, message='Invalid request. Friend request had already been accepted.')
-        
-    # mark as accepted and add reciprocal row
-    friend_relation.is_requested = False
-    current_user_relation.is_requested = False
-    db.session.commit()
-
-    flash('Friend request accepted!', 'success')
-    return jsonify(success=True, message='Successfully handled friend request.')
+    
+    # If the user is trying to reject the 
+    if acceptance == "reject":
+        db.session.delete(friend_relation)
+        db.session.delete(current_user_relation)
+        db.session.commit()
+        return jsonify(success=True, message='Successfully rejected friend request.')
+    elif acceptance == "accept":
+        # mark as accepted and add reciprocal row
+        friend_relation.is_requested = False
+        current_user_relation.is_requested = False
+        db.session.commit()
+        return jsonify(success=True, message='Successfully accepted friend request.')
 
 
 # There is no reason reason to have a block function, as users can't send each other messages
@@ -133,7 +138,7 @@ def accept_friend(acceptance: str):
 # @login_required
 # def block_friend(sender_id):
 #     """
-#     Reject/block (i.e. delete) a pending request from sender_id → you.
+#     Reject/block (i.e. delete) a pending request from sender_id -> you.
 #     """
 #     relation = Friendship.query.get((sender_id, current_user.user_id))
 #     if not relation or relation.is_requested:
@@ -200,29 +205,45 @@ def view_friend_stats(friend_username: str):
     )
 
 
-@friends_bp.route('/friends/remove/<int:friend_id>', methods=['POST'])
+@friends_bp.route('/friends/remove/<int:friend_id>', methods=['GET','POST'])
 @login_required
 def remove_friend(friend_id):
     """
-    Unfriend: delete both A→B and B→A rows.
+    Unfriend: delete both A->B and B->A rows.
     """
     # find both sides
-    relationship1 = Friendship.query.get((current_user.user_id, friend_id))
-    relationship2 = Friendship.query.get((friend_id, current_user.user_id))
+    relationship1: Friendship | None = Friendship.query.get((current_user.user_id, friend_id))
+    relationship2: Friendship | None = Friendship.query.get((friend_id, current_user.user_id))
 
-    # if either side is missing or not “accepted”, error out
-    if not relationship1 or not relationship2 or not relationship1.is_requested or not relationship2.is_requested:
-        return jsonify(success=False, message="You're not currently friends."), 400
+    # If either relationship is invalid, flash an error.
+    if not relationship1 or not relationship2:
+        flash("You are currently not friends with this user.", "error")
+        
+        # If only one relationship is None, there has been a major database error that must be fixed. Remove whichever is valid.
+        if relationship1 != relationship2:
+            valid_relationship: Friendship = relationship1 if relationship1 != None else relationship2
+            db.session.delete(valid_relationship)
+            db.session.commit()
 
+        return redirect(url_for('friends.friends'))
+    
+    # If either relationship is just a request, flash an error.
+    if relationship1.is_requested or relationship2.is_requested:
+        flash("You are currently not friends with this user.", "error")
+
+        # If only one relationship is a request, there has been a major database error that must be fixed. Remove them both. 
+        if relationship1.is_requested != relationship2.is_requested:
+            db.session.delete(relationship1)
+            db.session.delete(relationship2)
+            db.session.commit()
+
+        return redirect(url_for('friends.friends'))
+    
     # delete both
     db.session.delete(relationship1)
     db.session.delete(relationship2)
     db.session.commit()
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify(success=True)
-
     # fallback for normal form
-    flash('Friend removed.', 'info')
     return redirect(url_for('friends.friends'))
 

@@ -37,10 +37,12 @@ window.onload = () => {
         data: JSON.stringify({ "sender_id": sender_id }),
         contentType: 'application/json',
         success: function(response) {
-            console.log('Friend Request accepted successfully:', response);
+            console.log('Friend request handled successfully:', response);
+            window.location.reload();
         },
         error: function(error) {
-            console.error('An error occurred while accepting friend Request:', error);
+            console.error('An error occurred while handling friend request:', error);
+            window.location.reload();
         }
       });
 

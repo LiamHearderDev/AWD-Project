@@ -48,7 +48,7 @@
       <span>{{ friendship.friend.username }}</span>
       <a href="{{ url_for('friends.view_friend_stats', friend_username=friendship.friend.username) }}" class="btn btn-sm btn-info">View Stats</a>
       <a href="{{ url_for('main.profile', user_id=friendship.friend_id) }}" class="btn btn-sm btn-secondary">View Profile</a>
-      <button class="remove-btn btn btn-sm btn-danger" data-friend-id="{{ friendship.friend_id }}">Remove Friend</button>
+      <a href="{{ url_for('friends.remove_friend', friend_id=friendship.friend_id) }}" class="remove-btn btn btn-sm btn-danger">Remove Friend</a>
     </li>
   {% else %}
     <li><em>You have no friends yet.</em></li>
