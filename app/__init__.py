@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from app.config import Config, ProductionConfig
 from app.extensions import db, migrate, login, csrf
 from dotenv import load_dotenv
+from datetime import timedelta
 
 def create_app(config_class=ProductionConfig):
 
@@ -10,6 +11,9 @@ def create_app(config_class=ProductionConfig):
 
     application = Flask(__name__)
     application.config.from_object(config_class)
+
+    # application.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=1)
+    # application.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=1)
 
     db.init_app(application)
     migrate.init_app(application, db)

@@ -37,7 +37,7 @@ def login():
         return render_template('auth/login.html', form=form)
     
     # If the username was found, and the password correct, we log them in.
-    login_user(user, remember=form.remember_me.data)
+    login_user(user, remember=form.remember_me.data) 
     return redirect(url_for('intro.intro'))
 
     
