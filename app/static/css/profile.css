@@ -10,3 +10,7 @@
 .d-grid {
     display: grid !important;
 }
+
+body {
+    background-image: url('/static/img/purple_background.jpg');
+}

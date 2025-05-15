@@ -1,9 +1,5 @@
 // AJAXify the friends page: send, accept & reject without reload
 
-
-
-
-
 window.onload = () => {
 
   // makes so that all future AJAX communications to server add CSRF automatically
@@ -50,3 +46,4 @@ window.onload = () => {
     });
   }
 }
+

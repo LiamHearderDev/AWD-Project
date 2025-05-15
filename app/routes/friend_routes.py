@@ -204,7 +204,6 @@ def view_friend_stats(friend_username: str):
         alltime_chart=format_data(stats_all, 'chart')
     )
 
-
 @friends_bp.route('/friends/remove/<int:friend_id>', methods=['GET','POST'])
 @login_required
 def remove_friend(friend_id):
@@ -246,4 +245,3 @@ def remove_friend(friend_id):
 
     # fallback for normal form
     return redirect(url_for('friends.friends'))
-

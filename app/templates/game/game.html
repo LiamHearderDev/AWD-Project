@@ -16,6 +16,11 @@
     </div>
     <div id="gameContainer" style="display: none;">
         <p class="game-timer" id="timerElement"> 0.00 s</p>
+        <div class="progress-container">
+            <progress id="progressBar" value="0" max="100" style="width: 100%; height:20px; margin-top:10px;"></progress>
+            <img src="/static/img/running_man.gif" id="runner" style="position: absolute; top: -20px; left: 0; height: 40px;">
+        </div>
+        
         <p class="game-text" id="gameElement" tabindex="0">
             <!-- Script replaces text in here with text to be typed for game. -->
             This is the Game page.
@@ -24,4 +29,8 @@
     <p class="game-text" id="resultElement" style="display: none;">
         <!-- This is where the game result will be displayed. -->
     </p>
+    <div id="statsLinkWrapper" style="display: none; text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('stats.stats') }}" id="statsLink" class="green-button">View More Stats</a>
+    </div>
+    
 {% endblock %}
