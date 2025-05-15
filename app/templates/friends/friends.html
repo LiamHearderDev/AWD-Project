@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block content %}
+
+  <!-- purely for Selenium tests -->
+  <span id="Friends_ID" hidden></span>
+
   <h2>Send a Friend Request</h2>
   <form id="friendRequestForm" method="POST" action="">
     {{ form.hidden_tag() }}

@@ -88,6 +88,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
     let wordIndex = 0;
     const maxIndex = text.length-1;
     let mistakes = 0;
+    let totalMistakes = 0
 
     let start = true;
     let startTime = 0;
@@ -127,6 +128,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 }
                 if (!$letter.hasClass('wrong-char')) {
                     mistakes += 1; // update mistakes
+                    totalMistakes += 1;
                 }
                 $letter.addClass('wrong-char');
                 // update info on mistake
@@ -145,7 +147,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     // stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000))); not needed
                     stats.push(new statistic('words per minute', Math.round((text.split(' ').length / ((Date.now() - startTime) / 60000)))));
                     // stats.push(new statistic('characters per minute', Math.round((text.length / ((Date.now() - startTime) / 60000))))); not needed
-                    stats.push(new statistic('total mistakes', mistakes));
+                    stats.push(new statistic('total mistakes', totalMistakes));
                     // stats.push(new statistic('finished at', new Date().toLocaleTimeString())); not needed
                     stats.push(new statistic('correct characters', getCorrectDicts(char_list, char_check)));
                     stats.push(new statistic('correct words', getCorrectDicts(word_list, word_check)));
