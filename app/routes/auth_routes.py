@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.extensions import db
 from app.models import User
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,11 +23,9 @@ def login():
         # If the form did not validate, render the login page because this was a first time loading.
         return render_template('auth/login.html', form=form)
 
-    # Now we need to get the user from the database.
     try:
-        user = db.session.scalar(
-            # This does a database query to get the user with the same username.
-            sa.select(User).where(User.username == form.username.data))
+        # This does a database query to get the user with the same username.
+        user = db.session.scalar(sa.select(User).where(User.username == form.username.data)) 
     # handle any errors from the database query
     except Exception as error:
         flash('An unexpected error occurred while processing your login attempt. Please try again later.')
@@ -78,3 +76,21 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('intro.intro'))
+
+
+@auth_bp.route('/get_current_user', methods=['GET'])
+def get_current_user() -> User | None:
+    """
+    This route is used to get the current user's information. It returns a JSON object with the user's ID, username, email, registration time, and highest WPM.
+    This is primarily used by unit tests to check if the user is logged in and has the correct information. This can ONLY be used during tests, as it is not a route that is used in the application.
+    """
+    if current_user.is_authenticated:
+        return {
+            'user_id': current_user.user_id,
+            'username': current_user.username,
+            'email': current_user.email,
+            'registration_time': current_user.registration_time,
+            'highest_wpm': current_user.highest_wpm
+        }
+    else:
+        return {"error": "User is not logged in."}
