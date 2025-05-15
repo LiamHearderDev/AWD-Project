@@ -4,7 +4,7 @@ body {
     background-position: top;
     background-repeat: no repeat;
     background-size: 100% auto;
-    
+    backdrop-filter: blur(2px);
 }
 
 body::after {
