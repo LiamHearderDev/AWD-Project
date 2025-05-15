@@ -1,3 +1,7 @@
+body {
+    background-image: url('/static/img/gaming1.jpg');
+    background-size: cover;
+}
 
 .game-text {
     font-size: 1.5em;
@@ -14,7 +18,7 @@
     display: block;           
     width: fit-content;       
     margin: 0 auto;           
-    
+    margin-bottom:10px;
     padding: 0.25em 0.5em;
     font-size: 2em;
     text-align: center;
@@ -37,12 +41,19 @@
     height: 6em;
     border: none;
     border-radius: 50%;
-    background-color: #4CAF50;
+    background-color: var(--base-colour-3);
     color: white;
     font-size: 2em;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     transition: background-color 0.2s;
+}
+
+.start:hover {
+    border-color: #c77dff;
+    box-shadow: 0 0 25px rgba(170, 0, 255, 0.8),
+                0 0 45px rgba(170, 0, 255, 0.5);
+    transform: scale(1.05);
 }
 .game-start:hover {
     background-color: #45a049;
@@ -59,3 +70,38 @@
     background-color: salmon;
 }
 
+#statsLinkWrapper a {
+    display: block;
+    color:white;
+    font-weight: bold;
+}
+
+#progressBar {
+    appearance: none;
+    border: none;
+    border-radius: 8px;
+    background-color: #ddd;
+    margin-top:30px;
+}
+#progressBar::-webkit-progress-bar {
+    background-color: #333;
+    border-radius: 8px;
+}
+#progressBar::-webkit-progress-value {
+    background: radial-gradient(circle,rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    border-radius: 8px;
+}
+
+.progress-container {
+    position: relative;
+    margin-top: 50px;
+
+}
+#runner {
+  transition: left 0.1s ease-out;
+  left: 0%;
+  position: absolute;
+  bottom: 100%;
+  width: auto;
+  height: 120px;
+}

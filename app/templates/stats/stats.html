@@ -10,7 +10,6 @@
 {% block content %}
   <!-- purely for Selenium tests -->
   <span id="Stats_ID" hidden></span>
-
   <h1>Statistics</h1>
   <div class="user-id">User: {{ current_user.username }}</div>
 
@@ -21,8 +20,10 @@
     <button class="bg-0" onclick="showTable('all')"  id="filter-button-all">All</button>
   </div>
 
-  <div class="table-section" id="tableContainer">
-    <!-- Today's stats -->
+  <div class="table-section grid-2col" id="tableContainer">
+    <div class="left-column">
+      <div class="grid-item" id="metric-blocks">
+        <!-- Today's stats -->
     <table class="statsTable" id="table-1" style="display: none;">
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
@@ -117,6 +118,107 @@
             data-accuracy='{{ alltime_chart.accuracy | tojson }}'
             data-averagewpm='{{ alltime_table[1].value | tojson }}'
             data-averageacc='{{ alltime_table[2].value | tojson }}'></canvas>
+
+        
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="doughnut-row" id="doughnut-block">
+        <canvas id="mistake-words-chart"
+        data-labels-today='{{ today_mistake_labels | tojson }}'
+        data-counts-today='{{ today_mistake_counts | tojson }}'
+        data-labels-last7='{{ last7days_mistake_labels | tojson }}'
+        data-counts-last7='{{ last7days_mistake_counts | tojson }}'
+        data-labels-last28='{{ last28days_mistake_labels | tojson }}'
+        data-counts-last28='{{ last28days_mistake_counts | tojson }}'
+        data-labels-all='{{ alltime_mistake_labels | tojson }}'
+        data-counts-all='{{ alltime_mistake_counts | tojson }}'></canvas>
+
+    <canvas id="correct-words-chart"
+        data-labels-today='{{ today_correct_labels | tojson }}'
+        data-counts-today='{{ today_correct_counts | tojson }}'
+        data-labels-last7='{{ last7days_correct_labels | tojson }}'
+        data-counts-last7='{{ last7days_correct_counts | tojson }}'
+        data-labels-last28='{{ last28days_correct_labels | tojson }}'
+        data-counts-last28='{{ last28days_correct_counts | tojson }}'
+        data-labels-all='{{ alltime_correct_labels | tojson }}'
+        data-counts-all='{{ alltime_correct_counts | tojson }}'></canvas>
+        
+      </div>
+
+      <!-- paragraph stats tables -->
+      <div class="grid-item" id="paragraph-block">
+        <h5>Best Peforming Paragraph </h5>
+        <!-- Paragraph stats (today) -->
+    <table class="statsTable paragraphStatsTable" id="para-table-1" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Paragraph stats (7-days) -->
+    <table class="statsTable paragraphStatsTable" id="para-table-7" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paragraph stats (28-days) -->
+    <table class="statsTable paragraphStatsTable" id="para-table-28" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Paragraph stats (all) -->
+    <table class="statsTable paragraphStatsTable" id="para-table-all" style="display: none;">
+      <thead>
+        <tr><th>Paragraph ID</th><th>Avg WPM</th><th>Avg Accuracy</th><th>Attempts</th></tr>
+      </thead>
+      <tbody>
+        {% for row in today_paragraph_stats %}
+        <tr>
+          <td>{{ row.paragraph }}</td>
+          <td>{{ row.avg_wpm }}</td>
+          <td>{{ row.avg_accuracy }}</td>
+          <td>{{ row.attempts }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+      </div>
+    </div>
   </div>
 
   <div class="nav-buttons">

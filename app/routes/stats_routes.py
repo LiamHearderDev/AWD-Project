@@ -12,6 +12,9 @@ from app.models import TypingResult, User
 
 import ast      # This allows us to convert string literals into their respective types, like dictionaries.
 
+from collections import Counter  # This allows us to do some statistics on the data
+from collections import defaultdict
+
 
 stats_bp = Blueprint('stats', __name__)
 
@@ -40,6 +43,7 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
 
     # Fetch all matching results
     results = query.all()
+    print(f"[DEBUG] Days={days}, Found results: {len(results)}")
     if len(results) == 0:
         return {
             "total_attempts": 0,
@@ -53,7 +57,14 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
             "best_accuracy_timestamp": None,
             "best_accuracy_paragraph": None,
             "all_accuracy": [],
-            "result_timestamps": []
+            "result_timestamps": [],
+            "most_incorrect_words": [],
+            "most_correct_words": [],
+            "most_incorrect_words_labels": [],
+            "most_incorrect_words_counts": [],
+            "most_correct_words_labels": [],
+            "most_correct_words_counts": [],
+            "paragraph_stats": [],
         }
 
     # This is to be used when needing to flash an error to the screen in the following loop
@@ -72,21 +83,38 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
     best_wpm_timestamp: datetime = None
     best_wpm_paragraph: int = None
 
+    mistake_words_counter = Counter()
+    correct_words_counter = Counter()
+
+    processed_paragraphs = set()
+    paragraph_stats = defaultdict(list)
 
     # Loop over every TypingResult
     for result in results:
         correct = ast.literal_eval(result.correct_characters) # Need to convert to a dict by eval string literal
+        mistake_words = ast.literal_eval(result.mistake_words) 
+        correct_words = ast.literal_eval(result.correct_words)
 
         # Check for any issues
         if not isinstance(correct, dict):
             flash_error("correct_characters", result.result_id)
             continue
+        if not isinstance(mistake_words, dict):
+            flash_error("mistake_words", result.result_id)
+            continue
+        if not isinstance(correct_words, dict):
+            flash_error("correct_words", result.result_id)
+            continue
+
         if result.total_characters <= 0:
             flash_error("total_characters", result.result_id)
             continue
         if result.wpm < 0:
             flash_error("wpm", result.result_id)
             continue
+        if result.mistake_words is None or result.correct_words is None or result.correct_characters is None:
+            continue
+
         
         # Cache data
         result_timestamps.append(result.timestamp.strftime("%H:%M, %d/%m/%Y"))
@@ -104,6 +132,39 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
             best_wpm = result.wpm
             best_wpm_timestamp = result.timestamp.strftime("%H:%M, %d/%m/%Y")
             best_wpm_paragraph = result.paragraph_id
+
+        if result.mistake_words:
+            mistake_words_counter.update(mistake_words)
+        
+        if result.correct_words:
+            correct_words_counter.update(correct_words)
+
+        if result.paragraph_id is not None:
+            correct_count = sum(correct.values())
+            acc = (correct_count / result.total_characters) * 100
+            paragraph_stats[result.paragraph_id].append((result.wpm, acc))
+
+
+    most_incorrect_words = mistake_words_counter.most_common(10)
+    mistake_words_labels = [word for word, count in most_incorrect_words]
+    mistake_words_counts = [count for word, count in most_incorrect_words]
+
+    most_correct_words = correct_words_counter.most_common(10)
+    correct_words_labels = [word for word, count in most_correct_words]
+    correct_words_counts = [count for word, count in most_correct_words]
+ 
+    paragraph_table = []
+    for para_id, values in sorted(paragraph_stats.items()):
+        avg_wpm = round(sum(w for w, _ in values) / len(values), 1)
+        avg_acc = f"{round(sum(a for _, a in values) / len(values), 1)}%"
+        paragraph_table.append({
+            "paragraph": para_id,
+            "avg_wpm": avg_wpm,
+            "avg_accuracy": avg_acc,
+            "attempts": len(values)
+        })
+        
+        
         
     if len(acc_values) <= 0:
         avg_acc = 0.0
@@ -126,7 +187,12 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
         "best_accuracy_timestamp": best_acc_timestamp,
         "best_accuracy_paragraph": best_acc_paragraph,
         "all_accuracy": acc_values,
-        "result_timestamps": result_timestamps
+        "result_timestamps": result_timestamps,
+        "most_incorrect_words_labels": mistake_words_labels,
+        "most_incorrect_words_counts": mistake_words_counts,
+        "most_correct_words_labels": correct_words_labels,
+        "most_correct_words_counts": correct_words_counts,
+        "paragraph_stats": paragraph_table,
     }
 
 
@@ -185,8 +251,37 @@ def stats():
         today_chart         = format_data(stats_today, "chart"),
         last7days_chart     = format_data(stats_7days, "chart"),
         last28days_chart    = format_data(stats_28days,"chart"),
-        alltime_chart       = format_data(stats_all,   "chart")
+        alltime_chart       = format_data(stats_all,   "chart"),
+
+        # Words leaderboard data
+        # Mistake word leaderboard data
+        today_mistake_labels     = stats_today["most_incorrect_words_labels"],
+        today_mistake_counts     = stats_today["most_incorrect_words_counts"],
+        last7days_mistake_labels = stats_7days["most_incorrect_words_labels"],
+        last7days_mistake_counts = stats_7days["most_incorrect_words_counts"],
+        last28days_mistake_labels = stats_28days["most_incorrect_words_labels"],
+        last28days_mistake_counts = stats_28days["most_incorrect_words_counts"],
+        alltime_mistake_labels   = stats_all["most_incorrect_words_labels"],
+        alltime_mistake_counts   = stats_all["most_incorrect_words_counts"],
+
+        # Correct word leaderboard data
+        today_correct_labels     = stats_today["most_correct_words_labels"],
+        today_correct_counts     = stats_today["most_correct_words_counts"],
+        last7days_correct_labels = stats_7days["most_correct_words_labels"],
+        last7days_correct_counts = stats_7days["most_correct_words_counts"],
+        last28days_correct_labels = stats_28days["most_correct_words_labels"],
+        last28days_correct_counts = stats_28days["most_correct_words_counts"],
+        alltime_correct_labels   = stats_all["most_correct_words_labels"],
+        alltime_correct_counts   = stats_all["most_correct_words_counts"],
+
+        today_paragraph_stats = stats_today["paragraph_stats"],
+        last7days_paragraph_stats = stats_7days["paragraph_stats"],
+        last28days_paragraph_stats = stats_28days["paragraph_stats"],
+        alltime_paragraph_stats = stats_all["paragraph_stats"],
+
     )
+
+
 
 shared_data = {}
 #  Generate a random string for generation of the url in the syntax of '/stats/shared_stats/<userid>/<random_str>'
