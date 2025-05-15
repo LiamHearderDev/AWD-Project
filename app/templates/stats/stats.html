@@ -8,7 +8,9 @@
 {% endblock %}
 
 {% block content %}
-  <h1 >Statistics</h1>
+  <!-- purely for Selenium tests -->
+  <span id="Stats_ID" hidden></span>
+  <h1>Statistics</h1>
   <div class="user-id">User: {{ current_user.username }}</div>
 
   <div class="filter-buttons">

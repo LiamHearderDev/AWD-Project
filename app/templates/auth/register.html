@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block content %}
+
+    <!-- purely for Selenium tests -->
+    <span id="Register_ID" hidden></span>
+
     <section id="register_section" style="display: grid; align-items: center; justify-content: center; margin-top: 50px;">
         <form id="register_form" class="container-lg" action="" method="post" novalidate>
             {{ form.hidden_tag() }}
@@ -24,7 +28,7 @@
             <div id="form_username" name="input_field" class="login_field">
                 {{ form.username.label }} <br>
                 <div>
-                    {{ form.username(size=32, placeholder="Enter your username") }}
+                    {{ form.username(id="register_username", size=32, placeholder="Enter your username") }}
                 </div>
                 {% for error in form.username.errors %}
                 <p class="error_message">[{{ error }}]</p>
@@ -33,7 +37,7 @@
             <div id="form_email" name="input_field" class="login_field">
                 {{ form.email.label }} <br>
                 <div>
-                    {{ form.email(size=32, placeholder="Enter your email address") }}
+                    {{ form.email(id="register_email", size=32, placeholder="Enter your email address") }}
                 </div>
                 {% for error in form.email.errors %}
                 <p class="error_message">[{{ error }}]</p>
@@ -42,7 +46,7 @@
             <div id="form_password" name="input_field" class="login_field">
                 {{ form.password.label }} <br>
                 <div>
-                    {{ form.password(size=32, placeholder="******") }}
+                    {{ form.password(id="register_password", size=32, placeholder="******") }}
                 </div>
                 {% for error in form.password.errors %}
                 <p class="error_message">[{{ error }}]</p>
@@ -51,14 +55,14 @@
             <div id="form_password_resubmit" name="input_field" class="login_field">
                 {{ form.password2.label }} <br>
                 <div>
-                    {{ form.password2(size=32, placeholder="******") }}
+                    {{ form.password2(id="register_password2", size=32, placeholder="******") }}
                 </div>
                 {% for error in form.password2.errors %}
                 <p class="error_message">[{{ error }}]</p>
                 {% endfor %}
             </div> <br>
             <div class="login_field_submit" name="input_field">
-                {{ form.submit(class="login_input_submit", style="display: block;") }}
+                {{ form.submit(id="register_submit", class="login_input_submit", style="display: block;") }}
             </div>
         </form> <br>
     </section>

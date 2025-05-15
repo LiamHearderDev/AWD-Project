@@ -8,6 +8,7 @@ class GameBlueprintTestCase(unittest.TestCase):
     def setUp(self): # setup testing environment
         # create app with test config and context
         self.app = create_app(TestingConfig)
+        self.app.config['LOGIN_DISABLED'] = True # make it so that @login_required in routes can accept from anonymous (for testing)
         self.client = self.app.test_client()
         with self.app.app_context():
             db.create_all()
@@ -45,11 +46,12 @@ class GameBlueprintTestCase(unittest.TestCase):
 
     def test_handle_db_error(self): # checks if error handler for database commit errors is working
         # import the handler directly
-        from app.routes.game_routes import game_bp
+        from app.routes.game_routes import handle_db_error
         from sqlalchemy.exc import SQLAlchemyError
-        rv, status = game_bp.handle_db_error(SQLAlchemyError('oops')) # manually cause error
+        with self.app.app_context():
+            rv, status = handle_db_error(SQLAlchemyError('oops')) # manually cause error
         self.assertEqual(status, 500)
-        json_data = json.loads(rv[0].data)
+        json_data = json.loads(rv.data)
         self.assertEqual(json_data['error'], 'Database error, please try again')
 
     # NOTE: accepted data to game_routes.py is JSON such that is list with first element being dictionary with all info

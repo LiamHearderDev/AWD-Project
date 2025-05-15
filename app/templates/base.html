@@ -32,20 +32,20 @@
 
         <!-- Site Navigation links -->
         <nav class="position-absolute" style="left: 2%;">
-            <a class="header-link text-white font-weight-bold" href="{{ url_for('intro.intro') }}">Home</a>
-            <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('game.game') }}">Game</a>
-            <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.stats') }}">Stats</a>
-            <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('friends.friends') }}">Friends</a>
-            <a class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.leaderboard') }}">Leaderboard</a>
+            <a id='Base_Home' class="header-link text-white font-weight-bold" href="{{ url_for('intro.intro') }}">Home</a>
+            <a id='Base_Game' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('game.game') }}">Game</a>
+            <a id='Base_Stats' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.stats') }}">Stats</a>
+            <a id='Base_Friends' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('friends.friends') }}">Friends</a>
+            <a id='Base_Leaderboard' class="header-link hide-900 text-white font-weight-bold" href="{{ url_for('stats.leaderboard') }}">Leaderboard</a>
         </nav>
 
         <!-- Profile/Login Navigation -->
         <nav class="d-flex position-absolute" style="right: 2%;">
           {% if current_user.is_anonymous %}
-          <a class="header-link text-white font-weight-bold" href="{{ url_for('auth.login') }}">Login</a>
+          <a id='Base_Login' class="header-link text-white font-weight-bold" href="{{ url_for('auth.login') }}">Login</a>
           {% else %}
-          <a class="header-link text-white font-weight-bold" href="{{ url_for('main.profile') }}"> {{ current_user.username }}</a>
-          <a class="header-link text-white font-weight-bold" href="{{ url_for('auth.logout') }}">Logout</a>
+          <a id='Base_Profile' class="header-link text-white font-weight-bold" href="{{ url_for('main.profile') }}"> {{ current_user.username }}</a>
+          <a id='Base_Logout' class="header-link text-white font-weight-bold" href="{{ url_for('auth.logout') }}">Logout</a>
           {% endif %}
         </nav>
       </div>

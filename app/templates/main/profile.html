@@ -6,6 +6,9 @@
 {% endblock %}
 
 {% block content %}
+    <!-- purely for Selenium tests -->
+    <span id="Profile_ID" hidden></span>
+
     <section id="profile_main_section" class="justify-content-between d-lg-flex d-md-block">
         <!-- pfp and username -->
         <section id="profile_pfp_name" class="d-sm-flex align-items-sm-center justify-content-center justify-content-md-left m-0" style="display: grid">
@@ -16,7 +19,7 @@
 
             <!-- Username -->
             <div class="d-block mr-sm-4 m-0 text-center text-md-left">
-                <h3 id="username">{{ current_user.username }}</h3>
+                <h3 id="username">{{ user.username }}</h3>
             </div>
         </section>
         

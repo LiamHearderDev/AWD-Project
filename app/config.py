@@ -18,3 +18,4 @@ class TestingConfig(Config):
     TESTING = True # Use for running automated tests
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' # makes it so that database stored in memory, not on disk
     WTF_CSRF_ENABLED = False # disable CSRF in tests so you can post forms without a token
+    SECRET_KEY = 'test-secret-key'
