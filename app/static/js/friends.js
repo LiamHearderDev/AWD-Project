@@ -1,64 +1,50 @@
 // AJAXify the friends page: send, accept & reject without reload
 
-document.addEventListener('DOMContentLoaded', () => {
-  const requestForm = document.getElementById('friendRequestForm');
-  if (requestForm) {
-    requestForm.addEventListener('submit', async e => {
-      e.preventDefault(); // stop the browser from reloading the page
-      const formData = new FormData(requestForm);
-      try {
-        const res  = await fetch(requestForm.action, {
-          method:  'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },// mark this as an AJAX request
-          body: formData
-        });
-        const json = await res.json();
 
-        if (json.success) {
-          alert('Request sent!');
-          requestForm.reset();  // reset the entire form (clears the input)
-        } else {
-          alert(json.message || 'Failed to send request.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Network error.');
-      }
-    });
-  }
+
+
+
+window.onload = () => {
+
+  // makes so that all future AJAX communications to server add CSRF automatically
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // get csrf token from header
+  $.ajaxSetup({ headers: { 'X-CSRFToken': csrfToken } });
 
   // accept & block logic unchanged
   const pendingList = document.getElementById('incomingRequests');
   if (pendingList) {
-    pendingList.addEventListener('click', async e => {
+
+    // Add an event listener to clicking accept or reject friend request
+    pendingList.addEventListener('click', (e) => {
+
+
       const btn = e.target;
       if (!btn.classList.contains('accept-btn') &&
           !btn.classList.contains('reject-btn')) {
         return;
       }
+      
+      // Extract the friend request sender's ID from the button, populated by Jinja
+      const sender_id = btn.dataset.senderId;
 
-      const senderId = btn.dataset.senderId;
-      const isAccept = btn.classList.contains('accept-btn');
-      const url      = isAccept
-        ? `/friends/accept/${senderId}`
-        : `/friends/reject/${senderId}`;
+      // Create the URL we will be sending an AJAX POST request to
+      const url = btn.classList.contains('accept-btn') ? '/friends/accept-request' : '/friends/reject-request';
 
-      try {
-        const response  = await fetch(url, {
-          method:  'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        const json = await response.json();
-        if (response.ok && json.success) {
-          const li = btn.closest('li');  //li reflects the fact that it holds an <li> element
-          if (li) li.remove();
-        } else {
-          alert(json.message || 'Action failed.');
+      // Send the request
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: JSON.stringify({ "sender_id": sender_id }),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log('Friend Request accepted successfully:', response);
+        },
+        error: function(error) {
+            console.error('An error occurred while accepting friend Request:', error);
         }
-      } catch (err) {
-        console.error(err);
-        alert('Network error.');
-      }
+      });
+
+      
     });
   }
-});
+}
