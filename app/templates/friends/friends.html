@@ -5,53 +5,68 @@
 {% endblock %}
 
 {% block content %}
-  <!-- purely for Selenium tests -->
-  <span id="Friends_ID" hidden></span>
+  <h2>Send a Friend Request</h2>
+  <form
+    id="friendRequestFormUsername"
+    method="POST"
+    action="{{ url_for('friends.friends') }}"
+  >
+    {{ username_form.hidden_tag() }}
+    <div class="form-group">
+      {{ username_form.username.label }}
+      {{ username_form.username(size=20, placeholder="Username") }}
+    </div>
+    {{ username_form.submit(class="btn btn-primary") }}
+  </form>
 
-  <h2>Pending Requests</h2>
+  <form
+    id="friendRequestFormID"
+    class="mt-3"
+    method="POST"
+    action="{{ url_for('friends.friends') }}"
+  >
+    {{ id_form.hidden_tag() }}
+    <div class="form-group">
+      {{ id_form.user_id.label }}
+      {{ id_form.user_id(size=20, placeholder="User ID") }}
+    </div>
+    {{ id_form.submit(class="btn btn-primary") }}
+  </form>
+
+  <h2 class="mt-5">Pending Requests</h2>
   <ul id="incomingRequests">
     {% for req in incoming %}
       <li data-sender-id="{{ req.requesting_user }}">
-        {{ req.sender.username }} ({{ req.requesting_user }})
-        sent you a friend request.
-
-        <button
-          class="accept-btn btn btn-sm btn-success"
-          data-sender-id="{{ req.requesting_user }}">
-          Accept
-        </button>
-
-        <button
-          class="reject-btn btn btn-sm btn-danger"
-          data-sender-id="{{ req.requesting_user }}">
-          Reject
-        </button>
+        {{ req.sender.username }} ({{ req.requesting_user }}) sent you a friend request.
+        <button class="accept-btn btn btn-sm btn-success" data-sender-id="{{ req.requesting_user }}">Accept</button>
+        <button class="reject-btn btn btn-sm btn-danger" data-sender-id="{{ req.requesting_user }}">Reject</button>
       </li>
     {% else %}
       <li><em>No pending requests.</em></li>
     {% endfor %}
   </ul>
 
-    <h2>Send a Friend Request</h2>
-  <form id="friendRequestForm" method="POST"
-        action="{{ url_for('friends.friends') }}">
-    {{ form.hidden_tag() }}
-    {{ form.user_id.label }}  
-    {{ form.user_id(size=20) }}
-    {{ form.submit(class="btn btn-primary") }}
-  </form>
-
-
-  <h2>Your Friends</h2>
-  <ul>
-    {% for f in my_friends %}
-      <li>
-        {{ f.friend.username }} ({{ f.friend_id }})
-        <a href="{{ url_for('friends.view_friend_stats', friend_id=f.friend_id) }}"
-        class="btn btn-sm btn-info"
-        >View Stats</a>
-      </li>
-    {% endfor %}
-  </ul>
-
+<h2>Your Friends</h2>
+<ul id="friendsList">
+  {% for f in my_friends %}
+    <li>
+      {{ f.friend.username }} ({{ f.friend_id }})
+      <a href="{{ url_for('friends.view_friend_stats', friend_id=f.friend_id) }}"
+         class="btn btn-sm btn-info">
+        View Stats
+      </a>
+      <a href="{{ url_for('main.profile', user_id=f.friend_id) }}"
+         class="btn btn-sm btn-secondary">
+        View Profile
+      </a>
+      <button class="remove-btn btn btn-sm btn-danger"
+              data-friend-id="{{ f.friend_id }}">
+        Remove Friend
+      </button>
+    </li>
+  {% else %}
+    <li><em>You have no friends yet.</em></li>
+  {% endfor %}
+</ul>
 {% endblock %}
+
