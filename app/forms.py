@@ -42,7 +42,7 @@ class LoginForm(FlaskForm):
     # Fields
     username    = StringField('Username',                   validators=[DataRequired(), validate_datatype(str, True)])
     password    = PasswordField('Password',                 validators=[DataRequired(), validate_datatype(str, True)])
-    remember_me = BooleanField('Remember Me', default=False,validators=[DataRequired(), validate_datatype(bool)])
+    remember_me = BooleanField('Remember Me', default=False,validators=[validate_datatype(bool)])
     submit      = SubmitField('Sign In')
 
 

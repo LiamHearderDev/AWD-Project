@@ -20,7 +20,7 @@ class TestLogin(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'register_password2').send_keys(password)
         self.driver.find_element(By.ID, 'register_submit').click()
     
-    def attempt_login(self, username, password): # given on login page, attempt to log in
+    def attempt_login(self, username, password): # assume on login page, attempt to log in
         self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))
         self.driver.find_element(By.ID, 'login_input_username').send_keys(username)
         self.driver.find_element(By.ID, 'login_input_password').send_keys(password)
@@ -39,6 +39,7 @@ class TestLogin(BaseSeleniumTests):
     def test_successful_login(self):
         self.attempt_register('selenium_user', 'sel@gmail.com', 'Password123') # register
         self.attempt_login('selenium_user', 'Password123') # login
+        # print("I'm currently at:", self.driver.current_url)
         self.check_logged_in() # check if logged in
         self.driver.find_element(By.ID, 'Base_Logout').click() # logout
         self.check_logged_out() # check if logged out
@@ -71,6 +72,7 @@ class TestLogin(BaseSeleniumTests):
 
     def test_login_nonexistent_user(self):
         # login without registering
+        self.driver.get(f'{self.base_url}/login')
         self.attempt_login('noone', 'doesntmatter')
         self.wait.until(EC.url_contains('/login'))
 
