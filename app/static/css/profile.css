@@ -14,3 +14,15 @@
 body {
     background-image: url('/static/img/purple_background.jpg');
 }
+
+.btn-primary {
+  background-color: var(--base-colour-3);
+  border-color: var(--base-colour-3);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--base-colour-2);
+  border-color: var(--base-colour-2);
+}
+

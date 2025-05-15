@@ -5,7 +5,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Optional, Length
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -75,3 +75,18 @@ class FriendRequestForm(FlaskForm):
     # Fields
     user_id     = IntegerField('User ID', validators=[DataRequired(), validate_datatype(int, True)])
     submit      = SubmitField('Send Request')
+
+
+class UpdateProfileForm(FlaskForm):
+    """Form for updating user profile. Contains fields for username, email, and password."""
+    username = StringField('Username', validators=[
+        Optional(),  
+        Length(min=1, message="Username must not be empty.")
+    ])
+    password = PasswordField('Password', validators=[
+        Optional(),  
+        Length(min=1, message="Password must not be empty."),
+        EqualTo('confirm_password', message="Passwords must match.")
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[Optional()])
+    submit = SubmitField('Update Profile')
