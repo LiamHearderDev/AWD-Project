@@ -11,59 +11,62 @@
     <!-- purely for Selenium tests -->
     <span id="Register_ID" hidden></span>
 
-    <section id="register_section" style="display: grid; align-items: center; justify-content: center; margin-top: 50px;">
-        <form id="register_form" class="container-lg" action="" method="post" novalidate>
-            {{ form.hidden_tag() }}
-            <div id="register-title">
-                <h1 style="color:white;">Create Account</h1>
-            </div> 
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <p class="error_message">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-            {% endwith %}
-            <br>
-            <div id="form_username" name="input_field" class="login_field">
-                {{ form.username.label }} <br>
-                <div>
-                    {{ form.username(id="register_username", size=32, placeholder="Enter your username") }}
+    <section id="register_section" class="align-items-center justify-content-center" style="display: grid;">
+        <div id="register_form_wrapper" class="blur_section form_wrapper">
+            <form id="register_form" class="container-lg" action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <div id="register-title">
+                    <h1 style="color:white;">Create Account</h1>
+                </div> 
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p class="error_message">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <br>
+                <div id="form_username" name="input_field" class="login_field">
+                    {{ form.username.label }} <br>
+                    <div>
+                        {{ form.username(id="register_username", size=32, placeholder="Enter your username", class="bg-transparent text-0") }}
+                    </div>
+                    {% for error in form.username.errors %}
+                    <p class="error_message">[{{ error }}]</p>
+                    {% endfor %}
+                </div> <br>
+                <div id="form_email" name="input_field" class="login_field">
+                    {{ form.email.label }} <br>
+                    <div>
+                        {{ form.email(id="register_email", size=32, placeholder="Enter your email address", class="bg-transparent text-0") }}
+                    </div>
+                    {% for error in form.email.errors %}
+                    <p class="error_message">[{{ error }}]</p>
+                    {% endfor %}
+                </div> <br>
+                <div id="form_password" name="input_field" class="login_field">
+                    {{ form.password.label }} <br>
+                    <div>
+                        {{ form.password(id="register_password", size=32, placeholder="******", class="bg-transparent text-0") }}
+                    </div>
+                    {% for error in form.password.errors %}
+                    <p class="error_message">[{{ error }}]</p>
+                    {% endfor %}
+                </div> <br>
+                <div id="form_password_resubmit" name="input_field" class="login_field">
+                    {{ form.password2.label }} <br>
+                    <div>
+                        {{ form.password2(id="register_password2", size=32, placeholder="******", class="bg-transparent text-0") }}
+                    </div>
+                    {% for error in form.password2.errors %}
+                    <p class="error_message">[{{ error }}]</p>
+                    {% endfor %}
+                </div> <br>
+                <div class="login_field_submit" name="input_field">
+                    {{ form.submit(id="register_submit", class="login_input_submit bg-2 base-button", style="display: block;") }}
                 </div>
-                {% for error in form.username.errors %}
-                <p class="error_message">[{{ error }}]</p>
-                {% endfor %}
-            </div> <br>
-            <div id="form_email" name="input_field" class="login_field">
-                {{ form.email.label }} <br>
-                <div>
-                    {{ form.email(id="register_email", size=32, placeholder="Enter your email address") }}
-                </div>
-                {% for error in form.email.errors %}
-                <p class="error_message">[{{ error }}]</p>
-                {% endfor %}
-            </div> <br>
-            <div id="form_password" name="input_field" class="login_field">
-                {{ form.password.label }} <br>
-                <div>
-                    {{ form.password(id="register_password", size=32, placeholder="******") }}
-                </div>
-                {% for error in form.password.errors %}
-                <p class="error_message">[{{ error }}]</p>
-                {% endfor %}
-            </div> <br>
-            <div id="form_password_resubmit" name="input_field" class="login_field">
-                {{ form.password2.label }} <br>
-                <div>
-                    {{ form.password2(id="register_password2", size=32, placeholder="******") }}
-                </div>
-                {% for error in form.password2.errors %}
-                <p class="error_message">[{{ error }}]</p>
-                {% endfor %}
-            </div> <br>
-            <div class="login_field_submit" name="input_field">
-                {{ form.submit(id="register_submit", class="login_input_submit", style="display: block;") }}
-            </div>
-        </form> <br>
+            </form>
+        </div>
+        <br>
     </section>
 {% endblock %}
