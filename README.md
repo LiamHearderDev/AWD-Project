@@ -89,7 +89,12 @@ python -m flask db migrate
 python -m flask db upgrade
 ```
 
-### 6. Run the application:
+### 6. Add Required Data to Database (sample paragraphs user will type):
+```bash
+python setupTestData.py
+```
+
+### 7. Run the application:
 ```bash
 python -m flask run
 ```
@@ -98,5 +103,5 @@ Or alternatively, if in a docker container:
 python -m flask run --host=0.0.0.0              # to allow access from outside the container
 ```
 
-### 7. Open SpeedLogger
+### 8. Open SpeedLogger
 Head to ``` http://localhost:5000 ``` and have fun!
