@@ -6,6 +6,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Allows users to be redirected to where they were originally going, after being asked to first log in
+    USE_SESSION_FOR_NEXT = True
+
     # Flask-Mail settings:
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))

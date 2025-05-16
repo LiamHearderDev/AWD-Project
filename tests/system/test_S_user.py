@@ -128,7 +128,9 @@ class TestUserOperations(BaseSeleniumTests):
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.accept-btn")))
         self.driver.find_element(By.CSS_SELECTOR, "button.accept-btn").click()
         self.driver.find_element(By.LINK_TEXT, "View Stats").click() # go to friends stats 
-        self.wait.until(EC.presence_of_element_located((By.ID, "Friends_Stats_ID"))) # on friends stats page
+        self.wait.until(EC.presence_of_element_located((By.ID, "Stats_ID"))) # on a stats page
+        user = self.driver.find_element(By.ID, "user_ID").text
+        self.assertEqual(user, 'User: selenium_user_2') # on other user's stats page
 
 
 if __name__ == '__main__':
