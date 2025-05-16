@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
           labels: ['Average WPM'],
           datasets: [
             {
-              data: [ canvasData.avg_acc],
+              data: [ canvasData.avg_wpm],
               backgroundColor: ['#3CC47CBF'],
               borderColor: ['#3CC47C'],
               borderWidth: 2,
