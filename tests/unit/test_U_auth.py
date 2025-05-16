@@ -3,7 +3,6 @@ from app import create_app, db
 from app.config import TestingConfig
 from app.models import User
 from datetime import datetime
-from app.forms import LoginForm, RegistrationForm
 
 class AuthBlueprintTestCase(unittest.TestCase):
     def setUp(self): # setup testing environment
