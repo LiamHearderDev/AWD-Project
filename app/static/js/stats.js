@@ -140,13 +140,18 @@ function showTable(period) {
       element.style.display = "none"; 
     }
   }
-    showDoughnutChart(period);
-    showCorrectDoughnutChart(period);
-    const $paraTables = $(".paragraphStatsTable");
-    $paraTables.each((_, tbl) => {
-      tbl.style.display = tbl.id === "para-table-" + period ? "table" : "none";
-    });
 
+  showDoughnutChart(period);
+  showCorrectDoughnutChart(period);
+  const $paraTables = $(".paragraphStatsTable");
+  $paraTables.each((_, tbl) => {
+    tbl.style.display = tbl.id === "para-table-" + period ? "table" : "none";
+  });
+
+  // Select the button that was pressed, deselect all other buttons
+  $buttons = $("button[id^='filter-button']");
+  $buttons.removeClass("selected");
+  $(`#filter-button-${period}`).addClass("selected");
 }
 
 

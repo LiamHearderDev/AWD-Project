@@ -29,10 +29,10 @@ h1, .user-id {
 }
 
 .filter-buttons button:hover {
-    background-color: var(--base-colour-3);
+    background-color: var(--base-colour-3-hover);
 }
 .filter-buttons .selected {
-    background-color: #227a4b !important;
+    background-color: #c5407d !important;
 }
 
 .table-section {
