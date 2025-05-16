@@ -1,7 +1,11 @@
 body {
     background-image: url('/static/img/gaming1.jpg');
     background-size: cover;
+}
+
+.base-background-blur {
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .game-text {
