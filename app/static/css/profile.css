@@ -1,18 +1,18 @@
 #profile_main_section p {
-    margin: 0;
+  margin: 0;
 }
 
 #pfp_border {
-    border: 1px solid black; 
-    border-radius: 25px;
+  border: 1px solid black; 
+  border-radius: 25px;
 }
 
 .d-grid {
-    display: grid !important;
+  display: grid !important;
 }
 
 body {
-    background: linear-gradient(90deg,rgba(5, 4, 8, 1) 0%, rgba(59, 19, 102, 1) 50%, rgba(0, 0, 0, 1) 100%);
+  background: linear-gradient(90deg,rgba(5, 4, 8, 1) 0%, rgba(59, 19, 102, 1) 50%, rgba(0, 0, 0, 1) 100%);
 }
 
 .btn-primary {
@@ -32,52 +32,9 @@ body {
   justify-content: center;
 }
 
-#stats-inline .stat {
-  text-align: center;
-}
-
-#stats-inline .stat p,
-#stats-inline .stat h4 {
+#stats-inline .stat p, #stats-inline .stat h4, #username {
   margin: 0;
-  color: white;         /* if you haven’t already forced it */
+  color: white;         
   white-space: nowrap;
-}
-
-/* make all text in the profile white */
-#profile_main_section,
-#profile_main_section * {
-  color: white;
-}
-
-/* stack the three “rows” of your profile vertically, and center them */
-#profile_main_section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
-  gap: 2rem;               /* space between each section */
-  padding: 2rem 1rem;      /* some breathing room */
 }
-
-/* style the avatar+name block to sit at the top center */
-#profile_pfp_name {
-  display: flex !important;      /* override that inline grid if you like */
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* move the stats container to its own “row” */
-#stats .container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-}
-
-/* give each stat a consistent width */
-#stats span {
-  flex: 1 1 120px;
-}
-
-
