@@ -3,6 +3,7 @@
 {% block head %}
     <!-- This adds the script used for logging in -->
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
 
@@ -18,6 +19,7 @@
                 <div id="register-title">
                     <h1 style="color:white;">Create Account</h1>
                 </div> 
+                <div id="flash_container">
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         {% for message in messages %}
@@ -25,6 +27,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
+                </div>
                 <br>
                 <div id="form_username" name="input_field" class="login_field">
                     {{ form.username.label }} <br>
