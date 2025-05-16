@@ -6,6 +6,8 @@ import json, time
 from app.models import User
 from app.extensions import db
 import sqlalchemy as sa
+from selenium.common.exceptions import TimeoutException
+
 
 
 class TestUserOperations(BaseSeleniumTests):
@@ -25,7 +27,8 @@ class TestUserOperations(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'register_password2').send_keys(password)
         self.driver.find_element(By.ID, 'register_submit').click()
     
-    def attempt_login(self, username, password): # go to login page and login
+    def attempt_login(self, username, password): # login, assuming already on login page
+        time.sleep(1)
         self.driver.get(f'{self.base_url}/login')
         self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))
         self.driver.find_element(By.ID, 'login_input_username').send_keys(username)
@@ -60,12 +63,17 @@ class TestUserOperations(BaseSeleniumTests):
         self.driver.get(f"{self.base_url}/get_current_user")
         body = self.driver.find_element(By.TAG_NAME, "body").text
         return json.loads(body)
+
+    def logout_wait(self):
+        self.check_logged_in()
+        self.driver.find_element(By.ID, "Base_Logout").click()
+        time.sleep(0.5)
     
     def test_successful_login(self):
         self.attempt_register('selenium_user', 'sel@gmail.com', 'Password123') # register
         self.attempt_login('selenium_user', 'Password123') # login
         self.check_logged_in()
-        self.driver.find_element(By.ID, 'Base_Logout').click() # logout
+        self.logout_wait() # logout
         self.check_logged_out() # check if logged out
 
     def test_register_duplicate_username(self):
@@ -106,14 +114,32 @@ class TestUserOperations(BaseSeleniumTests):
         # register account 2
         self.attempt_register('selenium_user_2', 'sel2@gmail.com', 'Password1235') # register 2
         self.attempt_login('selenium_user_2', 'Password1235') # login to account 2
+        try:
+            self.check_logged_in()
+        except TimeoutException:
+            print("\n⎯⎯⎯⎯ FAILURE 1 ⎯⎯⎯⎯")
+            print("URL:", self.driver.current_url)
+            print("HTML:")
+            print(self.driver.page_source)
+            self.driver.save_screenshot("friendship-failure.png")
+            raise
         self.driver.get(f'{self.base_url}/friends') # go to friends
         # send request to account 1
         self.wait.until(EC.presence_of_element_located((By.ID, 'friend_type')))
         self.driver.find_element(By.ID, "friend_type").send_keys('selenium_user_1') 
         self.driver.find_element(By.ID, "friend_submit").click()
 
-        self.driver.find_element(By.ID, "Base_Logout").click() # logout
+        self.logout_wait() # logout
         self.attempt_login('selenium_user_1', 'Password1234') # login to account 1
+        try:
+            self.check_logged_in()
+        except TimeoutException:
+            print("\n⎯⎯⎯⎯ FAILURE 2 ⎯⎯⎯⎯")
+            print("URL:", self.driver.current_url)
+            print("HTML:")
+            print(self.driver.page_source)
+            self.driver.save_screenshot("friendship-failure.png")
+            raise
         self.driver.get(f'{self.base_url}/friends') # go to friends
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.accept-btn")))
         self.driver.find_element(By.CSS_SELECTOR, "button.accept-btn").click()

@@ -33,19 +33,31 @@ class BaseSeleniumTests(unittest.TestCase):
 
         time.sleep(1)  # give server time to start
 
-        # configure headless Chrome properly
-        opts = Options()
-        #opts.add_argument("--headless=new")      
-
-        # additional flags to improve stability in headless mode
+        opts = webdriver.ChromeOptions()
+        opts.add_argument("--headless")
         opts.add_argument("--disable-gpu")
         opts.add_argument("--no-sandbox")
+        opts.add_argument("---allow-insecure-localhost")
         opts.add_argument("--disable-dev-shm-usage")
-
+        opts.add_argument("--window-size=1920,1080")
+        opts.add_argument("--start-maximized")
+        opts.add_argument("--remote-allow-origins=*")
+        opts.add_argument("--disable-extensions")
+        opts.add_argument("--disable-infobars")
+        opts.add_argument("--disable-background-timer-throttling")
+        opts.add_argument("--disable-renderer-backgrounding")
+        opts.accept_insecure_certs = True
         cls.driver = webdriver.Chrome(options=opts)
-        cls.base_url = "http://localhost:5001"
 
-        cls.wait = WebDriverWait(cls.driver, 10)
+        cls.driver.set_window_size(1920, 1080)
+        cls.driver.maximize_window()
+        cls.driver.fullscreen_window()
+
+        # an implicit wait can help with small timing glitches in headless
+        cls.driver.implicitly_wait(2)
+
+        cls.base_url = "http://localhost:5001"
+        cls.wait = WebDriverWait(cls.driver, 3)
 
     @classmethod
     def tearDownClass(cls):
@@ -63,6 +75,7 @@ class BaseSeleniumTests(unittest.TestCase):
     def setUp(self):
         # reset DB for each test
         # can override this method in tests, but need to call super().setup() to ensure DB is reset
+        self.driver.delete_all_cookies()
         with self.app.app_context():
             db.drop_all()
             db.create_all()
