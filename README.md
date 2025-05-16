@@ -25,7 +25,7 @@ Along the header, you can find a series of tabs that allow you to navigate throu
 - **Login/Logout**: tab that takes you to the login page if anonymous, becomes logout if logged in.
 
 To relate these with required views:
-- **introductory view**: is the Home page, which describes app and allows user to access every other view
+- **introductory view**: is the Home page, which describes app and allows user to access every other view, this includes login tab
 - **upload data view**: is the game tab, where user is allowed to play the game, finishing it uploads the data for the game to database
 - **visualise data view**: stats page takes data from database and visually displays it in various graphs
 - **share data view**: friends page allows users to friend eachother in database. Any friends of user are given selective permission to view their data
