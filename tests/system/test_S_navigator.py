@@ -2,6 +2,7 @@ import unittest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from tests.system.test_S_base import BaseSeleniumTests
+import time
 
 
 class NavigationTestsNoLogin(BaseSeleniumTests):
@@ -60,6 +61,8 @@ class NavigationTestsLogin(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'register_password').send_keys('Password123')
         self.driver.find_element(By.ID, 'register_password2').send_keys('Password123')
         self.driver.find_element(By.ID, 'register_submit').click()
+
+        time.sleep(1) # allow database to update
 
         # login
         self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))

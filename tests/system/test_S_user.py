@@ -26,9 +26,9 @@ class TestUserOperations(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'register_password').send_keys(password)
         self.driver.find_element(By.ID, 'register_password2').send_keys(password)
         self.driver.find_element(By.ID, 'register_submit').click()
+        time.sleep(1) # allow database time to update
     
     def attempt_login(self, username, password): # login, assuming already on login page
-        time.sleep(1)
         self.driver.get(f'{self.base_url}/login')
         self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))
         self.driver.find_element(By.ID, 'login_input_username').send_keys(username)
