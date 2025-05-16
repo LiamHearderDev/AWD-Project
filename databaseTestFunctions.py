@@ -6,8 +6,6 @@ from app.config import ProductionConfig
 
 application = create_app(ProductionConfig)
 
-application = create_app(ProductionConfig)
-
 def add_paragraph(body, type=None): # add a new paragraph to the database
 
     # check to not add empty paragraph

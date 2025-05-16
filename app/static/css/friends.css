@@ -14,3 +14,9 @@ h2 {
     color: white;
     border-color: var(--base-colour-1);
 }
+
+#incomingRequests, #friendsList { /* no dot points */
+  list-style-type: none;  
+  margin: 0;
+  padding: 0;
+}

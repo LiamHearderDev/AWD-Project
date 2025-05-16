@@ -1,6 +1,5 @@
 body {
-    background-image: url('/static/img/purple_background.jpg');
-    backdrop-filter: blur(0.5px);
+    background: linear-gradient(90deg,rgba(5, 4, 8, 1) 0%, rgba(59, 19, 102, 1) 50%, rgba(0, 0, 0, 1) 100%);
 }
 
 .blur_section {
@@ -62,4 +61,59 @@ form label {
 .error_message {
     color: red;
     max-width: 300px;
+}
+
+/* 1) Make all text in the profile white */
+#profile_main_section,
+#profile_main_section * {
+  color: white;
+}
+
+/* 2) Stack the three “rows” of your profile vertically, and center them */
+#profile_main_section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2rem;               /* space between each section */
+  padding: 2rem 1rem;      /* some breathing room */
+}
+
+/* 3) Style the avatar+name block to sit at the top center */
+#profile_pfp_name {
+  display: flex !important;      /* override that inline grid if you like */
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* make the “?” circle a bit nicer and centered */
+#pfp_border {
+  border: 2px solid var(--base-colour-2);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 4) Move the stats container to its own “row” */
+#stats .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+/* give each stat a consistent width */
+#stats span {
+  flex: 1 1 120px;
+}
+
+/* 5) Finally the edit form sits below by default thanks to the column flex */
+
+#profile_editing_section {
+  width: 100%;
+  max-width: 400px;
 }
