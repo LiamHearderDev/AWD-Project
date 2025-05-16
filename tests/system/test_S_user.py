@@ -114,15 +114,7 @@ class TestUserOperations(BaseSeleniumTests):
         # register account 2
         self.attempt_register('selenium_user_2', 'sel2@gmail.com', 'Password1235') # register 2
         self.attempt_login('selenium_user_2', 'Password1235') # login to account 2
-        try:
-            self.check_logged_in()
-        except TimeoutException:
-            print("\n⎯⎯⎯⎯ FAILURE 1 ⎯⎯⎯⎯")
-            print("URL:", self.driver.current_url)
-            print("HTML:")
-            print(self.driver.page_source)
-            self.driver.save_screenshot("friendship-failure.png")
-            raise
+        self.check_logged_in()
         self.driver.get(f'{self.base_url}/friends') # go to friends
         # send request to account 1
         self.wait.until(EC.presence_of_element_located((By.ID, 'friend_type')))
@@ -131,15 +123,7 @@ class TestUserOperations(BaseSeleniumTests):
 
         self.logout_wait() # logout
         self.attempt_login('selenium_user_1', 'Password1234') # login to account 1
-        try:
-            self.check_logged_in()
-        except TimeoutException:
-            print("\n⎯⎯⎯⎯ FAILURE 2 ⎯⎯⎯⎯")
-            print("URL:", self.driver.current_url)
-            print("HTML:")
-            print(self.driver.page_source)
-            self.driver.save_screenshot("friendship-failure.png")
-            raise
+        self.check_logged_in()
         self.driver.get(f'{self.base_url}/friends') # go to friends
         self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.accept-btn")))
         self.driver.find_element(By.CSS_SELECTOR, "button.accept-btn").click()
