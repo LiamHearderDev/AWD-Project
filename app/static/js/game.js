@@ -4,6 +4,7 @@ const gameId = 'gameElement';
 const resultId = 'resultElement';
 const timerId = 'timerElement';
 const buttonId = 'startButton';
+const restartButtonsId = 'restartButtons'
 const gameContainerId = 'gameContainer';
 
 
@@ -67,6 +68,7 @@ function callGame() {
     $.getJSON('/random-paragraph') 
       .done(para => {                   // This is called when the ajax request is successful
         $('#' + buttonId).hide();
+        $('#' + restartButtonsId).hide();
         $('#' + gameContainerId).show();
 
         // Set up the game
@@ -75,6 +77,7 @@ function callGame() {
       .fail((status, error) => {        // This is called when the ajax request is unsuccessful
         console.error('Could not load paragraph:', status, error);
         $('#' + buttonId).hide();
+        $('#' + restartButtonsId).hide();
         $('#' + gameContainerId).show();
         setupGame(gameId, resultId, timerId, placeholder, -1); // pass placeholder paragraph if the server request fails
       });
@@ -195,7 +198,8 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     stats.push(new statistic('wrong characters', wrong_char_dict));
                     stats.push(new statistic('wrong words', wrong_word_dict));
                     stats.push(new statistic('paragraph id', paragraphId));
-                    readResults(resultId, stats);
+                    $('#' + restartButtonsId).show();
+                    // readResults(resultId, stats);
                     if (paragraphId !== -1) { 
                         // send data if valid paragraph
                         // don't worry about being logged in or not, if not logged in server doesn't save data automatically
@@ -239,6 +243,9 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 $letter.removeClass('wrong-char');
                 mistakes -= 1; // update mistakes
             }
+            const progress = Math.round((index / maxIndex) * 100);
+            $('#progressBar').val(progress);
+            $('#runner').css('left', `calc(${progress}% - 20px)`);
         }
         console.log("index: " + index);
         console.log("wordIndex: " + wordIndex);

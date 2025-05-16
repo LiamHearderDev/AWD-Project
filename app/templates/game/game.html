@@ -26,9 +26,13 @@
             This is the Game page.
         </p>
     </div>
-    <p class="game-text" id="resultElement" style="display: none;">
+    <div class="start-wrapper" id="restartButtons" style="display: none;">
+        <button class="start" id="startButton" onclick="callGame()">Play Again</button>
+        <a href="{{ url_for('stats.stats') }}" class="start">View Your Stats</a>
+    </div>
+    <div class="game-text" id="resultElement" style="display: none;">
         <!-- This is where the game result will be displayed. -->
-    </p>
+    </div>
     <div id="statsLinkWrapper" style="display: none; text-align: center; margin-top: 20px;">
         <a href="{{ url_for('stats.stats') }}" id="statsLink" class="green-button">View More Stats</a>
     </div>
