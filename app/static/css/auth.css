@@ -5,7 +5,7 @@ body {
 .base-background-blur {
     backdrop-filter: blur(0.5px);
     -webkit-backdrop-filter: blur(0.5px);
-
+}
 
 .blur_section {
     backdrop-filter: blur(4px);

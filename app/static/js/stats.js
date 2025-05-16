@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         data: {
           labels: canvasData.labels,
           datasets: [
-            { label: 'Words Per Minute (WPM)', data: canvasData.wpm, borderColor: 'blue',  fill: false },
-            { label: 'Accuracy',  data: canvasData.accuracy, borderColor: 'green', fill: false }
+            { label: 'Words Per Minute (WPM)', data: canvasData.wpm, borderColor: 'blue',  fill: false }
+            // { label: 'Accuracy',  data: canvasData.accuracy, borderColor: 'green', fill: false }
           ]
         },
         options: {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       new Chart(chart.getContext('2d'), {
         type: 'bar',
         data: {
-          labels: ['Average WPM','Average Accuracy'],
+          labels: ['Average WPM'],
           datasets: [
             {
               data: [ canvasData.avg_wpm, Number(canvasData.avg_acc.replace("%", ""))],
@@ -279,8 +279,8 @@ if (genBtn) genBtn.addEventListener('click', () => {
   } else {
     chartData = { 
       labels: [], 
-      wpm: [findMetric('table-' + currentPeriod, 'Average WPM')],
-      accuracy: [findMetric('table-' + currentPeriod, 'Average Accuracy')] 
+      wpm: [findMetric('table-' + currentPeriod, 'Average WPM')]
+      // accuracy: [findMetric('table-' + currentPeriod, 'Average Accuracy')] 
     };
   }
   
