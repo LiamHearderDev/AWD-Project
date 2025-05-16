@@ -12,7 +12,7 @@
 }
 
 body {
-    background-image: url('/static/img/purple_background.jpg');
+    background: linear-gradient(90deg,rgba(5, 4, 8, 1) 0%, rgba(59, 19, 102, 1) 50%, rgba(0, 0, 0, 1) 100%);
 }
 
 .btn-primary {
