@@ -179,7 +179,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 incrementDict(wrong_word_dict, $word.text());
             }
             if ($letter.next().length === 0) { // signal to move on to next word (no more letters in word)
-                if ($word.next().length === 0 ) { // end of game if no more words and all correct
+                if ($word.next().length === 0 && mistakes==0) { // end of game if no more words and all correct
                     clearInterval(interval);
                     $('#' + elementId).off('keydown') // turn off keydown event
                     // add statistics
