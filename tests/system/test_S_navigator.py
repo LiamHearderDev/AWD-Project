@@ -37,7 +37,7 @@ class NavigationTestsNoLogin(BaseSeleniumTests):
 
     def test_login_and_register(self):
         self.click_and_assert('Base_Login', '/login', 'Login_ID')
-        self.click_and_assert('Login_Register', '/register', 'Register_ID')
+        self.click_and_assert('register_here_button', '/register', 'Register_ID')
 
     def test_stats_redirects_to_login(self):
         # Stats link should bounce you to login

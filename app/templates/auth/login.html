@@ -3,6 +3,7 @@
 {% block head %}
     <!-- This adds the script used for logging in -->
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
 
@@ -11,26 +12,29 @@
     <!-- purely for Selenium tests -->
     <span id="Login_ID" hidden></span>
 
-    <section id="login_section" style="display: grid; align-items: center; justify-content: center; margin-top: 50px;">
-        <form id="login_form" class="container-lg" method="post" action="" novalidate>
+    <section id="login_section">
+        <div id="login_form_wrapper" class="blur_section form_wrapper">
+            <form id="login_form" class="container-lg" method="post" action="" novalidate>
             {{ form.hidden_tag() }}
             <div id="login-title">
                 <h1 style="color:white;"> Sign in </h1>
             </div> 
+            <div id="flash_container">
             {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <p class="error_message">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="error_message">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
             {% endwith %}
+            </div>
             <br>
             <div id="form_username" class="login_field">
                 <label for="login_input_username">
                     Username
                 </label> <br>
                 <div>
-                    {{ form.username(size=32, id="login_input_username", placeholder="your-username") }}
+                    {{ form.username(size=32, id="login_input_username", placeholder="your-username", class="bg-transparent text-0") }}
                 </div>
                 {% for error in form.username.errors %}
                 <p class="error_message">[{{ error }}]</p>
@@ -41,7 +45,7 @@
                     Password
                 </label> <br>
                 <div>
-                    {{ form.password(size=32, id="login_input_password", placeholder="********") }}
+                    {{ form.password(size=32, id="login_input_password", placeholder="********", class="bg-transparent text-0") }}
                 </div>
                 {% for error in form.password.errors %}
                 <p class="error_message">[{{ error }}]</p>
@@ -49,15 +53,25 @@
             </div> <br>
             <div id="form_remember_me" class="login_field" style="display: flex; justify-content: space-between; align-items: center;">
                 <div > {{ form.remember_me.label(style="position: relative;") }} </div>
-                <div style="height: 25px;"> {{ form.remember_me(style="min-height: 25px; min-width: 25px; margin: 0;") }} </div>
+                <div style="height: 25px;"> {{ form.remember_me(style="min-height: 25px; min-width: 25px; margin: 0;", class="bg-transparent") }} </div>
             </div> <br>
             <div class="login_field_submit">
-                {{ form.submit(class="login_input_submit", id="login_input_submit") }}
+                {{ form.submit(class="login_input_submit base-button bg-2", id="login_input_submit") }}
             </div>
         </form> <br>
+        </div>
+        <br>
+        <section id="register_section" class="align-items-center justify-content-center text-0 blur_section" style="display: grid;">
+            <br>
+            <h5> Don't have an account? </h5>
+            <!-- <a id='Login_Register' href="{{ url_for('auth.register') }}" class="base-button bg-1 text-black text-center">Register here!</a> -->
+            <a href="{{ url_for('auth.register') }}" class="d-flex align-center justify-content-center mt-3">
+            <button id="register_here_button" class="container base-button bg-2 text-0" style="box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                Register Here!
+            </button>
+        </a>
+            <br>
+        </section>
     </section>
-    <section id="register_section" style="display: grid; align-items: center; justify-content: center;">
-        <p> Don't have an account? </p>
-        <a id='Login_Register' href="{{ url_for('auth.register') }}">Register here!</a>
-    </section>
+    
 {% endblock %}
