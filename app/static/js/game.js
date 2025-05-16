@@ -159,7 +159,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 // correct input
                 if ($letter.hasClass('wrong-char')) {
                     $letter.removeClass('wrong-char');
-                    //mistakes -= 1; // update mistakes
+                    mistakes -= 1; // update mistakes
                 }
                 $letter.addClass('right-char');
             } else {
@@ -237,7 +237,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
             }
             if ($letter.hasClass('wrong-char')) {
                 $letter.removeClass('wrong-char');
-                //mistakes -= 1; // update mistakes
+                mistakes -= 1; // update mistakes
             }
         }
         console.log("index: " + index);
