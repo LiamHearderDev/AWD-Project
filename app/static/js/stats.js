@@ -57,14 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // If there is 1 data point, make it a bar chart.
     // If there is >1 data point, make it a line chart.
     if (canvasData.wpm.length > 1){
-      // Line graph
+      // Line graph for average WPM
       new Chart(chart.getContext('2d'), {
         type: 'line',
         data: {
           labels: canvasData.labels,
           datasets: [
             { label: 'Words Per Minute (WPM)', data: canvasData.wpm, borderColor: 'blue',  fill: false },
-            { label: 'Accuracy',  data: canvasData.accuracy, borderColor: 'green', fill: false }
           ]
         },
         options: {
@@ -72,21 +71,36 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: { 
             legend: { position: 'top' }
           },
-          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+        // 2) Accuracy line chart
+      new Chart(accCanvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: canvasData.labels,
+          datasets: [
+            {label: 'Average Accuracy (%)', data: accData, borderColor: 'green', fill: false},]
+       },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: {y: { beginAtZero: true, max: 100 }}
         }
       });
     } 
     else {
-      // Bar graph
+      // Bar graph for average WPM
       new Chart(chart.getContext('2d'), {
         type: 'bar',
         data: {
-          labels: ['Average WPM','Average Accuracy'],
+          labels: ['Average WPM'],
           datasets: [
             {
-              data: [ canvasData.avg_wpm, Number(canvasData.avg_acc.replace("%", ""))],
-              backgroundColor: ['#3CC47CBF','#1E392ABF'],
-              borderColor: ['#3CC47C','#1E392A'],
+              data: [ canvasData.avg_acc],
+              backgroundColor: ['#3CC47CBF'],
+              borderColor: ['#3CC47C'],
               borderWidth: 2,
               barPercentage: 0.4,
               categoryPercentage: 0.5
@@ -98,9 +112,35 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: { display: false }
           },
-          scales: { y: { beginAtZero: true, max: maxChartHeight } }
+          scales: { y: { beginAtZero: true} }
         }
       });
+
+      // bar chart for average accuracy
+      new Chart(chart.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Average Accuracy'],
+          datasets: [
+            {
+              data: [ canvasData.avg_acc],
+              backgroundColor: ['#1E392ABF'],
+              borderColor: ['#1E392A'],
+              borderWidth: 2,
+              barPercentage: 0.4,
+              categoryPercentage: 0.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: { y: { beginAtZero: true, max: 100 } }
+        }
+      });
+      
     }
   }
 
