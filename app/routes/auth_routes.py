@@ -2,7 +2,7 @@ import sqlalchemy as sa
 from app.models import User
 from app.forms import LoginForm, RegistrationForm
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request, session
 from app.extensions import db
 from flask_login import login_user, logout_user, current_user, login_required
 
@@ -38,6 +38,8 @@ def login():
     
     # If the username was found, and the password correct, we log them in.
     login_user(user, remember=form.remember_me.data)
+    if session["next"]:
+        return redirect(session["next"])
     return redirect(url_for('intro.intro'))
 
     
