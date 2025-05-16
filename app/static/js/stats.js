@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data: {
           labels: canvasData.labels,
           datasets: [
-            {label: 'Average Accuracy (%)', data: accData, borderColor: 'green', fill: false},]
+            {label: 'Average Accuracy (%)', data: canvasData.acc, borderColor: 'green', fill: false},]
        },
         options: {
           responsive: true,
