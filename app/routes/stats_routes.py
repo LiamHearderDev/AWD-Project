@@ -3,7 +3,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from flask import render_template, request, url_for, jsonify, flash, Blueprint
+from flask import render_template, request, url_for, jsonify, flash, Blueprint, redirect
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
@@ -334,3 +334,11 @@ def get_leaderboard():
         'wpm': [user.highest_wpm for user in top_users]
     }
     return jsonify(data)
+
+
+@stats_bp.route('/stats/<username>', methods=['GET'])
+@login_required
+def friends_stats_reroute(username: str):
+    """This is a redirect function designed to send players to the proper URL for their friends stats.
+    This is primarily used during testing, but also adds a more intuitive path to get to your friends stats."""
+    return redirect(url_for('friends.view_friend_stats', friend_username=username))
