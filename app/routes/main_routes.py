@@ -81,14 +81,25 @@ def profile(user_id):
     form = UpdateProfileForm()
     if form.validate_on_submit():
         if form.username.data:
-            existing_user = User.query.filter_by(username=form.username.data).first()
-            if existing_user and existing_user.user_id != current_user.user_id:
+            existing = User.query.filter_by(username=form.username.data).first()
+            if existing and existing.user_id != current_user.user_id:
                 flash('Username already exists. Please choose a different one!')
-                return render_template('profile/update.html', form=form)
+                # re‐render the same page with the full context
+                return render_template(
+                    'main/profile.html',
+                    user=current_user,
+                    wpm=wpm,
+                    friends_count=friends_count,
+                    account_age=account_age,
+                    rank=rank,
+                    max_rank=max_rank,
+                    form=form,
+                )
+
             current_user.username = form.username.data
 
         if form.password.data:
-            current_user.password = form.password.data
+            current_user.set_password(form.password.data)
         
         db.session.commit()
         msg = Message(
