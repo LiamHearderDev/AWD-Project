@@ -1,6 +1,8 @@
 body {
-    background-image: url('/static/img/gaming1.jpg');
     background-size: cover;
+    /* There is a background colour here so that the screen isn't white when the image isn't loaded. */
+    background-color: #0a2d31;
+    background-image: url('/static/img/gaming1.jpg');
 }
 
 .base-background-blur {
