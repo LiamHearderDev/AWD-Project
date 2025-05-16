@@ -19,8 +19,16 @@ Along the header, you can find a series of tabs that allow you to navigate throu
 - **Home**: The main page of the application, where users can read about the application and its features.
 - **Game**: The main feature of the application, where users can take typing tests and see their results.
 - **Stats**: A page that displays the user's typing speed, accuracy, and more over a given period of time, allowing them to track their progress.
+- **Friends**: page where user can send, accept and remove friends. A user is allowed to see the stats and profile of any friends.
 - **Leaderboard**: A page that displays the top scores of users, allowing them to compete with friends and others.
-- **Profile**: A page that allows users to view and edit their profile information, including their username and password.
+- **Profile** (username): A page that allows users to view and edit their profile information, including their username and password.
+- **Login/Logout**: tab that takes you to the login page if anonymous, becomes logout if logged in.
+
+To relate these with required views:
+- **introductory view**: is the Home page, which describes app and allows user to access every other view
+- **upload data view**: is the game tab, where user is allowed to play the game, finishing it uploads the data for the game to database
+- **visualise data view**: stats page takes data from database and visually displays it in various graphs
+- **share data view**: friends page allows users to friend eachother in database. Any friends of user are given selective permission to view their data
 
 # Technologies Used
 Frontend:
