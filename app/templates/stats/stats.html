@@ -28,7 +28,7 @@
       <thead>
         <tr><th>Metric</th><th>Value</th><th>Timestamp</th><th>Paragraph No.</th></tr>
       </thead>
-      <tbody id="table_1_body_ID">
+      <tbody>
         {% for row in today_table %}
         <tr>
           <td>{{ row.metric }}</td>
@@ -39,13 +39,19 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas class="statsChart" id="chart-1" 
-            width="400" height="200" style="display: none;"
-            data-labels='{{ today_chart.labels    | tojson }}'
-            data-wpm='{{ today_chart.wpm       | tojson }}'
-            data-accuracy='{{ today_chart.accuracy | tojson }}'
-            data-averagewpm='{{ today_table[1].value | tojson }}'
-            data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
+        <!-- 1) WPM chart -->
+    <canvas class="statsChart" id="wpm-chart-1"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels    | tojson }}'
+        data-wpm='{{ today_chart.wpm       | tojson }}'
+        data-averagewpm='{{ today_table[1].value | tojson }}'></canvas>
+
+        <!-- 2) Accuracy chart -->
+    <canvas class="statsChart" id="acc-chart-1"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels       | tojson }}'
+        data-accuracy='{{ today_chart.accuracy  | tojson }}'
+        data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
 
     <!-- Last 7 Days stats -->
     <table class="statsTable" id="table-7" style="display: none;">
@@ -63,13 +69,19 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas class="statsChart" id="chart-7" 
-            width="400" height="200" style="display: none;"
-            data-labels='{{ last7days_chart.labels    | tojson }}'
-            data-wpm='{{ last7days_chart.wpm       | tojson }}'
-            data-accuracy='{{ last7days_chart.accuracy | tojson }}'
-            data-averagewpm='{{ last7days_table[1].value | tojson }}'
-            data-averageacc='{{ last7days_table[2].value | tojson }}'></canvas>
+    <!-- 1) WPM chart -->
+    <canvas class="statsChart" id="wpm-chart-7"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels    | tojson }}'
+        data-wpm='{{ today_chart.wpm       | tojson }}'
+        data-averagewpm='{{ today_table[1].value | tojson }}'></canvas>
+
+        <!-- 2) Accuracy chart -->
+    <canvas class="statsChart" id="acc-chart-7"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels       | tojson }}'
+        data-accuracy='{{ today_chart.accuracy  | tojson }}'
+        data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
 
     <!-- Last 28 Days stats -->
     <table class="statsTable" id="table-28" style="display: none;">
@@ -87,13 +99,19 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas class="statsChart" id="chart-28" 
-            width="400" height="200" style="display: none;"
-            data-labels='{{ last28days_chart.labels    | tojson }}'
-            data-wpm='{{ last28days_chart.wpm       | tojson }}'
-            data-accuracy='{{ last28days_chart.accuracy | tojson }}'
-            data-averagewpm='{{ last28days_table[1].value | tojson }}'
-            data-averageacc='{{ last28days_table[2].value | tojson }}'></canvas>
+    <!-- 1) WPM chart -->
+    <canvas class="statsChart" id="wpm-chart-28"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels    | tojson }}'
+        data-wpm='{{ today_chart.wpm       | tojson }}'
+        data-averagewpm='{{ today_table[1].value | tojson }}'></canvas>
+
+        <!-- 2) Accuracy chart -->
+    <canvas class="statsChart" id="acc-chart-28"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels       | tojson }}'
+        data-accuracy='{{ today_chart.accuracy  | tojson }}'
+        data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
 
     <!-- All-time stats -->
     <table class="statsTable" id="table-all" style="display: none;">
@@ -111,13 +129,19 @@
         {% endfor %}
       </tbody>
     </table>
-    <canvas class="statsChart" id="chart-all" 
-            width="400" height="200" style="display: none;"
-            data-labels='{{ alltime_chart.labels    | tojson }}'
-            data-wpm='{{ alltime_chart.wpm       | tojson }}'
-            data-accuracy='{{ alltime_chart.accuracy | tojson }}'
-            data-averagewpm='{{ alltime_table[1].value | tojson }}'
-            data-averageacc='{{ alltime_table[2].value | tojson }}'></canvas>
+    <!-- 1) WPM chart -->
+    <canvas class="statsChart" id="wpm-chart-all"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels    | tojson }}'
+        data-wpm='{{ today_chart.wpm       | tojson }}'
+        data-averagewpm='{{ today_table[1].value | tojson }}'></canvas>
+
+        <!-- 2) Accuracy chart -->
+    <canvas class="statsChart" id="acc-chart-all"
+        width="400" height="130" style="display: none;"
+        data-labels='{{ today_chart.labels       | tojson }}'
+        data-accuracy='{{ today_chart.accuracy  | tojson }}'
+        data-averageacc='{{ today_table[2].value | tojson }}'></canvas>
 
         
       </div>
