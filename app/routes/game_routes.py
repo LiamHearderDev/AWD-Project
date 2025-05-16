@@ -4,7 +4,7 @@ from app.models import TypingResult, Paragraph
 from flask_login import current_user, login_required
 from datetime import datetime
 import json
-from sqlalchemy.sql.expression import func # SQLite function that returns a random row
+from sqlalchemy.sql.expression import select, func # SQLite function that returns a random row
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -24,7 +24,7 @@ def handle_db_error(e):
 
 @game_bp.route('/random-paragraph', methods=['GET'])
 def random_paragraph():
-    p = Paragraph.query.order_by(func.random()).first() # pick a row at random
+    p = db.session.scalars(select(Paragraph).order_by(func.random())).first() # pick a row at random
     if p is None:
         return jsonify({'error': 'no paragraphs available'}), 404
 
@@ -79,7 +79,7 @@ def submit_results():
     
     # validate paragraph exists (unless it’s -1 for placeholder)
     pid = data.get('paragraph id', -1)
-    if pid != -1 and Paragraph.query.get(pid) is None:
+    if pid != -1 and db.session.get(Paragraph, pid) is None:
         return jsonify(error=f"No paragraph found with id {pid}"), 400
 
     # Build TypingResult record with validated data

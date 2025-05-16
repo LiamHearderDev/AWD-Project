@@ -7,6 +7,8 @@ from app import db
 from app.models import User, Friendship
 from app.forms import FriendRequestForm
 from app.routes.stats_routes import compute_user_stats, format_data
+from sqlalchemy import select
+
 
 friends_bp = Blueprint('friends', __name__)
 
@@ -17,10 +19,22 @@ def friends():
     form = FriendRequestForm()
 
     # Get all current friends
-    friends = Friendship.query.filter_by(user_id=current_user.user_id, is_requested=False).all()
+    friends = db.session.execute(
+        select(Friendship).filter_by(
+            user_id=current_user.user_id,
+            is_requested=False
+        )
+    ).scalars().all()
 
     # Get all incoming friend requests
-    friend_requests = Friendship.query.filter_by(user_id=current_user.user_id, is_requested=True).filter(Friendship.requesting_user != current_user.user_id).all()
+    friend_requests = db.session.execute(
+        select(Friendship)
+        .filter_by(
+            user_id=current_user.user_id,
+            is_requested=True
+        )
+        .filter(Friendship.requesting_user != current_user.user_id)
+    ).scalars().all()
 
     # Short helper function to avoid repeated code
     def render_friends_page():
@@ -37,7 +51,9 @@ def friends():
     # Get the user we are sending a friend request to.
 
     target_username = form.username.data
-    target_user = User.query.filter_by(username=target_username).first()
+    target_user = db.session.execute(
+        select(User).filter_by(username=target_username)
+    ).scalar_one_or_none()
 
     if not target_user:
         flash("User not found.")
@@ -48,7 +64,10 @@ def friends():
         return render_friends_page()
     
     # Stops the request if you already sent them a request, or are already friends.
-    existing_friendship = Friendship.query.get((current_user.user_id, target_user.user_id))
+    existing_friendship = db.session.get(
+        Friendship,
+        (current_user.user_id, target_user.user_id)
+    )
     if existing_friendship:
         if existing_friendship.is_requested == True:
             flash(f"You have already sent {target_user.username} user a friend request.")
@@ -103,10 +122,16 @@ def handle_friend_request(acceptance: str):
     sender_id = payload["sender_id"]
 
     # Look up the pending request as it exists on the friend's ID.
-    friend_relation = Friendship.query.get((sender_id, current_user.user_id))
+    friend_relation = db.session.get(
+        Friendship,
+        (sender_id, current_user.user_id)
+    )
 
     # Find the pending request as it exists on the current_user's ID.
-    current_user_relation = Friendship.query.get((current_user.user_id, sender_id))
+    current_user_relation = db.session.get(
+        Friendship,
+        (current_user.user_id, sender_id)
+    )
 
     # Exit early if no such friend request is in the database
     if friend_relation == None or current_user_relation == None:
@@ -131,31 +156,6 @@ def handle_friend_request(acceptance: str):
         db.session.commit()
         return jsonify(success=True, message='Successfully accepted friend request.')
 
-
-# There is no reason reason to have a block function, as users can't send each other messages
-
-# @friends_bp.route('/friends/block/<int:sender_id>', methods=['POST'])
-# @login_required
-# def block_friend(sender_id):
-#     """
-#     Reject/block (i.e. delete) a pending request from sender_id -> you.
-#     """
-#     relation = Friendship.query.get((sender_id, current_user.user_id))
-#     if not relation or relation.is_requested:
-#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#             return jsonify(success=False, message='Invalid block request.')
-#         abort(404)
-
-#     db.session.delete(relation)
-#     db.session.commit()
-
-#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#         return jsonify(success=True)
-
-#     flash('Friend request rejected.', 'info')
-#     return redirect(url_for('friends.friends'))
-
-
 @friends_bp.route('/friends/<friend_username>/stats')
 @login_required
 def view_friend_stats(friend_username: str):
@@ -170,17 +170,18 @@ def view_friend_stats(friend_username: str):
     if friend_username == current_user.username:
         return redirect(url_for('stats.stats'))
 
-    # Get the friend's user
-    friend: User = User.query.filter_by(username=friend_username).first()
-
-    # Find the friendship row
-    relation: Friendship = Friendship.query.get((current_user.user_id, friend.user_id))
-
-    # If no friendship was found, give an error
-    if not relation:
+    friend = db.session.execute(
+        select(User).filter_by(username=friend_username)
+    ).scalar_one_or_none()
+    if not friend:
         abort(404)
-    
-    # If the friendship hasn't been accepted, give an error
+
+    relation = db.session.get(
+        Friendship,
+        (current_user.user_id, friend.user_id)
+    )
+    if relation is None:
+        abort(404)
     if relation.is_requested:
         abort(403)
         
@@ -211,8 +212,14 @@ def remove_friend(friend_id):
     Unfriend: delete both A->B and B->A rows.
     """
     # find both sides
-    relationship1: Friendship | None = Friendship.query.get((current_user.user_id, friend_id))
-    relationship2: Friendship | None = Friendship.query.get((friend_id, current_user.user_id))
+    relationship1 = db.session.get(
+        Friendship,
+        (current_user.user_id, friend_id)
+    )
+    relationship2 = db.session.get(
+        Friendship,
+        (friend_id, current_user.user_id)
+    )
 
     # If either relationship is invalid, flash an error.
     if not relationship1 or not relationship2:
