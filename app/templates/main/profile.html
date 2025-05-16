@@ -52,6 +52,7 @@
         </section>
 
         <!-- edit username and password -->
+        {% if user.user_id == current_user.user_id %}
         <section class="mt-5 text-center" id="profile_editing_section">
             <h4 class="text-white mb-3">Edit Profile </h4>
 
@@ -94,5 +95,7 @@
             </form>
             
         </section>
+        {% endif %}
+        
     </section>
 {% endblock %}

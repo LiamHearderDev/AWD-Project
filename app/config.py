@@ -28,3 +28,6 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False # disable CSRF in tests so you can post forms without a token
     SECRET_KEY = 'test-secret-key'
 
+    MAIL_SUPPRESS_SEND = True
+    MAIL_DEFAULT_SENDER = 'sender@gmail.com'
+
