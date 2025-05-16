@@ -36,6 +36,17 @@ Backend:
 - SQLite for storing user data, game results, etc.
 
 
+# Running Unit & Selenium Tests
+- run unit tests via
+```bash
+python -m unittest discover -v -s tests/unit
+```
+- run selenium tests via
+```bash
+python -m unittest discover -v -s tests/system
+```
+
+
 # How to run
 
 ## Prerequisites
