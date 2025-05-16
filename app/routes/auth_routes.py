@@ -12,6 +12,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
 
+    # If the user is already logged in, then we send them back to the home page.
     if current_user.is_authenticated:
         return redirect(url_for('intro.intro'))
     
@@ -35,12 +36,16 @@ def login():
     if user is None or not user.check_password(form.password.data):
         flash('Invalid username or password.')
         return render_template('auth/login.html', form=form)
-    
+
     # If the username was found, and the password correct, we log them in.
     login_user(user, remember=form.remember_me.data)
-    if session["next"]:
-        return redirect(session["next"])
-    return redirect(url_for('intro.intro'))
+
+    # Now, we check if the user was trying to go somewhere, before being redirected here.
+    # Gets and pops the "next" value from the session, so that it does not persist after handling it.
+    next_page = session.pop("next", None)
+
+    # Go to the next page, or if there is no next page, go to the home page
+    return redirect(next_page or url_for('intro.intro'))
 
     
     
