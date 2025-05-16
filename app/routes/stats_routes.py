@@ -240,6 +240,9 @@ def stats():
 
     # Render template with dynamic data
     return render_template('stats/stats.html',
+        
+        # Name of the user that this stats sheet applies to.
+        username            = current_user.username,
                            
         # Table data
         today_table         = format_data(stats_today, "table"),
