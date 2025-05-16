@@ -9,14 +9,6 @@ class Config:
     # Allows users to be redirected to where they were originally going, after being asked to first log in
     USE_SESSION_FOR_NEXT = True
 
-    # Flask-Mail settings:
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', '1']
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-
 class ProductionConfig(Config):
     # Use in real deployment. Reads DATABASE_URL from env or falls back to file
     SQLALCHEMY_DATABASE_URI = (
@@ -30,7 +22,4 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:' # makes it so that database stored in memory, not on disk
     WTF_CSRF_ENABLED = False # disable CSRF in tests so you can post forms without a token
     SECRET_KEY = 'test-secret-key'
-
-    MAIL_SUPPRESS_SEND = True
-    MAIL_DEFAULT_SENDER = 'sender@gmail.com'
 

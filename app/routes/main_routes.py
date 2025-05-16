@@ -5,8 +5,6 @@ from app.models import User, TypingResult, Friendship
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc
 from app.forms import UpdateProfileForm
-from flask_mail import Message
-from app.extensions import mail
 
 main_bp = Blueprint('main', __name__)
 
@@ -28,14 +26,6 @@ def profile(user_id):
     # 2) compute exactly the same stats, but for `user.user_id` instead of current_user
     uid = user.user_id
 
-    # NEED:
-    """
-    WPM,
-    Friend count,
-    Account age,
-    Rank
-    """
-
     wpm             : int = 0
     friends_count   : int = 0
     account_age     : str = ""
@@ -46,7 +36,7 @@ def profile(user_id):
     ##### Calculate Average WPM #####
 
     # This will query every TypingResult, getting only this user's, then average them all out.
-    wpm = db.session.query(func.avg(TypingResult.wpm)).filter(TypingResult.user_id == uid).scalar()
+    wpm = db.session.query(func.avg(TypingResult.wpm)).filter(TypingResult.user_id == uid).scalar() or 0
 
     ##### Calculate Friends Count #####
 
@@ -79,26 +69,22 @@ def profile(user_id):
     max_rank = db.session.query(func.count(User.user_id)).scalar()
 
     form = UpdateProfileForm()
+
+    # Check for form validation
     if form.validate_on_submit():
         if form.username.data:
-            existing_user = User.query.filter_by(username=form.username.data).first()
+            existing_user: User = User.query.filter_by(username=form.username.data).first()
             if existing_user and existing_user.user_id != current_user.user_id:
-                flash('Username already exists. Please choose a different one!')
-                return render_template('profile/update.html', form=form)
+                flash('Username already exists. Please choose a different one!', "error")
+                return render_template('profile/profile.html', form=form)
+            
             current_user.username = form.username.data
 
         if form.password.data:
-            current_user.password = form.password.data
+            current_user.set_password(form.password.data)
         
         db.session.commit()
-        msg = Message(
-            subject='Your SpeedLogger profile has been updated',
-            recipients=[current_user.email],
-            body=f"Hello {current_user.username},\n\nYour profile has been updated successfully.\n\nIf you did not make this change, please contact support."
-        )
-        mail.send(msg)
-        flash('Your profile has been updated successfully!')
-        return redirect(url_for('main.profile'))
+        flash('Your profile has been updated successfully!', "success")
     
     return render_template('main/profile.html', 
         user            =   user,
