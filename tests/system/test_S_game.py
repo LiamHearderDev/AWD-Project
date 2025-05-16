@@ -41,7 +41,7 @@ class TestLogin(BaseSeleniumTests):
             db.session.commit()
             return new_paragraph
 
-    def test_play(self):
+    def test_play(self): # plays one instance of the game while not logged in
         
         text = 'beans on toast'
 
@@ -49,12 +49,65 @@ class TestLogin(BaseSeleniumTests):
 
         self.driver.get(f'{self.base_url}/') # go to home
         self.click_and_assert('Base_Game', '/game', 'Game_ID') # click to game page
-        
         self.driver.find_element(By.ID, 'startButton').click() # start game
         gameText = self.driver.find_element(By.ID, 'gameElement')
         gameText.send_keys(text) # type paragraph
+        
+        # check if game finished
+        restart = self.wait.until(EC.visibility_of_element_located((By.ID, "restartButtons")))
+        self.assertTrue(restart.is_displayed())
 
-        self.wait.until(EC.presence_of_element_located((By.ID, 'proof_game_finished'))) # check if results displayed
+    def test_stats_update(self): # checks if playing the game dynamically changes stats and leaderboard
+        
+        text = 'beans on toast'
+        self.add_paragraph(body=text, type='normal') # add paragraph to database
+
+        # register
+        self.driver.get(f'{self.base_url}/register')
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Register_ID')))
+        self.driver.find_element(By.ID, 'register_username').send_keys('selenium_user')
+        self.driver.find_element(By.ID, 'register_email').send_keys('sel@gmail.com')
+        self.driver.find_element(By.ID, 'register_password').send_keys('Password123')
+        self.driver.find_element(By.ID, 'register_password2').send_keys('Password123')
+        self.driver.find_element(By.ID, 'register_submit').click()
+
+        # login
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Login_ID')))
+        self.driver.find_element(By.ID, 'login_input_username').send_keys('selenium_user')
+        self.driver.find_element(By.ID, 'login_input_password').send_keys('Password123')
+        self.driver.find_element(By.ID, 'login_input_submit').click()
+
+        # ensure we're logged in
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Base_Profile')))
+        self.wait.until(EC.presence_of_element_located((By.ID, 'Base_Logout')))
+
+        # check value of total attempts in stats
+        self.driver.get(f'{self.base_url}/stats')
+        tbody = self.driver.find_element(By.ID, "table_1_body_ID")
+        first_row = tbody.find_elements(By.TAG_NAME, "tr")[0] # first row
+        cells = first_row.find_elements(By.TAG_NAME, "td") # get all elements of first row
+        total_attempts_1 = cells[1].text # get total attempts from all table, 2nd column of first row
+
+        # play the game
+        self.driver.get(f'{self.base_url}/') # go to home
+        self.click_and_assert('Base_Game', '/game', 'Game_ID') # click to game page
+        self.driver.find_element(By.ID, 'startButton').click() # start game
+        gameText = self.driver.find_element(By.ID, 'gameElement')
+        self.wait.until(EC.element_to_be_clickable((By.ID, 'gameElement')))
+        gameText.send_keys(text) # type paragraph
+        # check if game finished
+        restart = self.wait.until(EC.visibility_of_element_located((By.ID, "restartButtons")))
+        self.assertTrue(restart.is_displayed())
+
+        # make sure stats is updated
+        self.driver.get(f'{self.base_url}/stats')
+        tbody = self.driver.find_element(By.ID, "table_1_body_ID")
+        first_row = tbody.find_elements(By.TAG_NAME, "tr")[0] # first row
+        cells = first_row.find_elements(By.TAG_NAME, "td") # get all elements of first row
+        total_attempts_2 = cells[1].text # get total attempts from all table, 2nd column of first row
+
+        self.assertNotEqual(total_attempts_1, total_attempts_2, f"expected total attempts to change, but both are [{total_attempts_1}]")
+
 
 
 

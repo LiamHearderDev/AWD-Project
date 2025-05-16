@@ -5,7 +5,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Optional, Length
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -40,9 +40,9 @@ class LoginForm(FlaskForm):
     The form uses Flask-WTF for CSRF protection and WTForms for validation. """
 
     # Fields
-    username    = StringField('Username',                   validators=[DataRequired(), validate_datatype(str, True)])
-    password    = PasswordField('Password',                 validators=[DataRequired(), validate_datatype(str, True)])
-    remember_me = BooleanField('Remember Me', default=False,validators=[validate_datatype(bool)])
+    username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
+    password    = PasswordField('Password', validators=[DataRequired(), validate_datatype(str, True)])
+    remember_me = BooleanField('Remember Me', default=False, validators=[validate_datatype(bool)])
     submit      = SubmitField('Sign In')
 
 
@@ -74,3 +74,18 @@ class FriendRequestForm(FlaskForm): # Using user id
     # Fields
     username    = StringField('Username', validators=[DataRequired(), validate_datatype(str, True)])
     submit      = SubmitField('Send Request')
+
+
+class UpdateProfileForm(FlaskForm):
+    """Form for updating user profile. Contains fields for username, email, and password."""
+    username = StringField('Username', validators=[
+        Optional(),  
+        Length(min=1, message="Username must not be empty.")
+    ])
+    password = PasswordField('Password', validators=[
+        Optional(),  
+        Length(min=1, message="Password must not be empty."),
+        EqualTo('confirm_password', message="Passwords must match.")
+    ])
+    confirm_password = PasswordField('Confirm Password', validators=[Optional()])
+    submit = SubmitField('Update Profile')

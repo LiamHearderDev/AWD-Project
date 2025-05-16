@@ -1,5 +1,6 @@
 body {
     background-image: url('/static/img/purple_background.jpg');
+    backdrop-filter: blur(0.5px);
 }
 
 .blur_section {

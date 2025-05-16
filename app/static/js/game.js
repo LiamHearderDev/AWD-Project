@@ -4,28 +4,38 @@ const gameId = 'gameElement';
 const resultId = 'resultElement';
 const timerId = 'timerElement';
 const buttonId = 'startButton';
+const restartButtonsId = 'restartButtons'
 const gameContainerId = 'gameContainer';
 
+
+/** This is the CSRF token, taken from the header element. */
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // get csrf token from header
 $.ajaxSetup({ // makes so that all future AJAX communications to server add CSRF automatically
     headers: { 'X-CSRFToken': csrfToken }
 });
 
-function statistic(description, value) { // constructor for statistics
+/**
+ * A constructor for statistics
+ * @param {*} description   The description value of what this statistic means.
+ * @param {*} value         The actual value of the statistic.
+ */
+function statistic(description, value) { 
     this.description = description;
     this.value = value;
 
-    this.toJSON = function() { // turn to JSON for sending data to server
+    // turn to JSON for sending data to server
+    this.toJSON = function() { 
         return {
             description: this.description,
             value: this.value
         };
     };
 
-    this.toString = function() { // turn to string for displaying data
+    // turn to string for displaying data
+    this.toString = function() { 
         if (this.value && typeof this.value === 'object' && !Array.isArray(this.value)) { // for dictionary like objects
             const formatted = Object.entries(this.value)
-                .map(([k, v]) => `${k}: ${v}`)
+                .map(([key, val]) => `${key}: ${val}`)
                 .join(', ');
             return `${this.description}: ${formatted}`;
         }
@@ -34,29 +44,55 @@ function statistic(description, value) { // constructor for statistics
 }
 
 
-function updateTimerDisplay(timerId, startTime) { // function to update timer display, is used in setInterval
+
+/**
+ * This is a function to update the timer display, is used in setInterval().
+ * @param {*} timerId       The ID property of the timer element in HTML.
+ * @param {*} startTime     The time which will be used in the calculation. Typically, will simply be `date.now()`.
+ */
+function updateTimerDisplay(timerId, startTime) {
     const elapsed = (Date.now() - startTime) / 1000;
     $('#'+timerId).text(elapsed.toFixed(2) + ' s');
 }
 
-function callGame() {
-    $.getJSON('/random-paragraph') // get random paragraph from server
-      .done(para => {
-        $('#' + buttonId).hide();
-        $('#' + gameContainerId).show();
-        setupGame(gameId, resultId, timerId, para.body, para.paragraph_id); // setup game
-      })
-      .fail((status, error) => {
-        console.error('Could not load paragraph:', status, error);
-        //alert('Sorry, could not load a paragraph.');
-        $('#' + buttonId).hide();
-        $('#' + gameContainerId).show();
-        setupGame(gameId, resultId, timerId, placeholder, -1); // pass placeholder if deosn't work
-      });
-  }
 
+
+/**
+ * This is the function bound to the "start game" button. When the button is clicked, this function is called.
+ * This function is primarily used to get a random paragraph from the server, and passing it through, before 
+ * setting up the rest of the game.
+ */
+function callGame() {
+
+    // get random paragraph from server using jQuery AJAX request
+    $.getJSON('/random-paragraph') 
+      .done(para => {                   // This is called when the ajax request is successful
+        $('#' + buttonId).hide();
+        $('#' + restartButtonsId).hide();
+        $('#' + gameContainerId).show();
+
+        // Set up the game
+        setupGame(gameId, resultId, timerId, para.body, para.paragraph_id); 
+      })
+      .fail((status, error) => {        // This is called when the ajax request is unsuccessful
+        console.error('Could not load paragraph:', status, error);
+        $('#' + buttonId).hide();
+        $('#' + restartButtonsId).hide();
+        $('#' + gameContainerId).show();
+        setupGame(gameId, resultId, timerId, placeholder, -1); // pass placeholder paragraph if the server request fails
+      });
+}
+
+
+/**
+ * This function adds words to game element, as retrieved from the server. This function ends by starting the game.
+ * @param {*} elementId     The ID property of the p element that contains the server's paragraph.
+ * @param {*} resultId      The ID property of the p element that contains the results of the game.
+ * @param {*} timerId       The ID property of the p element that contains the game's timer.
+ * @param {*} text          This is a string containing the text the player will need to type, retrieved from the server.
+ * @param {*} paragraphId   This is the database id of the paragraph retrieved from the server.
+ */
 function setupGame(elementId, resultId, timerId, text, paragraphId) {
-    // adds words to game element
 
     const $screen = $('#' + elementId).empty();
     $screen.off('keydown');
@@ -79,8 +115,16 @@ function setupGame(elementId, resultId, timerId, text, paragraphId) {
     startGame(elementId, resultId, timerId, text, paragraphId); // starts game logic
 }
 
+
+/**
+ * This is the function that actually starts the game logic.
+ * @param {*} elementId     The ID property of the p element that contains the server's paragraph.
+ * @param {*} resultId      The ID property of the p element that contains the results of the game.
+ * @param {*} timerId       The ID property of the p element that contains the game's timer.
+ * @param {*} text          This is a string containing the text the player will need to type, retrieved from the server.
+ * @param {*} paragraphId   This is the database id of the paragraph retrieved from the server.
+ */
 function startGame(elementId, resultId, timerId, text, paragraphId) {
-    // starts game logic
 
     let $word = $('#' + elementId).children().eq(0);
     let $letter = $word.children().eq(0);
@@ -88,6 +132,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
     let wordIndex = 0;
     const maxIndex = text.length-1;
     let mistakes = 0;
+    let totalMistakes = 0
 
     let start = true;
     let startTime = 0;
@@ -127,6 +172,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 }
                 if (!$letter.hasClass('wrong-char')) {
                     mistakes += 1; // update mistakes
+                    totalMistakes += 1;
                 }
                 $letter.addClass('wrong-char');
                 // update info on mistake
@@ -136,7 +182,7 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 incrementDict(wrong_word_dict, $word.text());
             }
             if ($letter.next().length === 0) { // signal to move on to next word (no more letters in word)
-                if ($word.next().length === 0 && mistakes === 0) { // end of game if no more words and all correct
+                if ($word.next().length === 0 && mistakes==0) { // end of game if no more words and all correct
                     clearInterval(interval);
                     $('#' + elementId).off('keydown') // turn off keydown event
                     // add statistics
@@ -145,14 +191,15 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                     // stats.push(new statistic('seconds to complete', ((Date.now() - startTime) / 1000))); not needed
                     stats.push(new statistic('words per minute', Math.round((text.split(' ').length / ((Date.now() - startTime) / 60000)))));
                     // stats.push(new statistic('characters per minute', Math.round((text.length / ((Date.now() - startTime) / 60000))))); not needed
-                    stats.push(new statistic('total mistakes', mistakes));
+                    stats.push(new statistic('total mistakes', totalMistakes));
                     // stats.push(new statistic('finished at', new Date().toLocaleTimeString())); not needed
                     stats.push(new statistic('correct characters', getCorrectDicts(char_list, char_check)));
                     stats.push(new statistic('correct words', getCorrectDicts(word_list, word_check)));
                     stats.push(new statistic('wrong characters', wrong_char_dict));
                     stats.push(new statistic('wrong words', wrong_word_dict));
                     stats.push(new statistic('paragraph id', paragraphId));
-                    readResults(resultId, stats);
+                    $('#' + restartButtonsId).show();
+                    // readResults(resultId, stats);
                     if (paragraphId !== -1) { 
                         // send data if valid paragraph
                         // don't worry about being logged in or not, if not logged in server doesn't save data automatically
@@ -196,6 +243,9 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
                 $letter.removeClass('wrong-char');
                 mistakes -= 1; // update mistakes
             }
+            const progress = Math.round((index / maxIndex) * 100);
+            $('#progressBar').val(progress);
+            $('#runner').css('left', `calc(${progress}% - 20px)`);
         }
         console.log("index: " + index);
         console.log("wordIndex: " + wordIndex);
@@ -205,10 +255,17 @@ function startGame(elementId, resultId, timerId, text, paragraphId) {
     });
   }
 
-function readResults(resultId, stats) { // function to display results, dynamically creating HTML list with data in statistics
+
+
+/**
+ * This is a function to display results, dynamically creating HTML list with data in statistics.
+ * @param {*} resultId 
+ * @param {*} stats 
+ */
+function readResults(resultId, stats) { 
     const $result = $('#' + resultId).empty(); // reset results
     $result.show();
-    const $list = $('<ul id="proof_game_finished"></ul>').appendTo($result); // create list
+    const $list = $('<ul></ul>').appendTo($result); // create list
     for (let i = 0; i < stats.length; i++) { // add point for each statistic
         const stat = stats[i];
         $('<li></li>')
@@ -226,12 +283,15 @@ function readResults(resultId, stats) { // function to display results, dynamica
     $('#statsLinkWrapper').show();
 }
 
+
+/**
+ * This is a helper function to get dictionary of correct elements. Getting an element correct means the user never made a mistake on it
+ * @param {Array} element_list      A list of elements (words or characters)
+ * @param {Array} element_check     A list of booleans indicating if the element was correct
+ * @returns {Dictionary}            A dictionary of elements and their correct counts
+ */
 function getCorrectDicts(element_list, element_check) { 
-    // helper function to get dictionary of correct elements
-    // element_list is a list of elements (words or characters)
-    // element_check is a list of booleans indicating if the element was correct
-    // returns a dictionary of elements and their correct counts
-    // getting an element correct means the user never made a mistake on it
+
     let element_dict = {};
     for (let i = 0; i < element_list.length; i++) {
         if (element_check[i]) {
@@ -246,7 +306,14 @@ function getCorrectDicts(element_list, element_check) {
     return element_dict;
 }
 
-function incrementDict(dict, key) { // helper function to increment dictionary values
+
+/**
+ * This is a helper function to increment dictionary values. 
+ * This is primarily used to increase counts in the "wrong_char_dict" dictionary.
+ * @param {*} dict      This is the dictionary that is being accessed and modified.
+ * @param {*} key       This is the key for the value that is being incremented. If `key` does not exist within `dict`, the field will be added and set to 1.
+ */
+function incrementDict(dict, key) { // 
     key = key.toLowerCase().replace(/[.,!?;:'"()]/g, '').trim(); // remove punctuation and trim whitespace
     if (key in dict) {
         dict[key] += 1;
@@ -255,7 +322,12 @@ function incrementDict(dict, key) { // helper function to increment dictionary v
     }
 }
 
-function sendData(statistics) { // send data to server
+
+/**
+ * This is a helper function to send data to server.
+ * @param {*} statistics    This is the payload object that will be sent to the server. It is first turned into a JSON string before being sent, do not expect data types to persist.
+ */
+function sendData(statistics) {
     $.ajax({
         type: 'POST',
         url: '/submit-instance-statistics',

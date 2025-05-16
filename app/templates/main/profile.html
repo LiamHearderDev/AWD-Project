@@ -29,8 +29,13 @@
             <div class="container m-0 mt-5 p-0 d-md-flex d-sm-block align-items-end text-center text-md-left">
                 <span class="m-0 col-3">
                     <p>WPM:</p>
-                    <h4>{{ wpm }}</h4>
-                </span>
+                    <h4>
+                        {% if wpm is not none %}
+                            {{ wpm | round(1) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </h4>
                 <span class="m-0 col-3">
                     <p>Rank:</p>
                     <h4>{{ rank }} / {{ max_rank }}</h4>
@@ -45,5 +50,52 @@
                 </span>
             </div>
         </section>
+
+        <!-- edit username and password -->
+        {% if user.user_id == current_user.user_id %}
+        <section class="mt-5 text-center" id="profile_editing_section">
+            <h4 class="text-white mb-3">Edit Profile </h4>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('main.profile') }}" style="max-width: 400px; margin: auto;">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username.label(class="text-white") }}
+                    {{ form.username(class="form-control", placeholder="Enter new username") }}
+                    {% for error in form.username.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label(class="text-white") }}
+                    {{ form.password(class="form-control", placeholder="Enter new password") }}
+                    {% for error in form.password.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.confirm_password.label(class="text-white") }}
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm new password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+            
+        </section>
+        {% endif %}
+        
     </section>
 {% endblock %}

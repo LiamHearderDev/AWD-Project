@@ -43,7 +43,7 @@ def compute_user_stats(user_id: int | None = None, days: int = None) -> dict:
 
     # Fetch all matching results
     results = query.all()
-    print(f"[DEBUG] Days={days}, Found results: {len(results)}")
+    # print(f"[DEBUG] Days={days}, Found results: {len(results)}")
     if len(results) == 0:
         return {
             "total_attempts": 0,
