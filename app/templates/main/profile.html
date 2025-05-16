@@ -9,93 +9,99 @@
     <!-- purely for Selenium tests -->
     <span id="Profile_ID" hidden></span>
 
-    <section id="profile_main_section" class="justify-content-between d-lg-flex d-md-block">
-        <!-- pfp and username -->
-        <section id="profile_pfp_name" class="d-sm-flex align-items-sm-center justify-content-center justify-content-md-left m-0" style="display: grid">
-            <!-- pfp -->
-            <border id="pfp_border" class="mr-sm-4 m-0 bg-3 d-inline-block text-center align-center text-white">
-                <h1 id="pfp_text" style="min-width: 100px; min-height: 100px; line-height: 100px; margin: auto;">?</h1>
-            </border>
+    <section id="profile_main_section" class="container">
+        <div class="row gx-lg-4 justify-content-lg-between align-items-lg-center">
+            <div class="col-12 col-lg-8">
+                <!-- pfp and username -->
+                <section id="profile_pfp_name" class="d-flex flex-column align-items-center align-items-lg-start m-0">
+                    <!-- pfp -->
+                    <border id="pfp_border" class="m-0 bg-3 d-inline-block text-center align-center text-white">
+                        <h1 id="pfp_text" style="min-width: 100px; min-height: 100px; line-height: 100px; margin: auto;">?</h1>
+                    </border>
 
-            <!-- Username -->
-            <div class="d-block mr-sm-4 m-0 text-center text-md-left">
-                <h3 id="username">{{ user.username }}</h3>
+                    <!-- Username -->
+                    <div class="d-block m-0 text-center">
+                        <h3 id="username">{{ user.username }}</h3>
+                    </div>
+                </section>
+                
+
+                <!-- Profile Stats -->
+                <section id="stats">
+                    <div id="stats-inline" class="m-0 mt-5 p-0">
+                        <span class="stat">
+                            <p>WPM:</p>
+                            <h4>
+                                {% if wpm is not none %}
+                                    {{ wpm | round(1) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h4>
+                        </span>
+                        <span class="stat">
+                            <p>Rank:</p>
+                            <h4>{{ rank }} / {{ max_rank }}</h4>
+                        </span>
+                        <span class="stat">
+                            <p>Friends:</p>
+                            <h4>{{ friends_count }}</h4>
+                        </span>
+                        <span class="stat">
+                            <p>Account Age:</p>
+                            <h4>{{ account_age }}</h4>
+                        </span>
+                    </div>
+                </section>
             </div>
-        </section>
-        
-
-        <!-- Profile Stats -->
-        <section id="stats">
-            <div class="container m-0 mt-5 p-0 d-md-flex d-sm-block align-items-end text-center text-md-left">
-                <span class="m-0 col-3">
-                    <p>WPM:</p>
-                    <h4>
-                        {% if wpm is not none %}
-                            {{ wpm | round(1) }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </h4>
-                <span class="m-0 col-3">
-                    <p>Rank:</p>
-                    <h4>{{ rank }} / {{ max_rank }}</h4>
-                </span>
-                <span class="m-0 col-3">
-                    <p>Friends:</p>
-                    <h4>{{ friends_count }}</h4>
-                </span>
-                <span class="m-0 col-4">
-                    <p>Account Age:</p>
-                    <h4>{{ account_age }}</h4>
-                </span>
-            </div>
-        </section>
-
-        <!-- edit username and password -->
-        {% if user.user_id == current_user.user_id %}
-        <section class="mt-5 text-center" id="profile_editing_section">
-            <h4 class="text-white mb-3">Edit Profile </h4>
-
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }} text-center" role="alert">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <form method="POST" action="{{ url_for('main.profile') }}" style="max-width: 400px; margin: auto;">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.username.label(class="text-white") }}
-                    {{ form.username(class="form-control", placeholder="Enter new username") }}
-                    {% for error in form.username.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                </div>
-                <div class="form-group">
-                    {{ form.password.label(class="text-white") }}
-                    {{ form.password(class="form-control", placeholder="Enter new password") }}
-                    {% for error in form.password.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                </div>
-                <div class="form-group">
-                    {{ form.confirm_password.label(class="text-white") }}
-                    {{ form.confirm_password(class="form-control", placeholder="Confirm new password") }}
-                    {% for error in form.confirm_password.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                </div>
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-primary") }}
-                </div>
-            </form>
             
-        </section>
-        {% endif %}
-        
+            <!-- edit username and password -->
+            {% if user.user_id == current_user.user_id %}
+            <div class="col-12 col-lg-4">
+                <section class="mt-5 text-center" id="profile_editing_section">
+                    <h4 class="text-white mb-3">Edit Profile </h4>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} text-center" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('main.profile') }}" style="max-width: 400px; margin: auto;">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            {{ form.username.label(class="text-white") }}
+                            {{ form.username(class="form-control", placeholder="Enter new username") }}
+                            {% for error in form.username.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password.label(class="text-white") }}
+                            {{ form.password(class="form-control", placeholder="Enter new password") }}
+                            {% for error in form.password.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.confirm_password.label(class="text-white") }}
+                            {{ form.confirm_password(class="form-control", placeholder="Confirm new password") }}
+                            {% for error in form.confirm_password.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                    
+                </section>
+            </div>
+            {% endif %}
+        </div>
     </section>
 {% endblock %}
