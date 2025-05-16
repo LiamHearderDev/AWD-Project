@@ -11,13 +11,13 @@
   <!-- purely for Selenium tests -->
   <span id="Stats_ID" hidden></span>
   <h1>Statistics</h1>
-  <div class="user-id">User: {{ current_user.username }}</div>
+  <div id='user_ID' class="user-id">User: {{ username }}</div>
 
   <div class="filter-buttons">
-    <button class="bg-0" onclick="showTable('1')"    id="filter-button-1">Today</button>
-    <button class="bg-0" onclick="showTable('7')"    id="filter-button-7">Last 7 Days</button>
-    <button class="bg-0" onclick="showTable('28')"   id="filter-button-28">Last 28 Days</button>
-    <button class="bg-0" onclick="showTable('all')"  id="filter-button-all">All</button>
+    <button class="bg-3" onclick="showTable('1')"    id="filter-button-1">Today</button>
+    <button class="bg-3" onclick="showTable('7')"    id="filter-button-7">Last 7 Days</button>
+    <button class="bg-3" onclick="showTable('28')"   id="filter-button-28">Last 28 Days</button>
+    <button class="bg-3" onclick="showTable('all')"  id="filter-button-all">All</button>
   </div>
 
   <div class="table-section grid-2col" id="tableContainer">
@@ -219,11 +219,5 @@
     </table>
       </div>
     </div>
-  </div>
-
-  <div class="nav-buttons">
-    <button type="button" id="generateReportBtn" class="green-button">
-      Generate a report to share with your friends
-    </button>
   </div>
 {% endblock %}

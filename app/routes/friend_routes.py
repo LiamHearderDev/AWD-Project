@@ -181,7 +181,7 @@ def view_friend_stats(friend_username: str):
         (current_user.user_id, friend.user_id)
     )
     if relation is None:
-        abort(404)
+        abort(403)
     if relation.is_requested:
         abort(403)
         
@@ -192,17 +192,49 @@ def view_friend_stats(friend_username: str):
     stats_28days = compute_user_stats(friend.user_id, days=28)
     stats_all    = compute_user_stats(friend.user_id, days=None)
 
-    return render_template(
-        'friends/friends_stats.html',
-        username=friend.username,
-        today_table=format_data(stats_today, 'table'),
-        last7_table=format_data(stats_7days, 'table'),
-        last28_table=format_data(stats_28days, 'table'),
-        alltime_table=format_data(stats_all, 'table'),
-        today_chart=format_data(stats_today, 'chart'),
-        last7_chart=format_data(stats_7days, 'chart'),
-        last28_chart=format_data(stats_28days, 'chart'),
-        alltime_chart=format_data(stats_all, 'chart')
+    # Render template with dynamic data
+    return render_template('stats/stats.html',
+                           
+        # Name of the user that this stats sheet applies to.
+        username            = friend_username,
+                           
+        # Table data
+        today_table         = format_data(stats_today, "table"),
+        last7days_table     = format_data(stats_7days, "table"),
+        last28days_table    = format_data(stats_28days,"table"),
+        alltime_table       = format_data(stats_all,   "table"),
+
+        # Chart data
+        today_chart         = format_data(stats_today, "chart"),
+        last7days_chart     = format_data(stats_7days, "chart"),
+        last28days_chart    = format_data(stats_28days,"chart"),
+        alltime_chart       = format_data(stats_all,   "chart"),
+
+        # Words leaderboard data
+        # Mistake word leaderboard data
+        today_mistake_labels     = stats_today["most_incorrect_words_labels"],
+        today_mistake_counts     = stats_today["most_incorrect_words_counts"],
+        last7days_mistake_labels = stats_7days["most_incorrect_words_labels"],
+        last7days_mistake_counts = stats_7days["most_incorrect_words_counts"],
+        last28days_mistake_labels = stats_28days["most_incorrect_words_labels"],
+        last28days_mistake_counts = stats_28days["most_incorrect_words_counts"],
+        alltime_mistake_labels   = stats_all["most_incorrect_words_labels"],
+        alltime_mistake_counts   = stats_all["most_incorrect_words_counts"],
+
+        # Correct word leaderboard data
+        today_correct_labels     = stats_today["most_correct_words_labels"],
+        today_correct_counts     = stats_today["most_correct_words_counts"],
+        last7days_correct_labels = stats_7days["most_correct_words_labels"],
+        last7days_correct_counts = stats_7days["most_correct_words_counts"],
+        last28days_correct_labels = stats_28days["most_correct_words_labels"],
+        last28days_correct_counts = stats_28days["most_correct_words_counts"],
+        alltime_correct_labels   = stats_all["most_correct_words_labels"],
+        alltime_correct_counts   = stats_all["most_correct_words_counts"],
+
+        today_paragraph_stats = stats_today["paragraph_stats"],
+        last7days_paragraph_stats = stats_7days["paragraph_stats"],
+        last28days_paragraph_stats = stats_28days["paragraph_stats"],
+        alltime_paragraph_stats = stats_all["paragraph_stats"],
     )
 
 @friends_bp.route('/friends/remove/<int:friend_id>', methods=['GET','POST'])
