@@ -52,7 +52,10 @@ class TestLogin(BaseSeleniumTests):
         self.driver.find_element(By.ID, 'startButton').click() # start game
         gameText = self.driver.find_element(By.ID, 'gameElement')
         gameText.send_keys(text) # type paragraph
-        self.wait.until(EC.presence_of_element_located((By.ID, 'proof_game_finished'))) # check if results displayed
+        
+        # check if game finished
+        restart = self.wait.until(EC.visibility_of_element_located((By.ID, "restartButtons")))
+        self.assertTrue(restart.is_displayed())
 
     def test_stats_update(self): # checks if playing the game dynamically changes stats and leaderboard
         
@@ -92,7 +95,9 @@ class TestLogin(BaseSeleniumTests):
         gameText = self.driver.find_element(By.ID, 'gameElement')
         self.wait.until(EC.element_to_be_clickable((By.ID, 'gameElement')))
         gameText.send_keys(text) # type paragraph
-        self.wait.until(EC.presence_of_element_located((By.ID, 'proof_game_finished'))) # check if results displayed
+        # check if game finished
+        restart = self.wait.until(EC.visibility_of_element_located((By.ID, "restartButtons")))
+        self.assertTrue(restart.is_displayed())
 
         # make sure stats is updated
         self.driver.get(f'{self.base_url}/stats')
