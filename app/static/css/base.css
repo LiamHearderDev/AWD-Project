@@ -4,10 +4,10 @@
     --base-colour-2: #4717F6;
     --base-colour-3: #A239CA;
 
-    --base-colour-0-hover: #2f9d62; /*  10%  darker  */
-    --base-colour-1-hover: #2c543e; /*  8%   lighter */
-    --base-colour-2-hover: #e1b36b; /*  10%  darker  */
-    --base-colour-3-hover: #676566; /*  10%  darker  */
+    --base-colour-0-hover: #d5c7c3; /*  10%  darker  */
+    --base-colour-1-hover: #032549; /*  10%  lighter */
+    --base-colour-2-hover: #3007c5; /*  13%  darker  */
+    --base-colour-3-hover: #802ba1; /*  11%  darker  */
 
 }
 

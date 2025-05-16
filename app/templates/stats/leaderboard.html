@@ -50,7 +50,7 @@
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${username}</td>
-                    <td>${data.wpm[index]}</td>
+                    <td>${parseFloat(data.wpm[index]).toFixed(0)}</td>
                 `;
                 leaderboardBody.appendChild(row);
             }

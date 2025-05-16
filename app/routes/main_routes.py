@@ -1,9 +1,12 @@
 from app import db
-from flask import render_template, Blueprint
+from flask import render_template, Blueprint, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models import User, TypingResult, Friendship
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc
+from app.forms import UpdateProfileForm
+from flask_mail import Message
+from app.extensions import mail
 
 main_bp = Blueprint('main', __name__)
 
@@ -12,8 +15,8 @@ def dashboard():
     # Handle main logic here
     return render_template('main/dashboard.html')
 
-@main_bp.route('/profile', defaults={'user_id': None}, methods=['GET']) #give it a default user_id
-@main_bp.route('/profile/<int:user_id>', methods=['GET'])
+@main_bp.route('/profile', defaults={'user_id': None}, methods=['GET','POST']) #give it a default user_id
+@main_bp.route('/profile/<int:user_id>', methods=['GET','POST'])
 @login_required
 def profile(user_id):
     # 1) look up the user (404 if missing)
@@ -75,11 +78,34 @@ def profile(user_id):
     rank = db.session.query(leaderboard_query.c.rank).filter(leaderboard_query.c.user_id == uid).scalar()
     max_rank = db.session.query(func.count(User.user_id)).scalar()
 
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        if form.username.data:
+            existing_user = User.query.filter_by(username=form.username.data).first()
+            if existing_user and existing_user.user_id != current_user.user_id:
+                flash('Username already exists. Please choose a different one!')
+                return render_template('profile/update.html', form=form)
+            current_user.username = form.username.data
+
+        if form.password.data:
+            current_user.password = form.password.data
+        
+        db.session.commit()
+        msg = Message(
+            subject='Your SpeedLogger profile has been updated',
+            recipients=[current_user.email],
+            body=f"Hello {current_user.username},\n\nYour profile has been updated successfully.\n\nIf you did not make this change, please contact support."
+        )
+        mail.send(msg)
+        flash('Your profile has been updated successfully!')
+        return redirect(url_for('main.profile'))
+    
     return render_template('main/profile.html', 
         user            =   user,
         wpm             =   wpm, 
         friends_count   =   friends_count, 
         account_age     =   account_age, 
         rank            =   rank, 
-        max_rank        =   max_rank
+        max_rank        =   max_rank,
+        form            =   form
     )

@@ -1,8 +1,7 @@
 from flask import Flask, render_template
 from app.config import Config, ProductionConfig
-from app.extensions import db, migrate, login, csrf
+from app.extensions import db, migrate, login, csrf, mail
 from dotenv import load_dotenv
-
 def create_app(config_class=ProductionConfig):
 
     # Loads configuration variables from the environment
@@ -15,6 +14,8 @@ def create_app(config_class=ProductionConfig):
     migrate.init_app(application, db)
     login.init_app(application)
     csrf.init_app(application)
+
+    mail.init_app(application)
 
     # Imports every route from their respective files
     from app.routes.auth_routes import auth_bp
